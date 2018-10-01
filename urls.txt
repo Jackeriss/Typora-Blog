@@ -1,1 +1,0 @@
-https://www.jackeiss.com/p/使用py2exe打包Python程序

@@ -1,0 +1,18 @@
+{
+  "name": "typora",
+  "version": "1.0.0",
+  "devDependencies": {
+    "del": "latest",
+    "pump": "latest",
+    "gulp": "latest",
+    "gulp-clean-css": "latest",
+    "gulp-rev": "latest",
+    "gulp-rev-collector": "latest",
+    "gulp-terser": "latest",
+    "gulp-image": "latest"
+  },
+  "dependencies": {
+    "es6-promise": "^4.2.5",
+    "isomorphic-fetch": "^2.2.1"
+  }
+}

@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="{% block description %}Hi, I'm Jackeriss, a Python developer. This blog is written in python using Typora-Blog.{% end %}">
+    <meta name="keywords" content="Jackeriss">
+    <title>{% block title %}Jackeriss{% end %}</title>
+    <link rel="stylesheet" href="https://cdnjs.loli.net/ajax/libs/gitalk/1.4.0/gitalk.min.css">
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="apple-touch-icon-precomposed" sizes="144x144" href="/image/logo.png">
+    <link rel="shortcut icon" href="/image/logo.png">
+    {% block head %}{% end %}
+  </head>
+  <body>
+    <header>
+      <div class="container clearfix">
+        <div class="logo left">
+          <a href="/" title="Jackeriss">
+            <img src="/image/logo.png" alt="Jackeriss" height="46">
+          </a>
+        </div>
+        <div class="search left">
+        </div>
+        <div class="nav nav-user right">
+          <ul>
+            <li><a href="/achive">归档</a></li>
+            <li><a href="/product">项目</a></li>
+            <li><a href="/link">友链</a></li>
+            <li><a href="/about">关于</a></li>
+          </ul>
+        </div>
+      </div>
+    </header>
+    <div class="container">
+      <div class="main-body">
+      {% block section %}{% end %}
+      <div class="go-top dn" id="go-top">
+        <a href="javascript:;" class="go iconfont">&#xe7d9;</a>
+      </div>
+      </div>
+    </div>
+    <footer>
+      <div class="container">
+        <p class="foot dn">
+          © 2018 <a href="/">Jackeriss</a> Powered by <a href="https://github.com/Jackeriss/Typora-Blog" target="_blank">Typora-Blog</a><a href="http://www.miitbeian.gov.cn/" target="_blank"></a>
+        </p>
+      </div>
+    </footer>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.1/moment.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.1/locale/zh-cn.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://cdnjs.loli.net/ajax/libs/gitalk/1.4.0/gitalk.min.css"></script>
+    <script src="/js/index.js"></script>
+    <script>
+      // baidu_tongji
+      var _hmt = _hmt || [];
+      (function() {
+        var hm = document.createElement("script");
+        hm.src = "https://hm.baidu.com/hm.js?149fb738632dca1810448c19ec56d8e0";
+        var s = document.getElementsByTagName("script")[0];
+        s.parentNode.insertBefore(hm, s);
+      })();
+      // baidu_spider
+      (function(){
+        var bp = document.createElement('script');
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+        var s = document.getElementsByTagName("script")[0];
+        s.parentNode.insertBefore(bp, s);
+      })();
+    </script>
+    {% block script %}{% end %}
+  </body>
+</html>

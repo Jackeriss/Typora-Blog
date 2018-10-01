@@ -1,0 +1,18 @@
+{% extends base.html %}
+{% block section %}
+<div class="postBlank dn">
+  <p>暂时还没有文章</p>
+</div>
+<input type="hidden" class="totalPage" value="{{ page_num }}"/>
+{% for i in range(page_num) %}
+<div class="pageBlock dn" id="page{{ i + 1 }}"></div>
+{% end %}
+<div class="loading">
+  <div class="spinner">
+    <div class="loader-inner ball-clip-rotate-multiple">
+      <div></div>
+      <div></div>
+    </div>
+  </div>
+</div>
+{% end %}

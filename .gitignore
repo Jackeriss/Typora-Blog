@@ -1,8 +1,11 @@
 .DS_Store
-*.log
 *.pyc
 venv/
 __pycache__/
-app/template/post/*.html
-urls.txt
 .vscode/
+dist/
+rev/
+yarn.lock
+*.log
+node_modules/
+src/template/post/*.html
