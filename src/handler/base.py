@@ -25,5 +25,5 @@ class PageNotFoundHandler(BaseHandler):
 class DeployHandler(BaseHandler):
     def post(self):
         subprocess.call(['git', 'pull'])
+        self.write('pull succuss, restarting...')
         subprocess.call(['supervisorctl', 'restart', 'Typora:'])
-        self.finish('1')
