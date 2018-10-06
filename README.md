@@ -14,7 +14,7 @@ Typora-Blog is a simple but special blog program, Its biggest characteristic is 
 
 ## Usage
 ### Deploy
-GitHub provides an api for Webhooks, you can use it for automatic deployment.
+GitHub provides a Webhooks, you can use it for automatic deployment.
 
 ### Customization
 1. This blog program does not provide blog name, logo and other configurations in `/config.py`, please directly modify the template file `/app/templates/base.html`, if want to change the appearance of the blog, please edit `/app/static/CSS/style.css`.

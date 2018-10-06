@@ -13,7 +13,7 @@ ROUTE = [
     (r'/about', post.AboutHandler),
     (r'/((js|css|image)/.*)', web.StaticFileHandler, dict(path=Config.SETTING['static_path'])),
     (r'/(.*\.(txt|html))', web.StaticFileHandler, dict(path=Config.SETTING['static_path'])),
-    (r'.*', base.PageNotFoundHandler),
     (r'/deploy', base.DeployHandler),
+    (r'.*', base.PageNotFoundHandler),
 ]
 

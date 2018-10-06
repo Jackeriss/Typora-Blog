@@ -25,3 +25,4 @@ class PageNotFoundHandler(BaseHandler):
 class DeployHandler(BaseHandler):
     def post(self):
         logging.debug(self.request.body)
+        self.finish('1')

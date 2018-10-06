@@ -63,4 +63,3 @@ if __name__ == '__main__':
     POSTS = html2template()
     for p in POSTS:
         print(p['id'])
-
