@@ -1,5 +1,5 @@
 import os
-import logging
+import subprocess
 
 from tornado import web
 
@@ -24,5 +24,6 @@ class PageNotFoundHandler(BaseHandler):
 
 class DeployHandler(BaseHandler):
     def post(self):
-        logging.debug(self.request.body)
+        subprocess.call(['git', 'pull'])
+        subprocess.call(['supervisorctl', 'restart', 'Typora:'])
         self.finish('1')
