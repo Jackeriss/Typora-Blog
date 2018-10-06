@@ -5,6 +5,7 @@ from src.config import Config
 
 ROUTE = [
     (r'/', post.IndexHandler),
+    (r'/deploy', post.DeployHandler),
     (r'/postlist', post.PostListHandler),
     (r'/p/(.*)', post.PostHandler),
     (r'/achive', post.AchiveHandler),

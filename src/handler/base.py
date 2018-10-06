@@ -1,4 +1,5 @@
 import os
+import logging
 
 from tornado import web
 
@@ -19,3 +20,8 @@ class BaseHandler(web.RequestHandler):
 class PageNotFoundHandler(BaseHandler):
     def get(self):
         self.write_error(404)
+
+
+class DeployHandler(BaseHandler):
+    def post(self):
+        logging.debug(self.request.body)
