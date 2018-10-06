@@ -5,7 +5,6 @@ from src.config import Config
 
 ROUTE = [
     (r'/', post.IndexHandler),
-    (r'/deploy', post.DeployHandler),
     (r'/postlist', post.PostListHandler),
     (r'/p/(.*)', post.PostHandler),
     (r'/achive', post.AchiveHandler),
@@ -14,6 +13,7 @@ ROUTE = [
     (r'/about', post.AboutHandler),
     (r'/((js|css|image)/.*)', web.StaticFileHandler, dict(path=Config.SETTING['static_path'])),
     (r'/(.*\.(txt|html))', web.StaticFileHandler, dict(path=Config.SETTING['static_path'])),
-    (r'.*', base.PageNotFoundHandler)
+    (r'.*', base.PageNotFoundHandler),
+    (r'/deploy', base.DeployHandler),
 ]
 
