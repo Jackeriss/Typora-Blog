@@ -20,10 +20,3 @@ class BaseHandler(web.RequestHandler):
 class PageNotFoundHandler(BaseHandler):
     def get(self):
         self.write_error(404)
-
-
-class DeployHandler(BaseHandler):
-    def post(self):
-        self.write('ready to pull and restart...')
-        subprocess.call(['git', 'pull'])
-        subprocess.call(['supervisorctl', 'restart', 'Typora:'])
