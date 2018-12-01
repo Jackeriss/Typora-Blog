@@ -1,8 +1,8 @@
 import json
 import copy
+import logging
 
 from src.util.html2template import html2template
-from src.service.log import logger
 from src.config import Config
 
 class Cache:

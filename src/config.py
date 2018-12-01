@@ -6,12 +6,12 @@ ROOT_PATH = os.path.dirname(__file__)
 
 class BaseConfig:
     ROOT_PATH = ROOT_PATH
-    LOG_LEVEL = logging.INFO
     PAGE_LIMIT = 5
 
 
 class DevConfig(BaseConfig):
     ENV = 'dev'
+    LOG_LEVEL = logging.DEBUG
     SETTING = {
         'template_path': os.path.join(ROOT_PATH, 'template'),
         'static_path': os.path.join(ROOT_PATH, 'static'),
@@ -23,6 +23,7 @@ class DevConfig(BaseConfig):
 
 class ProdConfig(BaseConfig):
     ENV = 'prod'
+    LOG_LEVEL = logging.WARNING
     SETTING = {
         'template_path': os.path.join(ROOT_PATH, 'template'),
         'static_path': os.path.join(ROOT_PATH, 'static'),
