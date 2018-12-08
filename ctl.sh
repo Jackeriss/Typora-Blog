@@ -31,6 +31,7 @@ function restart()
 function update()
 {
     git pull
+    echo "pulled"
     restart
 }
 
