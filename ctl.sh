@@ -22,7 +22,7 @@ function restart()
     for port in $( seq 8101 8102 )
     do
         supervisorctl restart ${app_name}_${port}
-        sleep 0.1
+        sleep 1
     done
     sleep 1
     echo "restart done"
