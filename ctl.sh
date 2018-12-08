@@ -38,7 +38,7 @@ opt="$1"
 app_name="$2"
 if [ "$opt" == "" ]
 then
-    printf "usage: \n\tstart {app_name}\n\tstop {app_name}\n\trestart {app_name}\n"
+    printf "usage: \n\tstart {app_name}\n\tstop {app_name}\n\trestart {app_name}\n\tupdate {app_name}\n"
     exit
 else
     "$1"
