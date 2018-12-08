@@ -28,6 +28,12 @@ function restart()
     echo "restart done"
 }
 
+function update()
+{
+    git pull
+    restart
+}
+
 opt="$1"
 app_name="$2"
 if [ "$opt" == "" ]
