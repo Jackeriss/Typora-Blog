@@ -1,6 +1,6 @@
 $(function () {
   moment.locale('zh-cn');
-  var time = $('.is-mac').find('.time');
+  var time = $('.postBlock').find('.time');
   time.html(moment.unix(time.find('input').val()).fromNow());
   $('.achiveTime').each(function () {
     var timestamp = $(this).find('input').val();
