@@ -30,7 +30,7 @@ function restart()
 
 function update()
 {
-    sudo git pull orgin master
+    sudo git pull origin master
     restart
 }
 
