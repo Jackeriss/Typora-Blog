@@ -26,10 +26,10 @@ GitHub provides a Webhook, you can use it for automatic deployment.
 2. Use `h2` at title.
 3. Write down the current time in the following format at the first paragraph: `YY-mm-dd HH-MM-S` `YY-mm-dd HH:MM:SS` `YY/mm/dd HH-MM-SS` `YY/mm/dd HH:MM:SS`(Chinese users can use Sogou typing `sj` to input the current time in format quickly.)
 4. Wrap the abstract using `<div id="a"></div>`, or the first `p` except the time paragraph will be the abstract.
-5. Export it with style and put it under `/posts`.
+5. Export it without style and put it under `src/data/html`.
 6. The file name should be exactly the same with the title of your post, and it should end up with `.html`.
 7. add all -> commit -> push
-8. You should keep the `.md` files to make it easy for you to reedit your posts.
+8. You should save the `.md` files at `src/data/md` to make it easy for you to reedit your posts.
 
 ## License
 MIT © [Jackeriss](//www.jackeriss.com)
