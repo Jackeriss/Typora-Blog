@@ -30,7 +30,7 @@ function restart()
 
 function update()
 {
-    sudo git pull origin master --allow-unrelated-histories
+    sudo git pull origin master
     restart
 }
 
