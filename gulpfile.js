@@ -99,5 +99,5 @@ gulp.task('rev', ['upload-css', 'upload-js', 'upload-image'], function (cb) {
         gulp.dest(config.rev.dest)
     ], cb)
 });
- 
+
 gulp.task('default', ['clean', 'rev']);
