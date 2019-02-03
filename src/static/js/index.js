@@ -110,7 +110,7 @@ $(function () {
     repo: 'comments_of_www.jackeriss.com',
     owner: 'Jackeriss',
     admin: ['Jackeriss'],
-    id: new Date().getTime(),
+    id: document.title.split(' - ')[0],
   })
   gitalk.render('gitalk-container')
 });
