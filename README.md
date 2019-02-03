@@ -1,4 +1,4 @@
-# Typora-Blog
+# typora-blog
 
 [![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square)](LICENSE.txt)
 [![versions](https://img.shields.io/badge/versions%20-%20%201.0.0-blue.svg?style=flat-square)]()  
@@ -6,7 +6,7 @@
 Write blog using Typora! [demo](//www.jackeriss.com)
 
 ## Introduction
-Typora-Blog is a simple but special blog program, Its biggest characteristic is post editing will be done locally, and use a specific Markdown editor —— [Typora](http://typora.io)
+typora-blog is a simple but special blog program, Its biggest characteristic is post editing will be done locally, and use a specific Markdown editor —— [Typora](http://typora.io)
 
 ### Features
 1. *Less is more*. It only keeps the most frequently used features of a blog program. So, no post type, no tags and no searching. If you really want these features, please add them yourself.

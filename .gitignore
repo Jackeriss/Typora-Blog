@@ -9,3 +9,4 @@ yarn.lock
 *.log
 node_modules/
 src/template/post/*.html
+cos.json

@@ -1,0 +1,60 @@
+{
+    "revDest": "rev",
+    "clean": {
+        "del": [
+            "dist/**/*.*",
+            "src/template/prod/*.*"
+        ]
+    },
+    "js": {
+        "src": "src/static/js/*.js",
+        "dest": "dist/js",
+        "manifest": {
+            "path": "rev/rev-manifest.json",
+            "base": "rev",
+            "merge": true
+        }
+    },
+    "css": {
+        "src": "src/static/css/*.css",
+        "dest": "dist/css",
+        "manifest": {
+            "path": "rev/rev-manifest.json",
+            "base": "rev",
+            "merge": true
+        }
+    },
+    "image": {
+        "src": "src/static/image/*.*",
+        "dest": "dist/image",
+        "manifest": {
+            "path": "rev/rev-manifest.json",
+            "base": "rev",
+            "merge": true
+        }
+    },
+    "uploadJs": {
+        "src": "dist/js/*.*",
+        "prefix": "js"
+    },
+    "uploadCss": {
+        "src": "dist/css/*.*",
+        "prefix": "css"
+    },
+    "uploadImage": {
+        "src": "dist/image/*.*",
+        "prefix": "image"
+    },
+    "rev": {
+        "src": ["rev/rev-manifest.json", "src/template/dev/*.html"],
+        "revCollector": {
+            "replaceReved": true,
+            "dirReplacements": {
+                "/css/": "https://jackeriss-1252826939.file.myqcloud.com/css/",
+                "/js/": "https://jackeriss-1252826939.file.myqcloud.com/js/",
+                "/image/": "https://jackeriss-1252826939.file.myqcloud.com/image/"
+            }
+        },
+        "dest": "src/template/prod"
+    }
+}

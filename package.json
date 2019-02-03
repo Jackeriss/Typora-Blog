@@ -9,7 +9,8 @@
     "gulp-rev": "latest",
     "gulp-rev-collector": "latest",
     "gulp-terser": "latest",
-    "gulp-image": "latest"
+    "gulp-image": "latest",
+    "gulp-upload-qcloud": "latest"
   },
   "dependencies": {
     "es6-promise": "^4.2.5",
