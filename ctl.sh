@@ -1,8 +1,25 @@
 #!/bin/bash
+function deploy()
+{
+    echo "deploying $app_name..."
+    echo "creating venv..."
+    python3 -m venv venv
+    source venv/bin/activate
+    echo "installing requirements..."
+    python3 -m pip install -r requirements.txt
+    echo "copying config..."
+    cp deploy/*.ini /etc/supervisord.d/ -y
+    cp deploy/*.conf /etc/nginx/conf.d/ -y
+    echo "reloading supervisor..."
+    supervisorctl reload
+    echo "reloading nginx..."
+    nginx -s reload
+    echo "deploy done"
+}
 
 function start()
 {
-    echo "start $app_name..."
+    echo "starting $app_name..."
     supervisorctl start ${app_name}:
     sleep 3
     echo "start done"
@@ -10,7 +27,7 @@ function start()
 
 function stop()
 {
-    echo "stop $app_name..."
+    echo "stopping $app_name..."
     supervisorctl stop ${app_name}:
     sleep 3
     echo "stop done"
@@ -18,7 +35,7 @@ function stop()
 
 function restart()
 {
-    echo "restart $app_name..."
+    echo "restarting $app_name..."
     for port in $( seq 8101 8102 )
     do
         supervisorctl restart ${app_name}:${port}
@@ -30,15 +47,18 @@ function restart()
 
 function update()
 {
-    sudo git pull origin master
+    echo "updating $app_name..."
+    echo "pulling..."
+    git pull
     restart
+    echo "update done"
 }
 
 opt="$1"
 app_name="$2"
 if [ "$opt" == "" ]
 then
-    printf "usage: \n\tstart {app_name}\n\tstop {app_name}\n\trestart {app_name}\n\tupdate {app_name}\n"
+    printf "usage: \n\tdeploy {app_name}\n\tstart {app_name}\n\tstop {app_name}\n\trestart {app_name}\n\tupdate {app_name}\n"
     exit
 else
     "$1"
