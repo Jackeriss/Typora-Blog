@@ -8,8 +8,8 @@ function deploy()
     echo "installing requirements..."
     python3 -m pip install -r requirements.txt
     echo "copying config..."
-    cp deploy/*.ini /etc/supervisord.d/ -y
-    cp deploy/*.conf /etc/nginx/conf.d/ -y
+    cp deploy/*.ini /etc/supervisord.d/
+    cp deploy/*.conf /etc/nginx/conf.d/
     echo "reloading supervisor..."
     supervisorctl reload
     echo "reloading nginx..."
