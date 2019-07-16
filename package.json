@@ -3,17 +3,14 @@
   "version": "1.0.0",
   "devDependencies": {
     "del": "latest",
-    "pump": "latest",
-    "gulp": "latest",
+    "gulp": "^3.9.1",
     "gulp-clean-css": "latest",
+    "gulp-image": "latest",
     "gulp-rev": "latest",
     "gulp-rev-collector": "latest",
     "gulp-terser": "latest",
-    "gulp-image": "latest",
-    "gulp-upload-qcloud": "latest"
-  },
-  "dependencies": {
-    "es6-promise": "^4.2.5",
-    "isomorphic-fetch": "^2.2.1"
+    "gulp-upload-qcloud": "latest",
+    "pump": "latest",
+    "natives": "^1.1.6"
   }
 }
