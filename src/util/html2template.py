@@ -42,17 +42,17 @@ def html2template():
                 post['abstract'] = abstract.replace('</div>', post_link + '</div>')
             if post['abstract'] == str(None):
                 post['abstract'] = str(soup.find('p')).replace('</p>', post_link + '</p>')
-            template = (
-                '{% extends "../'
-                + Config.ENV
-                + '/base.html" %}{% block description %}'
-                + post['title']
-                + '{% end %}{% block title %}' + post['title']
-                + ' - Jackeriss{% end %}{% block section %}<div class="postBlock">'
-                + str(soup.find('body')).replace(
-                    '</h2>',
-                    '</h2><div class="time"><input type="hidden" value="{{ timestamp }}"/></div>')
-                + '<div id="gitalk-container"></div></div>{% end %}')
+            template = f"""
+                {{% extends "../{Config.ENV}/base.html" %}}
+                {{% block description %}}{post['title']}{{% end %}}
+                {{% block title %}}{post['title']} - Jackeriss{{% end %}}
+                {{% block section %}}
+                <div class="postBlock">
+                    {str(soup.find('body')).replace('</h2>', '</h2><div class="time"><input type="hidden" value="{{ timestamp }}"/></div>')}
+                    <div id="gitalk-container"></div>
+                </div>
+                {{% end %}}
+                """
             with open(os.path.join(Config.ROOT_PATH, 'template/post/%s.html' % post['title']), 'w') as template_file:
                 template_file.write(template)
             posts.append(post)
@@ -61,5 +61,5 @@ def html2template():
 
 if __name__ == '__main__':
     POSTS = html2template()
-    for p in POSTS:
-        print(p['id'])
+    for post in POSTS:
+        print(post['id'])
