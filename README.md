@@ -18,8 +18,8 @@ typora-blog is a simple but special blog program, Its biggest characteristic is 
 GitHub provides a Webhook, you can use it for automatic deployment.
 
 ### Customization
-1. This blog program does not provide blog name, logo and other configurations in `/config.py`, please directly modify the template file `/app/templates/base.html`, if want to change the appearance of the blog, please edit `/app/static/CSS/style.css`.
-2. The program can accept two arguments, use `--help` for more information.
+1. This blog program does not provide blog name, logo and other configurations. Please directly modify the template file `/app/templates/base.html`. if want to change the appearance of the blog, please edit `/app/static/CSS/style.css`.
+2. To start the program you can run `python3 run.py --port=8080`，then you can go visit `http://127.0.0.1:8080` to see if it's working or not.
 
 ### Convention over configuration
 1. Write your post with Typora.
