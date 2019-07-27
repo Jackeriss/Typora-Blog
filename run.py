@@ -9,7 +9,6 @@ from src.service.cache import cache
 from src.app import TornadoApplication
 
 py_version = sys.version_info
-assert py_version.major == 3 and py_version.minor >= 5
 
 
 def main():
@@ -21,7 +20,7 @@ def main():
     cache.load()
     app = TornadoApplication()
     app.listen(options.port)
-    logging.info('listening on port %d' % options.port)
+    logging.info(f'Ready to serve at http://0.0.0.0:{options.port}')
     loop.run_forever()
 
 if __name__ == '__main__':

@@ -48,7 +48,7 @@ def html2template():
                 {{% block title %}}{post['title']} - Jackeriss{{% end %}}
                 {{% block section %}}
                 <div class="postBlock">
-                    {str(soup.find('body')).replace('</h2>', '</h2><div class="time"><input type="hidden" value="{{ timestamp }}"/></div>').replace("<a href='", "<a target='_blank' href='")}
+                    {str(soup.find('body')).replace('</h2>', '</h2><div class="time"><input type="hidden" value="{{ timestamp }}"/></div>').replace('<a href="', '<a target="_blank" href="')}
                     <div id="gitalk-container"></div>
                 </div>
                 {{% end %}}
