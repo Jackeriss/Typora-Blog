@@ -11,7 +11,7 @@ tornado 的优点：并发性能优异，代码简洁轻量，扩展性强。
 
 [uvloop](https://github.com/MagicStack/uvloop) 是 asyncio 默认事件循环的一个替代品，实现的功能完整，且即插即用。uvloop 是用 Cython 写的，建于 libuv 之上。uvloop 可以使 asyncio 更快。事实上，它至少比 Node.js、gevent 和其他 Python 异步框架要快两倍。基于 uvloop 的 asyncio 速度已经接近了 Go 程序。
 
-### 使用 orjson 替代标准库 json
+###使用 orjson 替代标准库 json
 
 [orjson](https://github.com/ijl/orjson) 是 python 中最快的 json 库，其速度较标准库有显著提升。
 
@@ -43,7 +43,7 @@ tornado 的优点：并发性能优异，代码简洁轻量，扩展性强。
 
 `util/time_util.py` 中有一个打印函数超时日志的装饰器，如有需要可接入 [sentry](https://github.com/getsentry/sentry) 进行日志报警监控。
 
-### HTTP 客户端、Redis 连接池 以及 PG 连接池等
+###HTTP 客户端、Redis 连接池 以及 PG 连接池等
 
 常用的数据源连接已经封装好了，其中 Redis 和 PG 客户端默认是不会加载的，需要用的时候把 `Pipfile` 相应的库取消注释重新安装一下。然后改一下对应的 yaml 配置文件，最后将 `main.py` 的 `AFTER_HOOKS` 中的初始化方法取消注释就行了。
 
@@ -56,6 +56,6 @@ tornado 的优点：并发性能优异，代码简洁轻量，扩展性强。
 
 第二步，启动服务：
 如果是本地开发环境运行则执行 `pipenv run serve`
-使用该方法启动程序会在前台运行并在终端窗口输出日志，由于使用 asyncio 代替了 IOLoop，即使在 debug 模式下修改代码也不会自动重启）
+使用该方法启动程序会在前台运行并在终端窗口输出日志，由于使用 asyncio 代替了 IOLoop，即使在 debug 模式下修改代码也不会自动重启。
 
 如果是非本地开发、测试、预发或生产环境，则执行 `pipenv run restart [dev|test|pre|prod]`，使用该方法启动程序会在后台运行，并将日志输出在 `/data/log/` 文件夹下，如果启动失败可能是没有该日志路径的写权限，修改路径权限后重试即可。你也可以通过修改 `ctl.sh` 文件来自定义启动脚本。

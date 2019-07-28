@@ -32,7 +32,7 @@
 <span>执行 </span><code>pipenv install</code></p>
 <p><span>第二步，启动服务：</span>
 <span>如果是本地开发环境运行则执行 </span><code>pipenv run serve</code>
-<span>使用该方法启动程序会在前台运行并在终端窗口输出日志，由于使用 asyncio 代替了 IOLoop，即使在 debug 模式下修改代码也不会自动重启）</span></p>
+<span>使用该方法启动程序会在前台运行并在终端窗口输出日志，由于使用 asyncio 代替了 IOLoop，即使在 debug 模式下修改代码也不会自动重启。</span></p>
 <p><span>如果是非本地开发、测试、预发或生产环境，则执行 </span><code>pipenv run restart [dev|test|pre|prod]</code><span>，使用该方法启动程序会在后台运行，并将日志输出在 </span><code>/data/log/</code><span> 文件夹下，如果启动失败可能是没有该日志路径的写权限，修改路径权限后重试即可。你也可以通过修改 </span><code>ctl.sh</code><span> 文件来自定义启动脚本。</span></p>
 </body>
 </html>
