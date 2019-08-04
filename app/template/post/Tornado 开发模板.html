@@ -1,0 +1,43 @@
+
+                    {% extends "../dev/base.html" %}
+                    {% block description %}Tornado 开发模板{% end %}
+                    {% block title %}Tornado 开发模板 - Jackeriss{% end %}
+                    {% block section %}
+                    <div class="postBlock">
+                        <body><h2><a class="md-header-anchor" name="tornado-%E5%BC%80%E5%8F%91%E6%A8%A1%E6%9D%BF"></a><span>Tornado 开发模板</span></h2><div class="time"><input type="hidden" value="{{ timestamp }}"/></div>
+
+<p><span>Github 近期推出了项目模板的功能，从模板创建新项目从未如此方便。为了方便挖坑，我也做了一个开箱即用的模板：</span><a target="_blank" href="https://github.com/Jackeriss/template-tornado"><span>template-tornado</span></a><span>。</span><br/><span>使用该模板可以快速搭建一个基于 tornado 的 RESTful API 服务器。</span><br/><span>tornado 的优点：并发性能优异，代码简洁轻量，扩展性强。</span><br/><span>本模板充分利用了 tornado 的这些优点，并在其基础上做了一些扩展与定制，主要功能如下：</span></p>
+<h3><a class="md-header-anchor" name="%E4%BD%BF%E7%94%A8-uvloop-%E5%8A%A0%E9%80%9F"></a><span>使用 uvloop 加速</span></h3>
+<p><a target="_blank" href="https://github.com/MagicStack/uvloop"><span>uvloop</span></a><span> 是 asyncio 默认事件循环的一个替代品，实现的功能完整，且即插即用。uvloop 是用 Cython 写的，建于 libuv 之上。uvloop 可以使 asyncio 更快。事实上，它至少比 Node.js、gevent 和其他 Python 异步框架要快两倍。基于 uvloop 的 asyncio 速度已经接近了 Go 程序。</span></p>
+<h3><a class="md-header-anchor" name="%E4%BD%BF%E7%94%A8-orjson-%E6%9B%BF%E4%BB%A3%E6%A0%87%E5%87%86%E5%BA%93-json"></a><span>使用 orjson 替代标准库 json</span></h3>
+<p><a target="_blank" href="https://github.com/ijl/orjson"><span>orjson</span></a><span> 是 python 中最快的 json 库，其速度较标准库有显著提升。</span></p>
+<h3><a class="md-header-anchor" name="%E5%85%BC%E5%AE%B9%E5%90%8C%E6%AD%A5%E5%87%BD%E6%95%B0"></a><span>兼容同步函数</span></h3>
+<p><span>在写异步代码的过程中最令人头疼的事情就是有些函数和库是同步且耗时的（例如 IO 读写，requests 网络请求），阻塞了客户代码与 asycio 事件循环的唯一线程，因此在执行调用时，整个应用程序都会冻结。这个问题的解决方法是，使用事件循环对象的 </span><code>run_in_executor</code><span> 方法。asyncio 的事件循环在背后维护着一个 </span><code>ThreadPoolExecutor</code><span> 对象，我们可以调用 </span><code>run_in_executor</code><span> 方法，把可调用对象发给它执行。此功能封装在 </span><code>util/thread_pool_util.py</code><span> 中。</span></p>
+<h3><a class="md-header-anchor" name="%E5%8F%82%E6%95%B0%E6%A0%A1%E9%AA%8C"></a><span>参数校验</span></h3>
+<p><span>使用 </span><a target="_blank" href="https://github.com/keleshev/schema"><span>schema</span></a><span> 这个库来做参数校验。可以在 </span><code>util/schema_util.py</code><span> 中添加自定义参数校验器。</span></p>
+<h3><a class="md-header-anchor" name="basic-info-%E4%B8%8E%E5%8D%8F%E7%A8%8B%E4%B8%8A%E4%B8%8B%E6%96%87"></a><span>Basic-Info 与协程上下文</span></h3>
+<p><span>推荐尽量不使用 cookie，一些通用信息（例如客户端类型等）前端可以放在 </span><code>Basic-Info</code><span> 这个 Header 中，后端可以将通用信息放在 </span><code>aiotask_context</code><span> 协程上下文中。</span></p>
+<h3><a class="md-header-anchor" name="%E5%85%A8%E5%B1%80%E5%BC%82%E5%B8%B8%E5%A4%84%E7%90%86"></a><span>全局异常处理</span></h3>
+<p><span>在 </span><code>hook/before_hook.py</code><span> 中为所有 handler 的请求方法添加了异常处理装饰器。每个可处理的异常都要定义 code、message 和 status 三个属性。</span></p>
+<h3><a class="md-header-anchor" name="%E5%90%8E%E5%8F%B0%E5%BB%B6%E6%97%B6%E4%BB%BB%E5%8A%A1%E4%B8%8E%E5%91%A8%E6%9C%9F%E4%BB%BB%E5%8A%A1"></a><span>后台延时任务与周期任务</span></h3>
+<p><span>服务启动后如果有一些后台任务需要执行可以写在 </span><code>tasks</code><span> 文件夹中。如果只需要执行一次，那它就是一个 </span><code>delay_task</code><span>，如果需要周期性的执行则是 </span><code>periodic_task</code><span>。</span></p>
+<h3><a class="md-header-anchor" name="%E6%9C%AC%E5%9C%B0%E7%BC%93%E5%AD%98"></a><span>本地缓存</span></h3>
+<p><code>util/cache_util.py</code><span> 中实现了一个本地缓存装饰器，它可以为任意函数设置本地缓存，并且支持设置过期时间。这个缓存自动过期的功能就是通过上面提到的周期任务实现的。</span></p>
+<h3><a class="md-header-anchor" name="%E8%B6%85%E6%97%B6%E6%97%A5%E5%BF%97"></a><span>超时日志</span></h3>
+<p><code>util/time_util.py</code><span> 中有一个打印函数超时日志的装饰器，如有需要可接入 </span><a target="_blank" href="https://github.com/getsentry/sentry"><span>sentry</span></a><span> 进行日志报警监控。</span></p>
+<h3><a class="md-header-anchor" name="http-%E5%AE%A2%E6%88%B7%E7%AB%AF%E3%80%81redis-%E8%BF%9E%E6%8E%A5%E6%B1%A0-%E4%BB%A5%E5%8F%8A-pg-%E8%BF%9E%E6%8E%A5%E6%B1%A0%E7%AD%89"></a><span>HTTP 客户端、Redis 连接池 以及 PG 连接池等</span></h3>
+<p><span>常用的数据源连接已经封装好了，其中 Redis 和 PG 客户端默认是不会加载的，需要用的时候把 </span><code>Pipfile</code><span> 相应的库取消注释重新安装一下。然后改一下对应的 yaml 配置文件，最后将 </span><code>main.py</code><span> 的 </span><code>AFTER_HOOKS</code><span> 中的初始化方法取消注释就行了。</span></p>
+<h3><a class="md-header-anchor" name="%E4%BE%9D%E8%B5%96%E7%AE%A1%E7%90%86%E4%B8%8E%E5%90%AF%E5%8A%A8%E6%96%B9%E6%B3%95"></a><span>依赖管理与启动方法</span></h3>
+<p><span>本模板使用 </span><a target="_blank" href="https://github.com/pypa/pipenv"><span>pipenv</span></a><span> 来管理依赖和执行启动命令。</span></p>
+<p><span>第一步，初始化虚拟环境并安装依赖：</span>
+<span>执行 </span><code>pipenv install</code></p>
+<p><span>第二步，启动服务：</span>
+<span>如果是本地开发环境运行则执行 </span><code>pipenv run serve</code>
+<span>使用该方法启动程序会在前台运行并在终端窗口输出日志，由于使用 asyncio 代替了 IOLoop，即使在 debug 模式下修改代码也不会自动重启。</span></p>
+<p><span>如果是非本地开发、测试、预发或生产环境，则执行 </span><code>pipenv run restart [dev|test|pre|prod]</code><span>，使用该方法启动程序会在后台运行，并将日志输出在 </span><code>/app/log/</code><span> 文件夹下，如果启动失败可能是没有该日志路径的写权限，修改路径权限后重试即可。你也可以通过修改 </span><code>app.sh</code><span> 文件来自定义启动脚本。限后重试即可。你也可以通过修改 </span><code>app.sh</code><span> 文件来自定义启动脚本。</span></p>
+<p><span>执行 </span><code>pipenv run log [dev|test|pre|prod]</code><span> 可以打印实时日志。</span></p>
+</body>
+                        <div id="gitalk-container"></div>
+                    </div>
+                    {% end %}
+                    

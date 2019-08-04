@@ -1,0 +1,7 @@
+---
+server:
+  debug: true
+  host: 0.0.0.0
+  port: 8001
+  allow_origin: "*"
+  thread_worker: 60

@@ -1,11 +1,8 @@
 .DS_Store
+.vscode
+__pycache__
 *.pyc
-venv/
-__pycache__/
-.vscode/
-dist/
-rev/
-*.log
-node_modules/
-src/template/post/*.html
-cos.json
+node_modules
+dist
+qcloud.json
+app/config/config.local.yaml

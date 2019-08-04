@@ -1,0 +1,30 @@
+[[source]]
+name = "aliyun"
+url = "https://mirrors.aliyun.com/pypi/simple"
+verify_ssl = true
+
+[scripts]
+serve = "python app/main.py"
+start = "./app.sh start"
+stop = "./app.sh stop"
+restart = "./app.sh restart"
+log = "./app.sh log"
+
+[dev-packages]
+
+[packages]
+beautifulsoup4 = "*"
+lxml = "*"
+tornado = "*"
+schema = "*"
+uvloop = "*"
+aiotask-context = "*"
+pytz = "*"
+PyYAML = "*"
+orjson = "*"
+aiohttp = "*"
+# aioredis = "*"
+# asyncpg = "*"
+
+[requires]
+python_version = "3.7"

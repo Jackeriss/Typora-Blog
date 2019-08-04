@@ -1,16 +1,14 @@
 {
-  "name": "typora",
-  "version": "1.0.0",
   "devDependencies": {
-    "del": "latest",
-    "gulp": "^3.9.1",
-    "gulp-clean-css": "latest",
-    "gulp-image": "latest",
-    "gulp-rev": "latest",
-    "gulp-rev-collector": "latest",
-    "gulp-terser": "latest",
-    "gulp-upload-qcloud": "latest",
-    "pump": "latest",
-    "natives": "^1.1.6"
+    "gulp": "^4.0.2"
+  },
+  "dependencies": {
+    "del": "^5.0.0",
+    "gulp-clean-css": "^4.2.0",
+    "gulp-image": "^5.1.0",
+    "gulp-qcloud-cos-upload": "^1.1.3",
+    "gulp-rev": "^9.0.0",
+    "gulp-rev-collector": "^1.3.1",
+    "gulp-terser": "^1.2.0"
   }
 }

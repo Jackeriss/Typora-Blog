@@ -1,103 +1,78 @@
-const gulp = require('gulp')
+const { src, dest, series, parallel } = require('gulp');
 const del = require('del')
-const pump = require('pump')
 const rev = require('gulp-rev')
-const clean = require('gulp-clean-css')
+const clean_css = require('gulp-clean-css')
 const terser = require('gulp-terser')
 const image = require('gulp-image')
-const uploadQcloud = require('gulp-upload-qcloud')
+const uploadQcloud = require('gulp-qcloud-cos-upload')
 const revCollector = require('gulp-rev-collector')
-const config = require('./gulp.json')
-const cos = require('./cos.json')
+const qcloud = require('./qcloud.json')
 
-gulp.task('clean', function (cb) {
-    del(config.clean.del, cb);
-});
+function clean(cb) {
+  return del(['./dist'], cb)
+}
 
-gulp.task('js', function (cb) {
-    pump([
-        gulp.src(config.js.src),
-        rev(),
-        terser(),
-        gulp.dest(config.js.dest),
-        rev.manifest(config.js.manifest),
-        gulp.dest(config.revDest),
-    ], cb)
-});
+function build_js() {
+  return src('app/static/js/*.js')
+    .pipe(terser())
+    .pipe(rev())
+    .pipe(dest('dist'))
+    .pipe(rev.manifest({
+      path: 'dist/rev-manifest.json',
+      base: 'dist',
+      merge: true
+    }))
+    .pipe(dest('dist'))
+}
 
-gulp.task('css', function (cb) {
-    pump([
-        gulp.src(config.css.src),
-        rev(),
-        clean(),
-        gulp.dest(config.css.dest),
-        rev.manifest(config.css.manifest),
-        gulp.dest(config.revDest),
-    ], cb)
-});
+function build_css() {
+  return src('app/static/css/*.css')
+    .pipe(clean_css())
+    .pipe(rev())
+    .pipe(dest('dist'))
+    .pipe(rev.manifest({
+      path: 'dist/rev-manifest.json',
+      base: 'dist',
+      merge: true
+    }))
+    .pipe(dest('dist'))
+}
 
-gulp.task('image', function (cb) {
-    pump([
-        gulp.src(config.image.src),
-        rev(),
-        image(),
-        gulp.dest(config.image.dest),
-        rev.manifest(config.image.manifest),
-        gulp.dest(config.revDest),
-    ], cb)
-});
+function build_image() {
+  return src('app/static/image/*.*')
+    .pipe(image())
+    .pipe(rev())
+    .pipe(dest('dist'))
+    .pipe(rev.manifest({
+      path: 'dist/rev-manifest.json',
+      base: 'dist',
+      merge: true
+    }))
+    .pipe(dest('dist'))
+}
 
-gulp.task('upload-js', ['js'], function (cb) {
-    pump([
-        gulp.src(config.uploadJs.src),
-        uploadQcloud({
-            AppId: cos.AppId,
-            SecretId: cos.SecretId,
-            SecretKey: cos.SecretKey,
-            Bucket: cos.Bucket,
-            Region: cos.Region,
-            Prefix: config.uploadJs.prefix,
-            OverWrite: cos.OverWrite
-        })
-    ], cb)
-});
+function upload() {
+  return src('dist/*.*')
+    .pipe(uploadQcloud({
+      AppId: qcloud.AppId,
+      SecretId: qcloud.SecretId,
+      SecretKey: qcloud.SecretKey,
+      Bucket: qcloud.Bucket,
+      Region: qcloud.Region,
+    }))
+}
 
-gulp.task('upload-css', ['css'], function (cb) {
-    pump([
-        gulp.src(config.uploadCss.src),
-        uploadQcloud({
-            AppId: cos.AppId,
-            SecretId: cos.SecretId,
-            SecretKey: cos.SecretKey,
-            Bucket: cos.Bucket,
-            Region: cos.Region,
-            Prefix: config.uploadCss.prefix,
-            OverWrite: cos.OverWrite
-        })
-    ], cb)
-});
+function rev_collect() {
+  return src(['dist/rev-manifest.json', 'app/template/dev/*.html'])
+    .pipe(revCollector({
+      'replaceReved': true,
+      'dirReplacements': {
+          '/css/': 'https://jackeriss-1252826939.file.myqcloud.com/dist/',
+          '/js/': 'https://jackeriss-1252826939.file.myqcloud.com/dist/',
+          '/image/': 'https://jackeriss-1252826939.file.myqcloud.com/dist/'
+      }
+    }))
+    .pipe(dest('src/template/prod'))
+}
 
-gulp.task('upload-image', ['image'], function (cb) {
-    pump([
-        gulp.src(config.uploadImage.src),
-        uploadQcloud({
-            AppId: cos.AppId,
-            SecretId: cos.SecretId,
-            SecretKey: cos.SecretKey,
-            Bucket: cos.Bucket,
-            Region: cos.Region,
-            Prefix: config.uploadImage.prefix,
-            OverWrite: cos.OverWrite
-        })
-    ], cb)
-});
-
-gulp.task('rev', ['upload-css', 'upload-js', 'upload-image'], function (cb) {
-    pump([
-        gulp.src(config.rev.src),
-        revCollector(config.rev.revCollector),
-        gulp.dest(config.rev.dest)
-    ], cb)
-});
-
-gulp.task('default', ['clean', 'rev']);
+exports.default = series(clean, parallel(build_js, build_css, build_image), upload, rev_collect)
