@@ -72,7 +72,7 @@ function rev_collect() {
           '/image/': 'https://jackeriss-1252826939.file.myqcloud.com/dist/'
       }
     }))
-    .pipe(dest('src/template/prod'))
+    .pipe(dest('app/template/prod'))
 }
 
 exports.default = series(clean, parallel(build_js, build_css, build_image), upload, rev_collect)
