@@ -9,18 +9,21 @@ from app.config.const_config import HTTPCode
 class ERROR_CODE(IntEnum):
     SUCCESS = 0
     SYSTEM_ERROR = 1
-    SCHEMA_ERROR = 1000
-    JSON_PARAMS_NOT_IN_DICT = 1001
-    JSON_PARAMS_FORMAT_ERROR = 1002
+    NOT_FOUND = 1000
+    SCHEMA_ERROR = 1001
+    JSON_PARAMS_NOT_IN_DICT = 1002
+    JSON_PARAMS_FORMAT_ERROR = 1003
 
 
 ERROR_MAP = {
     ERROR_CODE.SUCCESS: {"message": "SUCCESS", "status": HTTPCode.OK},
     ERROR_CODE.SYSTEM_ERROR: {"message": "SYSTEM_ERROR", "status": HTTPCode.INTERNAL_SERVER_ERROR},
+    ERROR_CODE.NOT_FOUND: {"message": "NOT_FOUND", "status": HTTPCode.NOT_FOUND},
     ERROR_CODE.SCHEMA_ERROR: {"message": "SCHEMA_ERROR", "status": HTTPCode.BAD_REQUEST},
     ERROR_CODE.JSON_PARAMS_NOT_IN_DICT: {"message": "JSON_PARAMS_NOT_IN_DICT", "status": HTTPCode.BAD_REQUEST},
     ERROR_CODE.JSON_PARAMS_FORMAT_ERROR: {"message": "JSON_PARAMS_FORMAT_ERROR", "status": HTTPCode.BAD_REQUEST},
 }
+
 
 
 class BasicException(Exception):

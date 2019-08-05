@@ -126,10 +126,29 @@ class BasicHandler(tornado.web.RequestHandler):
     
     def post_page(self, post, **kwargs):
         return self.render(os.path.join(f"post/{post}.html"), **kwargs)
+    
+    def write_error(self, status_code, **kwargs):
+        self.error(status_code)
+    
+    def render_error(self, status_code):
+        page_params = {
+            "status_code": status_code.value
+        }
+        return self.page("error.html", **page_params)
+
+
+class PageNotFoundHandler(BasicHandler):
+    """ 404 页面 handler """
+
+    def get(self):
+        self.render_error(const_config.HTTPCode.NOT_FOUND)
+    
+    def post(self):
+        return self.error(error_util.ERROR_CODE.NOT_FOUND)
 
 
 class StaticHandler(tornado.web.StaticFileHandler, BasicHandler):
-    pass
+    """ 静态文件 handler """
 
 
 def set_context(func, *args, **kwargs):
