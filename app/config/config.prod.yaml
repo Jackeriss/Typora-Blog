@@ -2,6 +2,6 @@
 server:
   debug: false
   host: 0.0.0.0
-  port: 9001
+  port: 10001
   allow_origin: "*"
   thread_worker: 60
