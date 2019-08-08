@@ -64,14 +64,14 @@ class PostService(object):
         return total_page
 
     @classmethod
-    def get_posts(cls, current_page=None):
+    def get_posts(cls, page=None):
         posts = cls.gen_posts()
-        if current_page:
+        if page:
             total_page = cls.get_total_page()
-            if current_page < total_page:
-                posts = posts[(current_page - 1) * const_config.PAGE_LIMIT:current_page * const_config.PAGE_LIMIT]
-            elif current_page == total_page:
-                posts = posts[(current_page - 1) * const_config.PAGE_LIMIT:len(posts)]
+            if page < total_page:
+                posts = posts[(page - 1) * const_config.PAGE_LIMIT:page * const_config.PAGE_LIMIT]
+            elif page == total_page:
+                posts = posts[(page - 1) * const_config.PAGE_LIMIT:len(posts)]
         return posts
     
     @classmethod

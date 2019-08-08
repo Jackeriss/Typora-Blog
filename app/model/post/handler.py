@@ -11,7 +11,7 @@ class PostsHandler(BasicHandler):
         params = self.validate_argument({
             Optional("page", default=None): Use(int)
         })
-        posts = PostService.get_posts(current_page=params["page"])
+        posts = PostService.get_posts(**params)
         self.success(posts)
 
 
