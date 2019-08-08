@@ -6,9 +6,16 @@ import tornado
 
 
 class Application(web.Application):
-
-    def __init__(self, settings, loop, model_routers, before_hooks=[],
-        after_hooks=[], delay_tasks=[], periodic_tasks=[]):
+    def __init__(
+        self,
+        settings,
+        loop,
+        model_routers,
+        before_hooks=[],
+        after_hooks=[],
+        delay_tasks=[],
+        periodic_tasks=[],
+    ):
         self.loop = loop
         self.routers = self.prefix_model_routers(model_routers)
         self.before_hooks = before_hooks
@@ -27,7 +34,7 @@ class Application(web.Application):
         if after_hooks:
             for hook in self.after_hooks:
                 hook(self)
-    
+
     def start_delay_tasks(self):
         """ 启动延时任务 """
         for delay_task in self.delay_tasks:
@@ -51,8 +58,11 @@ class Application(web.Application):
         prefixed_routers = []
         for router in routers:
             reg_url = "/" + prefix + router[0]
-            new_router = (reg_url, router[1], router[2]) if len(
-                router) > 2 else (reg_url, router[1])
+            new_router = (
+                (reg_url, router[1], router[2])
+                if len(router) > 2
+                else (reg_url, router[1])
+            )
             prefixed_routers.append(new_router)
         return prefixed_routers
 

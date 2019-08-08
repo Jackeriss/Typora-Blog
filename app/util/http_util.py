@@ -3,6 +3,9 @@ import functools
 import logging
 
 import aiohttp
+import orjson
+
+from app.util.config_util import config
 
 
 def as_asyncio_task(func):
@@ -18,6 +21,7 @@ def as_asyncio_task(func):
 
 class HTTPClient:
     """ HTTP 客户端 """
+
     _session = None
 
     @classmethod
@@ -27,7 +31,16 @@ class HTTPClient:
         return cls._session
 
     @as_asyncio_task
-    async def request(self, url, *, method="GET", format=None, timeout=3, retry=3, **kwargs):
+    async def request(
+        self,
+        url,
+        *,
+        method="GET",
+        format=None,
+        timeout=config.http["timeout"],
+        retry=config.http["retry"],
+        **kwargs,
+    ):
         session = await self.get_session()
         func = getattr(session, method.lower())
         logging.debug(f"url: {url} params: {kwargs}")
@@ -41,16 +54,23 @@ class HTTPClient:
                     response.json_data = await response.json(content_type=None)
             except asyncio.TimeoutError:
                 logging.error(
-                    f"request timeout {timeout}!request url:{url} kwargs:{kwargs}")
+                    f"request timeout {timeout}!request url:{url} kwargs:{kwargs}"
+                )
                 break
             except Exception as exception:
-                logging.exception("request failed. retry#{}\nurl:{}\nargs:{}\nresponse:{}\nexception:{}".format(
-                    retry, url, kwargs, response, exception))
+                logging.exception(
+                    "request failed. retry#{}\nurl:{}\nargs:{}\nresponse:{}\nexception:{}".format(
+                        retry, url, kwargs, response, exception
+                    )
+                )
                 continue
             else:
                 if response.status != 200:
-                    logging.warning("response status!=200 response:{} {}\nurl:{}\nargs:{}".format(
-                        response.status, response.text_data, url, kwargs))
+                    logging.warning(
+                        "response status!=200 response:{} {}\nurl:{}\nargs:{}".format(
+                            response.status, response.text_data, url, kwargs
+                        )
+                    )
                 break
         return response
 

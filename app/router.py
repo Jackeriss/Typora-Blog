@@ -15,5 +15,5 @@ ROUTERS = [
     (r"/about", static_page.AboutHandler),
     (r"/ping", health_check.HealthCheckHandler),
     (r"/(.*\..*)", base.StaticHandler, {"path": config.static_path}),
-    (r".*", base.PageNotFoundHandler)
+    (r".*", base.PageNotFoundHandler),
 ]

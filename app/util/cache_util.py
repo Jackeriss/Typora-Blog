@@ -11,8 +11,8 @@ def local_cache(expire=60):
     """ 异步函数执行结果本地缓存
         expire: 缓存过期时间，单位（秒）
     """
-    def decorate(func):
 
+    def decorate(func):
         def get_key(func, args, kwargs):
             return f"{func.__module__}@{func.__name__}@{args}@{kwargs}"
 
@@ -23,13 +23,13 @@ def local_cache(expire=60):
                 if key not in GLOBAL_LOCAL_CACHE:
                     GLOBAL_LOCAL_CACHE[key] = {
                         "expire": expire + time_util.timestamp(),
-                        "value": await func(*args, **kwargs)
+                        "value": await func(*args, **kwargs),
                     }
                 return GLOBAL_LOCAL_CACHE[key]["value"]
             except BaseException as error:
                 logging.debug("gen cache key failed.{}".format(error))
                 return await func(*args, **kwargs)
-        
+
         @functools.wraps(func)
         def _sync_wrapper(*args, **kwargs):
             try:
@@ -37,7 +37,7 @@ def local_cache(expire=60):
                 if key not in GLOBAL_LOCAL_CACHE:
                     GLOBAL_LOCAL_CACHE[key] = {
                         "expire": expire + time_util.timestamp(),
-                        "value": func(*args, **kwargs)
+                        "value": func(*args, **kwargs),
                     }
                 return GLOBAL_LOCAL_CACHE[key]["value"]
             except BaseException as error:

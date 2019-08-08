@@ -18,7 +18,11 @@ except BaseException as err:
 
 
 def _read_config(_env):
-    with open(const_config.BASE_DIR + "/config/config.{}.yaml".format(_env), "r", encoding="utf-8") as stream:
+    with open(
+        const_config.BASE_DIR + "/config/config.{}.yaml".format(_env),
+        "r",
+        encoding="utf-8",
+    ) as stream:
         return yaml.full_load(stream)
 
 
@@ -38,11 +42,11 @@ class Config:
     @property
     def base_dir(self):
         return const_config.BASE_DIR
-    
+
     @property
     def static_path(self):
         return os.path.join(const_config.BASE_DIR, "static")
-    
+
     @property
     def template_path(self):
         return os.path.join(const_config.BASE_DIR, "template")
@@ -56,15 +60,20 @@ class Config:
         return self._config["server"]
 
     @property
+    def http(self):
+        return self._config["http"]
+
+    @property
     def redis(self):
-        conf = copy.deepcopy(self._config['redis'])
-        address = (conf.pop('host', 'localhost'), conf.pop('port', 6379))
+        conf = copy.deepcopy(self._config["redis"])
+        address = (conf.pop("host", "localhost"), conf.pop("port", 6379))
         return address, conf
-    
+
     @property
     def pg(self):
-        conf = copy.deepcopy(self._config['pg'])
-        address = (conf.pop('host', 'localhost'), conf.pop('port', 6379))
+        conf = copy.deepcopy(self._config["pg"])
+        address = (conf.pop("host", "localhost"), conf.pop("port", 6379))
         return address, conf
+
 
 config = Config()

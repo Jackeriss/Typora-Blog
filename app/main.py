@@ -24,10 +24,7 @@ else:
     root_logger.setLevel(logging.WARNING)
 
 
-
-BEFORE_HOOKS = [
-    before_hook.wrap_handler
-]
+BEFORE_HOOKS = [before_hook.wrap_handler]
 
 AFTER_HOOKS = [
     # after_hook.init_redis_pool
@@ -37,18 +34,10 @@ AFTER_HOOKS = [
 DELAY_TASKS = []
 
 PERIODIC_TASKS = [
-    {
-        "callback": periodic_task.delete_expired_local_cache,
-        "callback_time": 1000,
-    }
+    {"callback": periodic_task.delete_expired_local_cache, "callback_time": 1000}
 ]
 
-MODEL_ROUTERS = [
-    {
-        "routers": router.ROUTERS,
-        "prefix": "",
-    }
-]
+MODEL_ROUTERS = [{"routers": router.ROUTERS, "prefix": ""}]
 
 
 def main():
@@ -61,6 +50,7 @@ def main():
 
     if sys.platform != "win32":
         import uvloop
+
         asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
 
     fork_processes(0 if config.env != "dev" else 1)
@@ -76,7 +66,7 @@ def main():
         before_hooks=BEFORE_HOOKS,
         after_hooks=AFTER_HOOKS,
         delay_tasks=DELAY_TASKS,
-        periodic_tasks=PERIODIC_TASKS
+        periodic_tasks=PERIODIC_TASKS,
     )
 
     app.start_periodic_tasks()

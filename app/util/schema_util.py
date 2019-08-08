@@ -7,6 +7,7 @@ def none_safe_str(data):
     else:
         return str(data)
 
+
 def change_bool(param):
     if isinstance(param, bool):
         return param
@@ -19,6 +20,7 @@ def change_bool(param):
             return True
     return False
 
+
 def list_parse(str_param, format_type=int):
     """ 获取以逗号分隔的参数 """
     try:
@@ -26,8 +28,8 @@ def list_parse(str_param, format_type=int):
     except BaseException:
         return None
 
-def validate_enum_type(enum_type):
 
+def validate_enum_type(enum_type):
     def _wrap(param):
         try:
             return enum_type(param)
@@ -36,6 +38,10 @@ def validate_enum_type(enum_type):
 
     return _wrap
 
+
 def email_schema():
     """ 校验邮箱合法性 """
-    return Regex(r"^[a-zA-Z0-9_.-]+@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+$", error="Please enter a valid email.")
+    return Regex(
+        r"^[a-zA-Z0-9_.-]+@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+$",
+        error="Please enter a valid email.",
+    )

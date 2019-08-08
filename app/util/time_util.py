@@ -17,14 +17,28 @@ def str2datetime(value, default=None, time_format="%Y-%m-%d %H:%M:%S"):
 
 
 def time_str2timestamp(time_str):
-    if ':' in time_str:
-        if '/' in time_str:
-            return (time_str.split('/')[0], time.mktime(datetime.strptime(time_str, '%Y/%m/%d %H:%M:%S').timetuple()))
-        return (time_str.split('-')[0], time.mktime(datetime.strptime(time_str, '%Y-%m-%d %H:%M:%S').timetuple()))
-    elif '/' in time_str:
-        return (time_str.split('/')[0], time.mktime(datetime.strptime(time_str, '%Y/%m/%d %H-%M-%S').timetuple()))
+    if ":" in time_str:
+        if "/" in time_str:
+            return (
+                time_str.split("/")[0],
+                time.mktime(
+                    datetime.strptime(time_str, "%Y/%m/%d %H:%M:%S").timetuple()
+                ),
+            )
+        return (
+            time_str.split("-")[0],
+            time.mktime(datetime.strptime(time_str, "%Y-%m-%d %H:%M:%S").timetuple()),
+        )
+    elif "/" in time_str:
+        return (
+            time_str.split("/")[0],
+            time.mktime(datetime.strptime(time_str, "%Y/%m/%d %H-%M-%S").timetuple()),
+        )
     else:
-        return (time_str.split('-')[0], time.mktime(datetime.strptime(time_str, '%Y-%m-%d %H-%M-%S').timetuple()))
+        return (
+            time_str.split("-")[0],
+            time.mktime(datetime.strptime(time_str, "%Y-%m-%d %H-%M-%S").timetuple()),
+        )
 
 
 def str2timestamp(value, default=0, time_format="%Y-%m-%d %H:%M:%S"):
@@ -73,7 +87,6 @@ def timeout_log(timeout=10, tag="", debug=False):
     """
 
     def decorator(func):
-
         def _time_log(time_start, time_end, function_name):
             if not debug and config.server["debug"]:
                 return
@@ -87,14 +100,14 @@ def timeout_log(timeout=10, tag="", debug=False):
             result = await func(*args, **kwargs)
             _time_log(start, now(), func.__name__)
             return result
-        
+
         @functools.wraps(func)
         def _sync_wrapper(*args, **kwargs):
             start = now()
             result = func(*args, **kwargs)
             _time_log(start, now(), func.__name__)
             return result
-        
+
         if asyncio.iscoroutinefunction(func):
             return _async_wrapper
         else:
