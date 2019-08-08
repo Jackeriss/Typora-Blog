@@ -14,8 +14,6 @@ log = "./app.sh log"
 black = "*"
 
 [packages]
-beautifulsoup4 = "*"
-lxml = "*"
 tornado = "*"
 schema = "*"
 uvloop = "*"
@@ -26,6 +24,8 @@ orjson = "*"
 aiohttp = "*"
 # aioredis = "*"
 # asyncpg = "*"
+beautifulsoup4 = "*"
+lxml = "*"
 
 [requires]
 python_version = "3.7"
