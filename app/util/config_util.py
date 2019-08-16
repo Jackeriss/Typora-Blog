@@ -19,14 +19,14 @@ except BaseException as err:
 
 def _read_config(_env):
     with open(
-        const_config.BASE_DIR + "/config/config.{}.yaml".format(_env),
+        os.path.join(const_config.BASE_DIR, "config", f"config.{_env}.yaml"),
         "r",
         encoding="utf-8",
     ) as stream:
         return yaml.full_load(stream)
 
 
-if os.path.exists(const_config.BASE_DIR + "/config/config.local.yaml"):
+if os.path.exists(os.path.join(const_config.BASE_DIR, "config", "config.local.yaml")):
     content = _read_config("local")
 else:
     content = _read_config(env)
