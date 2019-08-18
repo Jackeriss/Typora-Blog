@@ -40,7 +40,7 @@ function start()
         return
     fi
     echo "${PROJECT_NAME} is starting..."
-    gulp
+    ./node_modules/.bin/gulp
     pipenv run serve --name=${PROJECT_NAME} --env=${env} >> $LOG_DIR/${PROJECT_NAME}.${env}.log 2>&1 &
     sleep 3
     get_num
