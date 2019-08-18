@@ -130,10 +130,10 @@ class BasicHandler(tornado.web.RequestHandler):
         return self.finish(orjson.dumps(response))
 
     def page(self, template, **kwargs):
-        return self.render(os.path.join(config.env, template), **kwargs)
+        return self.render(os.path.join("dist", template) if config.env != "dev" else template, **kwargs)
 
     def post_page(self, post, **kwargs):
-        return self.render(os.path.join(f"post/{post}.html"), **kwargs)
+        return self.render(os.path.join("post", f"{post}.html"), **kwargs)
 
     def write_error(self, status_code, **kwargs):
         self.error(status_code)

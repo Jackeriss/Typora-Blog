@@ -63,7 +63,7 @@ function upload() {
 }
 
 function rev_collect() {
-  return src(['dist/rev-manifest.json', 'app/template/dev/*.html'])
+  return src(['dist/rev-manifest.json', 'app/template/*.html'])
     .pipe(revCollector({
       'replaceReved': true,
       'dirReplacements': {
@@ -72,7 +72,7 @@ function rev_collect() {
           '/image/': 'https://jackeriss-1252826939.file.myqcloud.com/dist/'
       }
     }))
-    .pipe(dest('app/template/prod'))
+    .pipe(dest('app/template/dist'))
 }
 
 exports.default = series(clean, parallel(build_js, build_css, build_image), upload, rev_collect)
