@@ -7,7 +7,7 @@ from app.util.config_util import config
 
 ROUTERS = [
     (r"/", static_page.IndexHandler),
-    (r"/posts", post.PostsHandler),
+    (r"/v1/posts", post.PostsHandler),
     (r"/post/(.*)", post.PostHandler),
     (r"/achive", static_page.AchiveHandler),
     (r"/product", static_page.ProductHandler),

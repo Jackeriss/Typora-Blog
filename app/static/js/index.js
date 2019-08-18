@@ -17,7 +17,7 @@ $(function () {
     } else {
       $.ajax({
         type: 'get',
-        url: '/posts',
+        url: '/v1/posts',
         data: {
           page: currentPage
         },
@@ -50,7 +50,7 @@ $(function () {
             setTimeout(function fade1() {
               $.ajax({
                 type: 'get',
-                url: '/posts',
+                url: '/v1/posts',
                 data: {
                   page: currentPage
                 },
