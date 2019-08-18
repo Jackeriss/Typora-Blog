@@ -67,9 +67,9 @@ function rev_collect() {
     .pipe(revCollector({
       'replaceReved': true,
       'dirReplacements': {
-          '/css/': 'https://jackeriss-1252826939.file.myqcloud.com/dist/',
-          '/js/': 'https://jackeriss-1252826939.file.myqcloud.com/dist/',
-          '/image/': 'https://jackeriss-1252826939.file.myqcloud.com/dist/'
+        '/css/': 'https://jackeriss-1252826939.file.myqcloud.com/' + qcloud.ProjactName + '/',
+        '/js/': 'https://jackeriss-1252826939.file.myqcloud.com/' + qcloud.ProjactName + '/',
+        '/image/': 'https://jackeriss-1252826939.file.myqcloud.com/' + qcloud.ProjactName + '/'
       }
     }))
     .pipe(dest('app/template/dist'))
