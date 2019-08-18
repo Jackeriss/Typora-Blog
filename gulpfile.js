@@ -52,13 +52,14 @@ function build_image() {
 }
 
 function upload() {
-  return src('dist/*.*')
+  return src('*.*', {cwd: 'dist'})
     .pipe(uploadQcloud({
       AppId: qcloud.AppId,
       SecretId: qcloud.SecretId,
       SecretKey: qcloud.SecretKey,
       Bucket: qcloud.Bucket,
       Region: qcloud.Region,
+      prefix: qcloud.prefix
     }))
 }
 
@@ -67,9 +68,9 @@ function rev_collect() {
     .pipe(revCollector({
       'replaceReved': true,
       'dirReplacements': {
-        '/css/': 'https://jackeriss-1252826939.file.myqcloud.com/' + qcloud.ProjactName + '/',
-        '/js/': 'https://jackeriss-1252826939.file.myqcloud.com/' + qcloud.ProjactName + '/',
-        '/image/': 'https://jackeriss-1252826939.file.myqcloud.com/' + qcloud.ProjactName + '/'
+        '/css/': 'https://jackeriss-1252826939.file.myqcloud.com/' + qcloud.prefix + '/',
+        '/js/': 'https://jackeriss-1252826939.file.myqcloud.com/' + qcloud.prefix + '/',
+        '/image/': 'https://jackeriss-1252826939.file.myqcloud.com/' + qcloud.prefix + '/'
       }
     }))
     .pipe(dest('app/template/dist'))
