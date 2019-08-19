@@ -20,7 +20,3 @@ async def init_pg_pool(loop):
     pg_config = config.pg
     pg_pool = await asyncpg.create_pool(loop=loop, **pg_config)
     return pg_pool
-
-
-async def close_pg_pool():
-    pg_pool.close()
