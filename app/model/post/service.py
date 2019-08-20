@@ -46,7 +46,7 @@ class PostService(object):
                         "</p>", post_link + "</p>"
                     )
                 template = f"""
-                    {{% extends "../{config.env}/base.html" %}}
+                    {{% extends "..{"/dist" if config.env != "dev" else ""}/base.html" %}}
                     {{% block description %}}{post['title']}{{% end %}}
                     {{% block title %}}{post['title']} - Jackeriss{{% end %}}
                     {{% block section %}}
