@@ -97,5 +97,4 @@ def try_exception(func):
 
     if asyncio.iscoroutinefunction(func):
         return _async_wrapper
-    else:
-        return _sync_wrapper
+    return _sync_wrapper

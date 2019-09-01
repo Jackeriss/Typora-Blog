@@ -51,7 +51,7 @@ class HTTPClient:
                 response = await func(url, timeout=timeout, **kwargs)
                 response.text_data = await response.text()
                 if format == "json":
-                    response.json_data = await response.json(content_type=None)
+                    response.json_data = response.json(content_type=None)
             except asyncio.TimeoutError:
                 logging.error(
                     f"request timeout {timeout}!request url:{url} kwargs:{kwargs}"

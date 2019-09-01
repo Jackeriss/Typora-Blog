@@ -2,7 +2,7 @@
 server:
   debug: true
   host: 0.0.0.0
-  port: 10001
+  port: 10200
   allow_origin: "*"
   thread_worker: 60
 
