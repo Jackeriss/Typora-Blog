@@ -1,4 +1,4 @@
 # typora-blog
-使用 Typora 写博客 —— 我的个人博客解决方案。
+> Write blog with Typora
 
-Powered by [template-tornado](https://github.com/Jackeriss/template-tornado)
+[![Generated from | template-tornado](https://img.shields.io/badge/Generated%20from-template--tornado-FF87D4?style=flat-square&logo=python&logoColor=FF87D4&labelColor=1F222A)](https://github.com/Jackeriss/template-tornado)

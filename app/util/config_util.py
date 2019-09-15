@@ -7,14 +7,13 @@ import yaml
 from app.config import const_config
 
 
-try:
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--name", type=str)
-    parser.add_argument("--env", type=str, default="dev")
-    args = parser.parse_args()
-    env = args.env
-except BaseException as err:
-    env = "dev"
+parser = argparse.ArgumentParser()
+parser.add_argument("--name", type=str)
+parser.add_argument("--env", type=str, default="dev")
+parser.add_argument("--port", type=int)
+args = parser.parse_args()
+env = args.env
+port = args.port
 
 
 def _read_config(_env):
@@ -57,6 +56,8 @@ class Config:
 
     @property
     def server(self):
+        if port:
+            self._config["server"]["port"] = port
         return self._config["server"]
 
     @property
