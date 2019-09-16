@@ -74,7 +74,7 @@ Kafka 只保证分区内的记录是有序的，而不保证主题中不同分�
 
 - [Kafka、RabbitMQ、RocketMQ 发送小消息性能对比](http://jm.taobao.org/2016/04/01/kafka-vs-rabbitmq-vs-rocketmq-message-send-performance/)
 - [Kafka vs RocketMQ——Topic 数量对单机性能的影响](http://jm.taobao.org/2016/04/07/kafka-vs-rocketmq-topic-amout/)
-- [Kafka vs RocketMQ—— 多 Topic 对性能稳定性的影响](http://jm.taobao.org/2016/04/20/kafka-vs-rocketmq-3/)
+- [Kafka vs RocketMQ——多 Topic 对性能稳定性的影响](http://jm.taobao.org/2016/04/20/kafka-vs-rocketmq-3/)
 - [业界主流 MQ 对比](http://jm.taobao.org/2016/03/24/rmq-vs-kafka/)
 
 ### 监控
