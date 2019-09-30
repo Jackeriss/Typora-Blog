@@ -2,7 +2,7 @@
 {% block title %}归档{% end %}
 {% block section %}
 <div class="staticBlock">
-  <h3>归档</h3>
+  <h4>归档</h4>
   {% if len(posts) == 0 %}
   <div class="postBlank">
     <p>暂时还没有文章</p>
@@ -12,21 +12,21 @@
   {% for post in posts %}
   {% if post['year'] != year %}
   {% if year != '' %}
-  </div>
-  </div>
-  {% end %}
-  <div class="achiveBlock">
+</div>
+</div>
+{% end %}
+<div class="achiveBlock">
   <div class="achiveYear">{{ post['year'] }}</div>
   <div class="achiveSide">
-  {% set year = post['year'] %}
-  {% end %}
-  <div class="achiveLine">
-    <div class="achiveTime"><input type="hidden" value="{{ post['timestamp'] }}"/></div>
-    <div class="achiveTitle"><a href="/post/{{ post['id'] }}">{{ post['title'] }}</a></div>
+    {% set year = post['year'] %}
+    {% end %}
+    <div class="achiveLine">
+      <div class="achiveTime"><input type="hidden" value="{{ post['timestamp'] }}" /></div>
+      <div class="achiveTitle"><a href="/post/{{ post['id'] }}">{{ post['title'] }}</a></div>
+    </div>
+    {% end %}
   </div>
-  {% end %}
-  </div>
-  </div>
-  <div id="gitalk-container"></div>
+</div>
+<div id="gitalk-container"></div>
 </div>
 {% end %}

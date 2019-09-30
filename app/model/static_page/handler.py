@@ -16,14 +16,14 @@ class AchiveHandler(BasicHandler):
         self.page("achive.html", **page_params)
 
 
-class ProductHandler(BasicHandler):
+class ProjectHandler(BasicHandler):
     def get(self):
-        self.page("product.html")
+        self.page("project.html")
 
 
-class LinkHandler(BasicHandler):
+class ShareHandler(BasicHandler):
     def get(self):
-        self.page("link.html")
+        self.page("share.html")
 
 
 class AboutHandler(BasicHandler):
