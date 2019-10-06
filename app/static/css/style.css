@@ -21,18 +21,10 @@ html {
   overflow-x: initial !important;
 }
 
-:root {
-  --bg-color: #ffffff;
-  --text-color: #333333;
-  --select-text-bg-color: #B5D6FC;
-  --select-text-font-color: auto;
-  --monospace: "Lucida Console", Consolas, "Courier", monospace;
-}
-
 html {
   font-size: 14px;
-  background-color: var(--bg-color);
-  color: var(--text-color);
+  background-color: #ffffff;
+  color: #333333;
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
 }

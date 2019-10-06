@@ -7,7 +7,7 @@
   <meta name="description" content="{% block description %}Discover & Create{% end %}">
   <meta name="keywords" content="Jackeriss">
   <title>{% block title %}Jackeriss{% end %}</title>
-  <link href="https://cdn.bootcss.com/gitalk/1.5.0/gitalk.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
   <link href="/css/style.css" rel="stylesheet">
   <link href="/image/logo.png" rel="apple-touch-icon-precomposed" sizes="144x144">
   <link href="/image/logo.png" rel="shortcut icon">
@@ -50,10 +50,7 @@
       </p>
     </div>
   </footer>
-  <script src="https://cdn.bootcss.com/moment.js/2.24.0/moment.min.js"></script>
-  <script src="https://cdn.bootcss.com/moment.js/2.24.0/locale/zh-cn.js"></script>
-  <script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.min.js"></script>
-  <script src="https://cdn.bootcss.com/gitalk/1.5.0/gitalk.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/combine/npm/gitalk@1,npm/moment@2,npm/moment@2/locale/zh-cn.min.js,npm/jquery@3"></script>
   <script src="/js/index.js"></script>
   {% block script %}{% end %}
 </body>
