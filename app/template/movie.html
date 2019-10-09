@@ -1,0 +1,23 @@
+{% extends navPageBase.html %}
+{% block title %}电影{% end %}
+{% block section %}
+<div class="staticBlock">
+  <div class="movie"></div>
+  <div id="gitalk-container"></div>
+</div>
+{% end %}
+{% block pageScript %}
+<script src="https://cdn.jsdelivr.net/gh/iMuFeng/bmdb@latest/dist/Bmdb.min.js"></script>
+<script>
+new Bmdb({
+  type: 'movies',
+  selector: '.movie',
+  secret: '8e7e4a9a5c7a0591634be2316c876636f5779542172ffc01238122f0f91d4d62',
+  noMoreText: 'ʅ(‾◡◝) 就这些电影啦',
+  darkMode: false,
+  showCategories: true,
+  categoryFilters: ['纪录片', '传记', '悬疑', '科幻', '奇幻', '冒险', '犯罪', '动作', '剧情', '战争', '动画', '喜剧', '爱情', '惊悚'],
+  limit: 30
+})
+</script>
+{% end %}
