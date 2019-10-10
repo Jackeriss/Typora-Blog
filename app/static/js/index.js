@@ -111,6 +111,7 @@ $(function () {
     success: function (data) {
       const aplayer = new APlayer({
         container: document.getElementById('aplayer'),
+        fixed: true,
         audio: data.data
       })
     }
