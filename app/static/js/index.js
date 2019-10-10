@@ -106,7 +106,7 @@ $(function () {
   })
   $.ajax({
     type: 'get',
-    url: 'https://netease-music-aplayer.jackeriss.com/api/playlist/2839871887',
+    url: 'https://netease-aplayer.jackeriss.com/api/playlist/2839871887',
     dataType: 'json',
     success: function (data) {
       const aplayer = new APlayer({
