@@ -8,8 +8,7 @@
   <meta name="keywords" content="Jackeriss">
   <meta name="referrer" content="never">
   <title>{% block title %}Jackeriss{% end %}</title>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/iMuFeng/bmdb@1.3.0/dist/Bmdb.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/combine/npm/gitalk@1/dist/gitalk.min.css,npm/aplayer@1/dist/APlayer.min.css">
   <link href="/css/style.css" rel="stylesheet">
   <link href="/image/logo.png" rel="apple-touch-icon-precomposed" sizes="144x144">
   <link href="/image/logo.png" rel="shortcut icon">
@@ -43,17 +42,18 @@
       <div class="go-top dn" id="go-top">
         <a href="javascript:;" class="go iconfont">&#xe7d9;</a>
       </div>
+      <div id="aplayer"></div>
     </div>
   </div>
   <footer>
     <div class="container">
       <p class="foot dn">
         © 2019 <a href="/">Jackeriss</a> Powered by <a href="https://github.com/Jackeriss/typora-blog"
-          target="_blank">typora-blog</a><a href="http://www.miitbeian.gov.cn/" target="_blank"></a>
+          target="_blank">typora-blog</a>
       </p>
     </div>
   </footer>
-  <script src="https://cdn.jsdelivr.net/combine/npm/gitalk@1,npm/moment@2,npm/moment@2/locale/zh-cn.min.js,npm/jquery@3"></script>
+  <script src="https://cdn.jsdelivr.net/combine/npm/gitalk@1,npm/aplayer@1/dist/APlayer.min.js,npm/moment@2,npm/moment@2/locale/zh-cn.min.js,npm/jquery@3"></script>
   <script src="/js/index.js"></script>
   {% block script %}{% end %}
 </body>
