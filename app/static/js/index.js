@@ -106,13 +106,13 @@ $(function () {
   })
   $.ajax({
     type: 'get',
-    url: 'https://netease-aplayer.jackeriss.com/api/playlist/2839871887',
+    url: 'https://api.i-meto.com/meting/api?server=netease&type=playlist&id=2839871887',
     dataType: 'json',
     success: function (data) {
       const aplayer = new APlayer({
         container: document.getElementById('aplayer'),
         fixed: true,
-        audio: data.data
+        audio: data
       })
     }
   })
