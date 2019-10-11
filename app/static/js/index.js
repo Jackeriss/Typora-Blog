@@ -1,4 +1,5 @@
 $(function () {
+  window.parent.history.pushState({}, document.title, window.location.href.replace('/i/', '/'))
   moment.locale('zh-cn')
   let time = $('.postBlock').find('.time')
   time.html(moment.unix(time.find('input').val()).fromNow())
@@ -103,18 +104,6 @@ $(function () {
     $('html,body').animate({
       'scrollTop': 0
     }, 500)
-  })
-  $.ajax({
-    type: 'get',
-    url: 'https://api.i-meto.com/meting/api?server=netease&type=playlist&id=2839871887',
-    dataType: 'json',
-    success: function (data) {
-      const aplayer = new APlayer({
-        container: document.getElementById('aplayer'),
-        fixed: true,
-        audio: data
-      })
-    }
   })
   const gitalk = new Gitalk({
     clientID: '748b4dac7ace16b6d7cb',

@@ -1,7 +1,7 @@
 {% extends base.html %}
 {% block script %}
 <script>
-  let navId = '#' + window.location.pathname.replace('/', '')
+  let navId = '#' + window.location.pathname.replace('/i/', '')
   $(navId).addClass('active')
 </script>
 {% block pageScript %}{% end %}

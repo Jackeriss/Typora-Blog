@@ -6,14 +6,15 @@ from app.util.config_util import config
 
 
 ROUTERS = [
-    (r"/", static_page.IndexHandler),
-    (r"/v1/posts", post.PostsHandler),
-    (r"/post/(.*)", post.PostHandler),
-    (r"/achive", static_page.AchiveHandler),
-    (r"/tool", static_page.ToolHandler),
-    (r"/movie", static_page.MovieHandler),
-    (r"/about", static_page.AboutHandler),
     (r"/ping", health_check.HealthCheckHandler),
+    (r"/v1/posts", post.PostsHandler),
+    (r"/i/", static_page.IndexHandler),
+    (r"/i/post/(.*)", post.PostHandler),
+    (r"/i/achive", static_page.AchiveHandler),
+    (r"/i/tool", static_page.ToolHandler),
+    (r"/i/movie", static_page.MovieHandler),
+    (r"/i/about", static_page.AboutHandler),
+    (r"/i/.*", base.PageNotFoundHandler),
     (r"/(.*\..*)", base.StaticHandler, {"path": config.static_path}),
-    (r".*", base.PageNotFoundHandler),
+    (r"/(.*)", static_page.IframeHandler),
 ]

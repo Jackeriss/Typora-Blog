@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Elegance begets simplicity">
+  <meta name="keywords" content="Jackeriss">
+  <meta name="referrer" content="never">
+  <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+  <title>Jackeriss</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/aplayer@1/dist/APlayer.min.css">
+  <link href="/image/logo.png" rel="apple-touch-icon-precomposed" sizes="144x144">
+  <link href="/image/logo.png" rel="shortcut icon">
+  <style>
+    body{
+      margin:0; 
+      padding:0; 
+      overflow-y:hidden
+    }
+  </style>
+</head>
+
+<body>
+  <iframe name="contentFrame" id="iframe" class="iframe" scrolling="auto" frameborder="0" style="width:100%;" src="about:blank" allowfullscreen="true"></iframe>
+  <div id="aplayer"></div>
+  <script>
+    if (top.document.getElementById('iframe').src.indexOf('/i/') == -1) {
+      document.getElementById('iframe').setAttribute('src', '/i/{{ url }}')
+      window.parent.history.pushState({}, document.title, window.location.href)
+    } else {
+      window.location.href = '/i/{{ url }}'
+    }
+  </script>
+  <script src="https://cdn.jsdelivr.net/combine/npm/aplayer@1/dist/APlayer.min.js,npm/jquery@3"></script>
+  <script>
+    window.onerror=function(){return true} 
+    $(function(){ 
+      headerHeight = 0
+      var height = $(window).height()
+      $("#iframe").height((height - headerHeight) + 'px')
+    })
+    $.ajax({
+      type: 'get',
+      url: 'https://api.i-meto.com/meting/api?server=netease&type=playlist&id=2839871887',
+      dataType: 'json',
+      success: function (data) {
+        const aplayer = new APlayer({
+          container: document.getElementById('aplayer'),
+          fixed: true,
+          audio: data
+        })
+      }
+    })
+  </script>
+</body>
+
+</html>

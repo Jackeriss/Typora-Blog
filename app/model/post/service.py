@@ -54,7 +54,7 @@ class PostService(object):
                         {str(soup.find('body')).replace(
                             '</h2>',
                             '</h2><div class="time"><input type="hidden" value="{{ timestamp }}"/></div>'
-                        ).replace('<a href="', '<a target="_blank" href="')}
+                        )}
                         <div id="gitalk-container"></div>
                     </div>
                     {{% end %}}

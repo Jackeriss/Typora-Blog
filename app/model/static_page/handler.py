@@ -2,6 +2,12 @@ from app.model.post.service import PostService
 from app.util.handler_util import BasicHandler
 
 
+class IframeHandler(BasicHandler):
+    def get(self, url):
+        page_params = {"url": url}
+        return self.page("iframe.html", **page_params)
+
+
 class IndexHandler(BasicHandler):
     def get(self):
         total_page = PostService.get_total_page()
