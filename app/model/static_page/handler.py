@@ -16,11 +16,6 @@ class AchiveHandler(BasicHandler):
         self.page("achive.html", **page_params)
 
 
-class WorkshopHandler(BasicHandler):
-    def get(self):
-        self.page("workshop.html")
-
-
 class ToolHandler(BasicHandler):
     def get(self):
         self.page("tool.html")

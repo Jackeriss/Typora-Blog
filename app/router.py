@@ -10,7 +10,6 @@ ROUTERS = [
     (r"/v1/posts", post.PostsHandler),
     (r"/post/(.*)", post.PostHandler),
     (r"/achive", static_page.AchiveHandler),
-    (r"/workshop", static_page.WorkshopHandler),
     (r"/tool", static_page.ToolHandler),
     (r"/movie", static_page.MovieHandler),
     (r"/about", static_page.AboutHandler),
