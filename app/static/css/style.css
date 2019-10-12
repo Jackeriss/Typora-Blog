@@ -17,6 +17,14 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+::selection {
+  background: rgba(0, 149, 255, .2); /* WebKit/Blink Browsers */
+}
+
+::-moz-selection {
+  background: rgba(0, 149, 255, .2); /* Gecko Browsers */
+}
+
 html {
   overflow-x: initial !important;
 }
@@ -61,13 +69,6 @@ a.url {
 a:active,
 a:hover {
   outline: 0px;
-}
-
-.in-text-selection,
-::selection {
-  text-shadow: none;
-  background: var(--select-text-bg-color);
-  color: var(--select-text-font-color);
 }
 
 #write {
