@@ -2,38 +2,507 @@
 <html>
 <head>
 <meta charset='UTF-8'><meta name='viewport' content='width=device-width initial-scale=1'>
-<title>Tornado 开发模板</title></head>
-<body><h2>Tornado 开发模板</h2>
-<p>2019-07-27 11:30:28</p>
-<p>Github 近期推出了项目模板的功能，从模板创建新项目从未如此方便。为了方便挖坑，我也做了一个开箱即用的模板：<a href='https://github.com/Jackeriss/template-tornado'>template-tornado</a>。<br/>使用该模板可以快速搭建一个基于 tornado 的 RESTful API 服务器。<br/>tornado 的优点：并发性能优异，代码简洁轻量，扩展性强。<br/>本模板充分利用了 tornado 的这些优点，并在其基础上做了一些扩展与定制，主要功能如下：</p>
-<h3>使用 uvloop 加速</h3>
-<p><a href='https://github.com/MagicStack/uvloop'>uvloop</a> 是 asyncio 默认事件循环的一个替代品，实现的功能完整，且即插即用。uvloop 是用 Cython 写的，建于 libuv 之上。uvloop 可以使 asyncio 更快。事实上，它至少比 Node.js、gevent 和其他 Python 异步框架要快两倍。基于 uvloop 的 asyncio 速度已经接近了 Go 程序。</p>
-<h3>使用 orjson 替代标准库 json</h3>
-<p><a href='https://github.com/ijl/orjson'>orjson</a> 是 python 中最快的 json 库，其速度较标准库有显著提升。</p>
-<h3>兼容同步函数</h3>
-<p>在写异步代码的过程中最令人头疼的事情就是有些函数和库是同步且耗时的（例如 IO 读写，requests 网络请求），阻塞了客户代码与 asycio 事件循环的唯一线程，因此在执行调用时，整个应用程序都会冻结。这个问题的解决方法是，使用事件循环对象的 <code>run_in_executor</code> 方法。asyncio 的事件循环在背后维护着一个 <code>ThreadPoolExecutor</code> 对象，我们可以调用 <code>run_in_executor</code> 方法，把可调用对象发给它执行。此功能封装在 <code>util/thread_pool_util.py</code> 中。</p>
-<h3>参数校验</h3>
-<p>使用 <a href='https://github.com/keleshev/schema'>schema</a> 这个库来做参数校验。可以在 <code>util/schema_util.py</code> 中添加自定义参数校验器。</p>
-<h3>Basic-Info 与协程上下文</h3>
-<p>推荐尽量不使用 cookie，一些通用信息（例如客户端类型等）前端可以放在 <code>Basic-Info</code> 这个 Header 中，后端可以将通用信息放在 <code>aiotask_context</code> 协程上下文中。</p>
-<h3>全局异常处理</h3>
-<p>在 <code>hook/before_hook.py</code> 中为所有 handler 的请求方法添加了异常处理装饰器。每个可处理的异常都要定义 code、message 和 status 三个属性。</p>
-<h3>后台延时任务与周期任务</h3>
-<p>服务启动后如果有一些后台任务需要执行可以写在 <code>tasks</code> 文件夹中。如果只需要执行一次，那它就是一个 <code>delay_task</code>，如果需要周期性的执行则是 <code>periodic_task</code>。</p>
-<h3>本地缓存</h3>
-<p><code>util/cache_util.py</code> 中实现了一个本地缓存装饰器，它可以为任意函数设置本地缓存，并且支持设置过期时间。这个缓存自动过期的功能就是通过上面提到的周期任务实现的。</p>
-<h3>超时日志</h3>
-<p><code>util/time_util.py</code> 中有一个打印函数超时日志的装饰器，如有需要可接入 <a href='https://github.com/getsentry/sentry'>sentry</a> 进行日志报警监控。</p>
-<h3>HTTP 客户端、Redis 连接池 以及 PG 连接池等</h3>
-<p>常用的数据源连接已经封装好了，其中 Redis 和 PG 客户端默认是不会加载的，需要用的时候把 <code>Pipfile</code> 相应的库取消注释重新安装一下。然后改一下对应的 yaml 配置文件，最后将 <code>main.py</code> 的 <code>AFTER_HOOKS</code> 中的初始化方法取消注释就行了。</p>
-<h3>依赖管理与启动方法</h3>
-<p>本模板使用 <a href='https://github.com/pypa/pipenv'>pipenv</a> 来管理依赖和执行启动命令。</p>
-<p>第一步，初始化虚拟环境并安装依赖：
-执行 <code>pipenv install</code></p>
-<p>第二步，启动服务：
-如果是本地开发环境运行则执行 <code>pipenv run serve</code>
-使用该方法启动程序会在前台运行并在终端窗口输出日志，由于使用 asyncio 代替了 IOLoop，即使在 debug 模式下修改代码也不会自动重启。</p>
-<p>如果是非本地开发、测试、预发或生产环境，则执行 <code>pipenv run restart [dev|test|pre|prod]</code>，使用该方法启动程序会在后台运行，并将日志输出在 <code>/app/log/</code> 文件夹下，如果启动失败可能是没有该日志路径的写权限，修改路径权限后重试即可。你也可以通过修改 <code>app.sh</code> 文件来自定义启动脚本。</p>
-<p>执行 <code>pipenv run log [dev|test|pre|prod]</code> 可以打印实时日志。</p>
+<title>Tornado 开发模板</title><link href='https://fonts.loli.net/css?family=Open+Sans:400italic,700italic,700,400&subset=latin,latin-ext' rel='stylesheet' type='text/css' /><style type='text/css'>html {overflow-x: initial !important;}:root { --bg-color: #ffffff; --text-color: #333333; --select-text-bg-color: #B5D6FC; --select-text-font-color: auto; --monospace: "Lucida Console",Consolas,"Courier",monospace; }
+html { font-size: 14px; background-color: var(--bg-color); color: var(--text-color); font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; -webkit-font-smoothing: antialiased; }
+body { margin: 0px; padding: 0px; height: auto; bottom: 0px; top: 0px; left: 0px; right: 0px; font-size: 1rem; line-height: 1.42857143; overflow-x: hidden; background-image: inherit; background-size: inherit; background-attachment: inherit; background-origin: inherit; background-clip: inherit; background-color: inherit; tab-size: 4; background-position: inherit inherit; background-repeat: inherit inherit; }
+iframe { margin: auto; }
+a.url { word-break: break-all; }
+a:active, a:hover { outline: 0px; }
+.in-text-selection, ::selection { text-shadow: none; background: var(--select-text-bg-color); color: var(--select-text-font-color); }
+#write { margin: 0px auto; height: auto; width: inherit; word-break: normal; word-wrap: break-word; position: relative; white-space: normal; overflow-x: visible; padding-top: 40px; }
+#write.first-line-indent p { text-indent: 2em; }
+#write.first-line-indent li p, #write.first-line-indent p * { text-indent: 0px; }
+#write.first-line-indent li { margin-left: 2em; }
+.for-image #write { padding-left: 8px; padding-right: 8px; }
+body.typora-export { padding-left: 30px; padding-right: 30px; }
+.typora-export .footnote-line, .typora-export li, .typora-export p { white-space: pre-wrap; }
+@media screen and (max-width: 500px) { 
+  body.typora-export { padding-left: 0px; padding-right: 0px; }
+  #write { padding-left: 20px; padding-right: 20px; }
+  .CodeMirror-sizer { margin-left: 0px !important; }
+  .CodeMirror-gutters { display: none !important; }
+}
+#write li > figure:last-child { margin-bottom: 0.5rem; }
+#write ol, #write ul { position: relative; }
+img { max-width: 100%; vertical-align: middle; }
+button, input, select, textarea { color: inherit; font-family: inherit; font-size: inherit; font-style: inherit; font-variant-caps: inherit; font-weight: inherit; font-stretch: inherit; line-height: inherit; }
+input[type="checkbox"], input[type="radio"] { line-height: normal; padding: 0px; }
+*, ::after, ::before { box-sizing: border-box; }
+#write h1, #write h2, #write h3, #write h4, #write h5, #write h6, #write p, #write pre { width: inherit; }
+#write h1, #write h2, #write h3, #write h4, #write h5, #write h6, #write p { position: relative; }
+p { line-height: inherit; }
+h1, h2, h3, h4, h5, h6 { break-after: avoid-page; break-inside: avoid; orphans: 2; }
+p { orphans: 4; }
+h1 { font-size: 2rem; }
+h2 { font-size: 1.8rem; }
+h3 { font-size: 1.6rem; }
+h4 { font-size: 1.4rem; }
+h5 { font-size: 1.2rem; }
+h6 { font-size: 1rem; }
+.md-math-block, .md-rawblock, h1, h2, h3, h4, h5, h6, p { margin-top: 1rem; margin-bottom: 1rem; }
+.hidden { display: none; }
+.md-blockmeta { color: rgb(204, 204, 204); font-weight: 700; font-style: italic; }
+a { cursor: pointer; }
+sup.md-footnote { padding: 2px 4px; background-color: rgba(238, 238, 238, 0.701961); color: rgb(85, 85, 85); border-top-left-radius: 4px; border-top-right-radius: 4px; border-bottom-right-radius: 4px; border-bottom-left-radius: 4px; cursor: pointer; }
+sup.md-footnote a, sup.md-footnote a:hover { color: inherit; text-transform: inherit; text-decoration: inherit; }
+#write input[type="checkbox"] { cursor: pointer; width: inherit; height: inherit; }
+figure { overflow-x: auto; margin: 1.2em 0px; max-width: calc(100% + 16px); padding: 0px; }
+figure > table { margin: 0px !important; }
+tr { break-inside: avoid; break-after: auto; }
+thead { display: table-header-group; }
+table { border-collapse: collapse; border-spacing: 0px; width: 100%; overflow: auto; break-inside: auto; text-align: left; }
+table.md-table td { min-width: 32px; }
+.CodeMirror-gutters { border-right-width: 0px; background-color: inherit; }
+.CodeMirror-linenumber { }
+.CodeMirror { text-align: left; }
+.CodeMirror-placeholder { opacity: 0.3; }
+.CodeMirror pre { padding: 0px 4px; }
+.CodeMirror-lines { padding: 0px; }
+div.hr:focus { cursor: none; }
+#write pre { white-space: pre-wrap; }
+#write.fences-no-line-wrapping pre { white-space: pre; }
+#write pre.ty-contain-cm { white-space: normal; }
+.CodeMirror-gutters { margin-right: 4px; }
+.md-fences { font-size: 0.9rem; display: block; break-inside: avoid; text-align: left; overflow: visible; white-space: pre; background-image: inherit; background-size: inherit; background-attachment: inherit; background-origin: inherit; background-clip: inherit; background-color: inherit; position: relative !important; background-position: inherit inherit; background-repeat: inherit inherit; }
+.md-diagram-panel { width: 100%; margin-top: 10px; text-align: center; padding-top: 0px; padding-bottom: 8px; overflow-x: auto; }
+#write .md-fences.mock-cm { white-space: pre-wrap; }
+.md-fences.md-fences-with-lineno { padding-left: 0px; }
+#write.fences-no-line-wrapping .md-fences.mock-cm { white-space: pre; overflow-x: auto; }
+.md-fences.mock-cm.md-fences-with-lineno { padding-left: 8px; }
+.CodeMirror-line, twitterwidget { break-inside: avoid; }
+.footnotes { opacity: 0.8; font-size: 0.9rem; margin-top: 1em; margin-bottom: 1em; }
+.footnotes + .footnotes { margin-top: 0px; }
+.md-reset { margin: 0px; padding: 0px; border: 0px; outline: 0px; vertical-align: top; text-decoration: none; text-shadow: none; float: none; position: static; width: auto; height: auto; white-space: nowrap; cursor: inherit; line-height: normal; font-weight: 400; text-align: left; box-sizing: content-box; direction: ltr; background-position: 0px 0px; background-repeat: initial initial; }
+li div { padding-top: 0px; }
+blockquote { margin: 1rem 0px; }
+li .mathjax-block, li p { margin: 0.5rem 0px; }
+li { margin: 0px; position: relative; }
+blockquote > :last-child { margin-bottom: 0px; }
+blockquote > :first-child, li > :first-child { margin-top: 0px; }
+.footnotes-area { color: rgb(136, 136, 136); margin-top: 0.714rem; padding-bottom: 0.143rem; white-space: normal; }
+#write .footnote-line { white-space: pre-wrap; }
+@media print { 
+  body, html { border: 1px solid transparent; height: 99%; break-after: avoid-page; break-before: avoid-page; }
+  #write { margin-top: 0px; padding-top: 0px; border-color: transparent !important; }
+  .typora-export * { -webkit-print-color-adjust: exact; }
+  html.blink-to-pdf { font-size: 13px; }
+  .typora-export #write { padding-left: 32px; padding-right: 32px; padding-bottom: 0px; break-after: avoid-page; }
+  .typora-export #write::after { height: 0px; }
+}
+.footnote-line { margin-top: 0.714em; font-size: 0.7em; }
+a img, img a { cursor: pointer; }
+pre.md-meta-block { font-size: 0.8rem; min-height: 0.8rem; white-space: pre-wrap; background-color: rgb(204, 204, 204); display: block; overflow-x: hidden; background-position: initial initial; background-repeat: initial initial; }
+p > .md-image:only-child:not(.md-img-error) img, p > img:only-child { display: block; margin: auto; }
+p > .md-image:only-child { display: inline-block; width: 100%; }
+#write .MathJax_Display { margin: 0.8em 0px 0px; }
+.md-math-block { width: 100%; }
+.md-math-block:not(:empty)::after { display: none; }
+[contenteditable="true"]:active, [contenteditable="true"]:focus { outline: 0px; box-shadow: none; }
+.md-task-list-item { position: relative; list-style-type: none; }
+.task-list-item.md-task-list-item { padding-left: 0px; }
+.md-task-list-item > input { position: absolute; top: 0px; left: 0px; margin-left: -1.2em; margin-top: calc(1em - 10px); border: none; }
+.math { font-size: 1rem; }
+.md-toc { min-height: 3.58rem; position: relative; font-size: 0.9rem; border-top-left-radius: 10px; border-top-right-radius: 10px; border-bottom-right-radius: 10px; border-bottom-left-radius: 10px; }
+.md-toc-content { position: relative; margin-left: 0px; }
+.md-toc-content::after, .md-toc::after { display: none; }
+.md-toc-item { display: block; color: rgb(65, 131, 196); }
+.md-toc-item a { text-decoration: none; }
+.md-toc-inner:hover { text-decoration: underline; }
+.md-toc-inner { display: inline-block; cursor: pointer; }
+.md-toc-h1 .md-toc-inner { margin-left: 0px; font-weight: 700; }
+.md-toc-h2 .md-toc-inner { margin-left: 2em; }
+.md-toc-h3 .md-toc-inner { margin-left: 4em; }
+.md-toc-h4 .md-toc-inner { margin-left: 6em; }
+.md-toc-h5 .md-toc-inner { margin-left: 8em; }
+.md-toc-h6 .md-toc-inner { margin-left: 10em; }
+@media screen and (max-width: 48em) { 
+  .md-toc-h3 .md-toc-inner { margin-left: 3.5em; }
+  .md-toc-h4 .md-toc-inner { margin-left: 5em; }
+  .md-toc-h5 .md-toc-inner { margin-left: 6.5em; }
+  .md-toc-h6 .md-toc-inner { margin-left: 8em; }
+}
+a.md-toc-inner { font-size: inherit; font-style: inherit; font-weight: inherit; line-height: inherit; }
+.footnote-line a:not(.reversefootnote) { color: inherit; }
+.md-attr { display: none; }
+.md-fn-count::after { content: "."; }
+code, pre, samp, tt { font-family: var(--monospace); }
+kbd { margin: 0px 0.1em; padding: 0.1em 0.6em; font-size: 0.8em; color: rgb(36, 39, 41); background-color: rgb(255, 255, 255); border: 1px solid rgb(173, 179, 185); border-top-left-radius: 3px; border-top-right-radius: 3px; border-bottom-right-radius: 3px; border-bottom-left-radius: 3px; box-shadow: rgba(12, 13, 14, 0.2) 0px 1px 0px, rgb(255, 255, 255) 0px 0px 0px 2px inset; white-space: nowrap; vertical-align: middle; background-position: initial initial; background-repeat: initial initial; }
+.md-comment { color: rgb(162, 127, 3); opacity: 0.8; font-family: var(--monospace); }
+code { text-align: left; }
+a.md-print-anchor { white-space: pre !important; border: none !important; display: inline-block !important; position: absolute !important; width: 1px !important; right: 0px !important; outline: 0px !important; text-shadow: initial !important; background-position: 0px 0px !important; background-repeat: initial initial !important; }
+.md-inline-math .MathJax_SVG .noError { display: none !important; }
+.html-for-mac .inline-math-svg .MathJax_SVG { vertical-align: 0.2px; }
+.md-math-block .MathJax_SVG_Display { text-align: center; margin: 0px; position: relative; text-indent: 0px; max-width: none; max-height: none; min-height: 0px; min-width: 100%; width: auto; overflow-y: hidden; display: block !important; }
+.MathJax_SVG_Display, .md-inline-math .MathJax_SVG_Display { width: auto; margin: inherit; display: inline-block !important; }
+.MathJax_SVG .MJX-monospace { font-family: var(--monospace); }
+.MathJax_SVG .MJX-sans-serif { font-family: sans-serif; }
+.MathJax_SVG { display: inline; font-style: normal; font-weight: 400; line-height: normal; zoom: 90%; text-indent: 0px; text-align: left; text-transform: none; letter-spacing: normal; word-spacing: normal; word-wrap: normal; white-space: nowrap; float: none; direction: ltr; max-width: none; max-height: none; min-width: 0px; min-height: 0px; border: 0px; padding: 0px; margin: 0px; }
+.MathJax_SVG * { transition: none; }
+.MathJax_SVG_Display svg { vertical-align: middle !important; margin-bottom: 0px !important; margin-top: 0px !important; }
+.os-windows.monocolor-emoji .md-emoji { font-family: "Segoe UI Symbol", sans-serif; }
+.md-diagram-panel > svg { max-width: 100%; }
+[lang="mermaid"] svg, [lang="flow"] svg { max-width: 100%; height: auto; }
+[lang="mermaid"] .node text { font-size: 1rem; }
+table tr th { border-bottom-width: 0px; }
+video { max-width: 100%; display: block; margin: 0px auto; }
+iframe { max-width: 100%; width: 100%; border: none; }
+.highlight td, .highlight tr { border: 0px; }
+
+
+:root {
+    --side-bar-bg-color: #fafafa;
+    --control-text-color: #777;
+}
+
+@include-when-export url(https://fonts.loli.net/css?family=Open+Sans:400italic,700italic,700,400&subset=latin,latin-ext);
+
+html {
+    font-size: 16px;
+}
+
+body {
+    font-family: "Open Sans","Clear Sans","Helvetica Neue",Helvetica,Arial,sans-serif;
+    color: rgb(51, 51, 51);
+    line-height: 1.6;
+}
+
+#write {
+    max-width: 860px;
+  	margin: 0 auto;
+  	padding: 30px;
+    padding-bottom: 100px;
+}
+#write > ul:first-child,
+#write > ol:first-child{
+    margin-top: 30px;
+}
+
+a {
+    color: #4183C4;
+}
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    position: relative;
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+    font-weight: bold;
+    line-height: 1.4;
+    cursor: text;
+}
+h1:hover a.anchor,
+h2:hover a.anchor,
+h3:hover a.anchor,
+h4:hover a.anchor,
+h5:hover a.anchor,
+h6:hover a.anchor {
+    text-decoration: none;
+}
+h1 tt,
+h1 code {
+    font-size: inherit;
+}
+h2 tt,
+h2 code {
+    font-size: inherit;
+}
+h3 tt,
+h3 code {
+    font-size: inherit;
+}
+h4 tt,
+h4 code {
+    font-size: inherit;
+}
+h5 tt,
+h5 code {
+    font-size: inherit;
+}
+h6 tt,
+h6 code {
+    font-size: inherit;
+}
+h1 {
+    padding-bottom: .3em;
+    font-size: 2.25em;
+    line-height: 1.2;
+    border-bottom: 1px solid #eee;
+}
+h2 {
+   padding-bottom: .3em;
+    font-size: 1.75em;
+    line-height: 1.225;
+    border-bottom: 1px solid #eee;
+}
+h3 {
+    font-size: 1.5em;
+    line-height: 1.43;
+}
+h4 {
+    font-size: 1.25em;
+}
+h5 {
+    font-size: 1em;
+}
+h6 {
+   font-size: 1em;
+    color: #777;
+}
+p,
+blockquote,
+ul,
+ol,
+dl,
+table{
+    margin: 0.8em 0;
+}
+li>ol,
+li>ul {
+    margin: 0 0;
+}
+hr {
+    height: 2px;
+    padding: 0;
+    margin: 16px 0;
+    background-color: #e7e7e7;
+    border: 0 none;
+    overflow: hidden;
+    box-sizing: content-box;
+}
+
+li p.first {
+    display: inline-block;
+}
+ul,
+ol {
+    padding-left: 30px;
+}
+ul:first-child,
+ol:first-child {
+    margin-top: 0;
+}
+ul:last-child,
+ol:last-child {
+    margin-bottom: 0;
+}
+blockquote {
+    border-left: 4px solid #dfe2e5;
+    padding: 0 15px;
+    color: #777777;
+}
+blockquote blockquote {
+    padding-right: 0;
+}
+table {
+    padding: 0;
+    word-break: initial;
+}
+table tr {
+    border-top: 1px solid #dfe2e5;
+    margin: 0;
+    padding: 0;
+}
+table tr:nth-child(2n),
+thead {
+    background-color: #f8f8f8;
+}
+table tr th {
+    font-weight: bold;
+    border: 1px solid #dfe2e5;
+    border-bottom: 0;
+    margin: 0;
+    padding: 6px 13px;
+}
+table tr td {
+    border: 1px solid #dfe2e5;
+    margin: 0;
+    padding: 6px 13px;
+}
+table tr th:first-child,
+table tr td:first-child {
+    margin-top: 0;
+}
+table tr th:last-child,
+table tr td:last-child {
+    margin-bottom: 0;
+}
+
+.CodeMirror-lines {
+    padding-left: 4px;
+}
+
+.code-tooltip {
+    box-shadow: 0 1px 1px 0 rgba(0,28,36,.3);
+    border-top: 1px solid #eef2f2;
+}
+
+.md-fences,
+code,
+tt {
+    border: 1px solid #e7eaed;
+    background-color: #f8f8f8;
+    border-radius: 3px;
+    padding: 0;
+    padding: 2px 4px 0px 4px;
+    font-size: 0.9em;
+}
+
+code {
+    background-color: #f3f4f4;
+    padding: 0 2px 0 2px;
+}
+
+.md-fences {
+    margin-bottom: 15px;
+    margin-top: 15px;
+    padding-top: 8px;
+    padding-bottom: 6px;
+}
+
+
+.md-task-list-item > input {
+  margin-left: -1.3em;
+}
+
+@media print {
+    html {
+        font-size: 13px;
+    }
+    table,
+    pre {
+        page-break-inside: avoid;
+    }
+    pre {
+        word-wrap: break-word;
+    }
+}
+
+.md-fences {
+	background-color: #f8f8f8;
+}
+#write pre.md-meta-block {
+	padding: 1rem;
+    font-size: 85%;
+    line-height: 1.45;
+    background-color: #f7f7f7;
+    border: 0;
+    border-radius: 3px;
+    color: #777777;
+    margin-top: 0 !important;
+}
+
+.mathjax-block>.code-tooltip {
+	bottom: .375rem;
+}
+
+.md-mathjax-midline {
+    background: #fafafa;
+}
+
+#write>h3.md-focus:before{
+	left: -1.5625rem;
+	top: .375rem;
+}
+#write>h4.md-focus:before{
+	left: -1.5625rem;
+	top: .285714286rem;
+}
+#write>h5.md-focus:before{
+	left: -1.5625rem;
+	top: .285714286rem;
+}
+#write>h6.md-focus:before{
+	left: -1.5625rem;
+	top: .285714286rem;
+}
+.md-image>.md-meta {
+    /*border: 1px solid #ddd;*/
+    border-radius: 3px;
+    padding: 2px 0px 0px 4px;
+    font-size: 0.9em;
+    color: inherit;
+}
+
+.md-tag {
+    color: #a7a7a7;
+    opacity: 1;
+}
+
+.md-toc { 
+    margin-top:20px;
+    padding-bottom:20px;
+}
+
+.sidebar-tabs {
+    border-bottom: none;
+}
+
+#typora-quick-open {
+    border: 1px solid #ddd;
+    background-color: #f8f8f8;
+}
+
+#typora-quick-open-item {
+    background-color: #FAFAFA;
+    border-color: #FEFEFE #e5e5e5 #e5e5e5 #eee;
+    border-style: solid;
+    border-width: 1px;
+}
+
+/** focus mode */
+.on-focus-mode blockquote {
+    border-left-color: rgba(85, 85, 85, 0.12);
+}
+
+header, .context-menu, .megamenu-content, footer{
+    font-family: "Segoe UI", "Arial", sans-serif;
+}
+
+.file-node-content:hover .file-node-icon,
+.file-node-content:hover .file-node-open-state{
+    visibility: visible;
+}
+
+.mac-seamless-mode #typora-sidebar {
+    background-color: #fafafa;
+    background-color: var(--side-bar-bg-color);
+}
+
+.md-lang {
+    color: #b4654d;
+}
+
+.html-for-mac .context-menu {
+    --item-hover-bg-color: #E6F0FE;
+}
+
+#md-notification .btn {
+    border: 0;
+}
+
+.dropdown-menu .divider {
+    border-color: #e5e5e5;
+}
+
+.ty-preferences .window-content {
+    background-color: #fafafa;
+}
+
+.ty-preferences .nav-group-item.active {
+    color: white;
+    background: #999;
+}
+
+ .typora-export li, .typora-export p, .typora-export,  .footnote-line {white-space: normal;} 
+</style>
+</head>
+<body class='typora-export' >
+<div  id='write'  class = 'is-mac'><h2><a name="tornado-开发模板" class="md-header-anchor"></a><span>Tornado 开发模板</span></h2><p><span>2019-07-27 11:30:28</span></p><p><span>Github 近期推出了项目模板的功能，从模板创建新项目从未如此方便。为了方便挖坑，我也做了一个开箱即用的模板：</span><a href='https://github.com/Jackeriss/template-tornado'><span>template-tornado</span></a><span>。 </span></p><p><span>使用该模板可以快速搭建一个基于 tornado 的 RESTful API 服务器。</span></p><p><span>tornado 的优点：并发性能优异，代码简洁轻量，扩展性强。 </span></p><p><span>本模板充分利用了 tornado 的这些优点，并在其基础上做了一些扩展与定制，主要功能如下：</span></p><h3><a name="使用-uvloop-加速" class="md-header-anchor"></a><span>使用 uvloop 加速</span></h3><p><a href='https://github.com/MagicStack/uvloop'><span>uvloop</span></a><span> 是 asyncio 默认事件循环的一个替代品，实现的功能完整，且即插即用。uvloop 是用 Cython 写的，建于 libuv 之上。uvloop 可以使 asyncio 更快。事实上，它至少比 Node.js、gevent 和其他 Python 异步框架要快两倍。基于 uvloop 的 asyncio 速度已经接近了 Go 程序。</span></p><h3><a name="使用-orjson-替代标准库-json" class="md-header-anchor"></a><span>使用 orjson 替代标准库 json</span></h3><p><a href='https://github.com/ijl/orjson'><span>orjson</span></a><span> 是 python 中最快的 json 库，其速度较标准库有显著提升。</span></p><h3><a name="兼容同步函数" class="md-header-anchor"></a><span>兼容同步函数</span></h3><p><span>在写异步代码的过程中最令人头疼的事情就是有些函数和库是同步且耗时的（例如 IO 读写，requests 网络请求），阻塞了客户代码与 asycio 事件循环的唯一线程，因此在执行调用时，整个应用程序都会冻结。这个问题的解决方法是，使用事件循环对象的 </span><code>run_in_executor</code><span> 方法。asyncio 的事件循环在背后维护着一个 </span><code>ThreadPoolExecutor</code><span> 对象，我们可以调用 </span><code>run_in_executor</code><span> 方法，把可调用对象发给它执行。此功能封装在 </span><code>util/thread_pool_util.py</code><span> 中。</span></p><h3><a name="参数校验" class="md-header-anchor"></a><span>参数校验</span></h3><p><span>使用 </span><a href='https://github.com/keleshev/schema'><span>schema</span></a><span> 这个库来做参数校验。可以在 </span><code>util/schema_util.py</code><span> 中添加自定义参数校验器。</span></p><h3><a name="basic-info-与协程上下文" class="md-header-anchor"></a><span>Basic-Info 与协程上下文</span></h3><p><span>推荐尽量不使用 cookie，一些通用信息（例如客户端类型等）前端可以放在 </span><code>Basic-Info</code><span> 这个 Header 中，后端可以将通用信息放在 </span><code>aiotask_context</code><span> 协程上下文中。</span></p><h3><a name="全局异常处理" class="md-header-anchor"></a><span>全局异常处理</span></h3><p><span>在 </span><code>hook/before_hook.py</code><span> 中为所有 handler 的请求方法添加了异常处理装饰器。每个可处理的异常都要定义 code、message 和 status 三个属性。</span></p><h3><a name="后台延时任务与周期任务" class="md-header-anchor"></a><span>后台延时任务与周期任务</span></h3><p><span>服务启动后如果有一些后台任务需要执行可以写在 </span><code>tasks</code><span> 文件夹中。如果只需要执行一次，那它就是一个 </span><code>delay_task</code><span>，如果需要周期性的执行则是 </span><code>periodic_task</code><span>。</span></p><h3><a name="本地缓存" class="md-header-anchor"></a><span>本地缓存</span></h3><p><code>util/cache_util.py</code><span> 中实现了一个本地缓存装饰器，它可以为任意函数设置本地缓存，并且支持设置过期时间。这个缓存自动过期的功能就是通过上面提到的周期任务实现的。</span></p><h3><a name="超时日志" class="md-header-anchor"></a><span>超时日志</span></h3><p><code>util/time_util.py</code><span> 中有一个打印函数超时日志的装饰器，如有需要可接入 </span><a href='https://github.com/getsentry/sentry'><span>sentry</span></a><span> 进行日志报警监控。</span></p><h3><a name="http-客户端redis-连接池-以及-pg-连接池等" class="md-header-anchor"></a><span>HTTP 客户端、Redis 连接池 以及 PG 连接池等</span></h3><p><span>常用的数据源连接已经封装好了，其中 Redis 和 PG 客户端默认是不会加载的，需要用的时候把 </span><code>Pipfile</code><span> 相应的库取消注释重新安装一下。然后改一下对应的 yaml 配置文件，最后将 </span><code>main.py</code><span> 的 </span><code>AFTER_HOOKS</code><span> 中的初始化方法取消注释就行了。</span></p><h3><a name="依赖管理与启动方法" class="md-header-anchor"></a><span>依赖管理与启动方法</span></h3><p><span>本模板使用 </span><a href='https://github.com/pypa/pipenv'><span>pipenv</span></a><span> 来管理依赖和执行启动命令。</span></p><p><span>第一步，初始化虚拟环境并安装依赖：</span>
+<span>执行 </span><code>pipenv install</code></p><p><span>第二步，启动服务：</span>
+<span>如果是本地开发环境运行则执行 </span><code>pipenv run serve</code>
+<span>使用该方法启动程序会在前台运行并在终端窗口输出日志，由于使用 asyncio 代替了 IOLoop，即使在 debug 模式下修改代码也不会自动重启。</span></p><p><span>如果是非本地开发、测试、预发或生产环境，则执行 </span><code>pipenv run restart [dev|test|pre|prod]</code><span>，使用该方法启动程序会在后台运行，并将日志输出在 </span><code>/app/log/</code><span> 文件夹下，如果启动失败可能是没有该日志路径的写权限，修改路径权限后重试即可。你也可以通过修改 </span><code>app.sh</code><span> 文件来自定义启动脚本。</span></p><p><span>执行 </span><code>pipenv run log [dev|test|pre|prod]</code><span> 可以打印实时日志。</span></p></div>
 </body>
 </html>

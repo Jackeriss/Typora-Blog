@@ -22,6 +22,11 @@ class AchiveHandler(BasicHandler):
         self.page("achive.html", **page_params)
 
 
+class ProjectHandler(BasicHandler):
+    def get(self):
+        self.page("project.html")
+
+
 class MovieHandler(BasicHandler):
     def get(self):
         self.page("movie.html")

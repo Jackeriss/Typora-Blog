@@ -11,6 +11,7 @@ ROUTERS = [
     (r"/i/", static_page.IndexHandler),
     (r"/i/post/(.*)", post.PostHandler),
     (r"/i/achive", static_page.AchiveHandler),
+    (r"/i/project", static_page.ProjectHandler),
     (r"/i/movie", static_page.MovieHandler),
     (r"/i/about", static_page.AboutHandler),
     (r"/i/.*", base.PageNotFoundHandler),

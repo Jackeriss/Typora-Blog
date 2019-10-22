@@ -5,10 +5,10 @@
 <title>Kafka 基础概览</title></head>
 <body><h2>Kafka 基础概览</h2>
 <p>2019-09-15 22:22:32</p>
-<p><img src='https://i.loli.net/2019/09/15/vE8BomRnPyXWhz3.png' alt='' referrerPolicy='no-referrer' /></p>
+<p><img src="https://i.loli.net/2019/10/22/Ssm6YgbQlUawEGR.jpg" referrerpolicy="no-referrer"></p>
 <p>部分内容取自 <a href='http://kafka.apachecn.org/'>Kafka 官方文档</a></p>
 <h3>架构概览</h3>
-<p><img src='https://i.loli.net/2019/09/15/dIWvMTNEOJwXqYS.png' alt='' referrerPolicy='no-referrer' /></p>
+<p><img src="https://i.loli.net/2019/09/15/dIWvMTNEOJwXqYS.png" referrerpolicy="no-referrer"></p>
 <h3>基本概念</h3>
 <h4>Broker</h4>
 <p>在消息队列中处理存储消息的服务器一般被称为 Broker（经纪人），目的是与 Producer（生产者） 和 Consumer（消费者）区分。</p>
@@ -16,7 +16,7 @@
 <p>Topic 就是数据主题，是数据记录发布的地方，可以用来区分业务系统。Kafka 中的 Topic 总是多订阅者模式，一个 Topic 可以拥有一个或者多个消费者来订阅它的数据。（物理上不同 Topic 的消息分开存储，逻辑上一个 Topic 的消息虽然保存于一个或多个 Broker 上，但用户只需指定消息的 Topic 即可生产或消费数据而不必关心数据存于何处）。</p>
 <h4>分区日志与 Offset</h4>
 <p>对于每一个 Topic， Kafka 集群都会维持一个分区日志，如下所示：</p>
-<p><img src='https://i.loli.net/2019/09/15/nFYfJlyNSbwzj1O.png' alt='' referrerPolicy='no-referrer' /></p>
+<p><img src="https://i.loli.net/2019/09/15/nFYfJlyNSbwzj1O.png" referrerpolicy="no-referrer"></p>
 <p>每个 Topic 包含一个或多个分区（Partition）。每个分区都是有序且顺序不可变的记录集，并且不断地追加到结构化的 commit log 文件。分区中的每一个记录都会分配一个 ID 来表示顺序，称作 offset，offset 用来唯一的标识分区中每一条记录。</p>
 <p>Kafka 只保证分区内的记录是有序的，而不保证主题中不同分区的顺序。如果你需要总记录在所有记录的上面，可使用仅有一个分区的主题来实现，但这意味着每个消费者组只有一个消费者线程（下面介绍 Consumer 与 Consumer Group 时有解释原因）。</p>
 <p>事实上，在每一个消费者中唯一保存的元数据是 offset（偏移量）即消费在日志中的位置。偏移量由消费者所控制：通常在读取记录后，消费者会以线性的方式增加偏移量，但是实际上，由于这个位置由消费者控制，所以消费者可以采用任何顺序来消费记录。例如，一个消费者可以重置到一个旧的偏移量，从而重新处理过去的数据；也可以跳过最近的记录，从“现在”开始消费。</p>
@@ -24,14 +24,14 @@
 <p>日志中的分区有以下几个用途：第一，当日志大小超过了单台服务器的限制，允许日志进行扩展。每个单独的分区都必须受限于主机的文件限制，不过一个主题可能有多个分区，因此可以处理无限量的数据。第二，可以作为并行的单元集。</p>
 <h4>Leader 与 Follower</h4>
 <p>日志的分区分布在 Kafka 集群的服务器上。每个服务器在处理数据和请求时，共享这些分区。每一个分区都会在已配置的服务器上进行备份，确保容错性。每个分区都有一台 Broker 作为 Leader，零台或者多台 Broker 作为 Follwer 。Leader 处理一切对分区的读写请求，而 Follower 只需被动的同步 Leader 上的数据。当 Leader 宕机了，Follower 中的一台服务器会自动成为新的 Leader。每台 Broker 都会成为某些分区的 Leader 和某些分区的 Follower，因此集群的负载是平衡的。</p>
-<p><img src='https://i.loli.net/2019/09/15/BhXU5fCGrTpHO1e.png' alt='' referrerPolicy='no-referrer' /></p>
+<p><img src="https://i.loli.net/2019/09/15/BhXU5fCGrTpHO1e.png" referrerpolicy="no-referrer"></p>
 <h4>Producer</h4>
 <p>生产者（Producer）可以将数据发布到所选择的 Topic 中。生产者负责将记录分配到 Topic 的哪一个分区中。可以使用循环的方式来简单地实现负载均衡，也可以根据某些语义分区函数（例如：记录中的 key）来完成。</p>
 <h4>Consumer 与 Consumer Group</h4>
 <p>消费者（Consumer）使用一个消费组（Consumer Group）名称来进行标识，发布到 Topic 中的每条记录被分配给订阅消费组中的一个消费者实例。消费者实例可以分布在多个进程中或者多个机器上。</p>
 <p>如果所有的消费者实例在同一消费组中，消息记录会负载均衡到每一个消费者实例。</p>
 <p>如果所有的消费者实例在不同的消费组中，每条消息记录会广播到所有的消费者进程。</p>
-<p><img src='https://i.loli.net/2019/09/15/7R4sFLC1qyfXjWv.png' alt='' referrerPolicy='no-referrer' /></p>
+<p><img src="https://i.loli.net/2019/09/15/7R4sFLC1qyfXjWv.png" referrerpolicy="no-referrer"></p>
 <p>多个消费者消费同一个 Topic 时，同一条消息只会被同一消费者组内的一个消费者所消费。而数据并非按消息为单位分配，而是以分区为单位分配，即同一个分区的数据只会被一个消费者所消费。如果消费者的个数多于分区的个数，那么会有部分消费者无法消费该 Topic 的任何数据，也就是说，当消费者个数超过分区数后，增加消费者并不能增加并行度。分区数决定了最大并行度。所以，如果你的分区数是 N，那么最好线程数也保持为 N，这样通常能够达到最大的吞吐量。超过 N 的配置只是浪费系统资源，因为多出的线程不会被分配到任何分区。</p>
 <h3>与 RabbitMQ 等对比</h3>
 <blockquote><p>从功能维度上来说，RabbitMQ 的优势要大于 Kafka，但是 Kafka 的吞吐量要比 RabbitMQ 高出 1 至 2 个数量级，一般 RabbitMQ 的单机 QPS 在万级别之内，而 Kafka 的单机 QPS 可以维持在十万级别，甚至可以达到百万级。</p>
