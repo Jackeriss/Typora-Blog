@@ -13,16 +13,17 @@
   <link href="/image/logo.png" rel="apple-touch-icon-precomposed" sizes="144x144">
   <link href="/image/logo.png" rel="shortcut icon">
   <style>
-    body{
-      margin:0; 
-      padding:0; 
-      overflow-y:hidden
+    body {
+      margin: 0;
+      padding: 0;
+      overflow-y: hidden
     }
   </style>
 </head>
 
 <body>
-  <iframe name="contentFrame" id="iframe" class="iframe" scrolling="auto" frameborder="0" style="width:100%;" src="about:blank" allowfullscreen="true"></iframe>
+  <iframe name="contentFrame" id="iframe" class="iframe" scrolling="auto" frameborder="0" style="width:100%;"
+    src="about:blank" allowfullscreen="true"></iframe>
   <div id="aplayer"></div>
   <script>
     if (top.document.getElementById('iframe').src.indexOf('/i/') == -1) {
@@ -34,8 +35,10 @@
   </script>
   <script src="https://cdn.jsdelivr.net/combine/npm/aplayer@1/dist/APlayer.min.js,npm/jquery@3"></script>
   <script>
-    window.onerror=function(){return true} 
-    $(function(){ 
+    window.onerror = function () {
+      return true
+    }
+    $(function () {
       headerHeight = 0
       var height = $(window).height()
       $("#iframe").height((height - headerHeight) + 'px')
