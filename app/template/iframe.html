@@ -28,13 +28,15 @@
   <script>
     if (top.document.getElementById('iframe').src.indexOf('/i/') == -1) {
       document.getElementById('iframe').setAttribute('src', '/i/{{ url }}')
-      window.parent.history.pushState({}, document.title, window.location.href)
     } else {
       window.location.href = '/i/{{ url }}'
     }
   </script>
   <script src="https://cdn.jsdelivr.net/combine/npm/aplayer@1/dist/APlayer.min.js,npm/jquery@3"></script>
   <script>
+    $(window).on('popstate', function() {
+      window.history.go(-2)
+    })
     window.onerror = function () {
       return true
     }
