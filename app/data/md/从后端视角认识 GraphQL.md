@@ -1,10 +1,10 @@
-# 从后端视角认识 GraphQL
+## 从后端视角认识 GraphQL
 
 2019-11-26 13:54:47
 
 本文以一个后端开发者的视角去认识和学习 GraphQL，比较 SDL 优先和代码优先这两种 GraphQL 服务端开发方法，发现 GraphQL 的优势并分析目前存在的问题。最后对 GraphQL 的未来进行了展望。
 
-## 什么是 GraphQL
+### 什么是 GraphQL
 
 GraphQL 既是一种用于 API 的查询语言也是一个满足你数据查询的运行时。 GraphQL 对你的 API 中的数据提供了一套易于理解的完整描述，使得客户端能够准确地获得它需要的数据，而且没有任何冗余，也让 API 更容易地随着时间推移而演进，还能用于构建强大的开发者工具。
 
@@ -12,7 +12,7 @@ GraphQL 既是一种用于 API 的查询语言也是一个满足你数据查询�
 
 以上便是 GraphQL 官网上对它的介绍。形象点说就是把服务器作为一个数据源，使用 GraphQL 接口就好像使用数据库的 SQL 语句一样，前端可以自由查询自己需要的数据。
 
-## 为什么需要 GraphQL
+### 为什么需要 GraphQL
 
 大家都知道 RESTful 一直是行业中 API 接口的通用规范，那么 GraphQL 是在什么背景下诞生的？它又解决了传统 API 的哪些问题呢？
 
@@ -24,11 +24,11 @@ GraphQL 既是一种用于 API 的查询语言也是一个满足你数据查询�
 
 然而，GraphQL 带来的好处远不止这些。随着移动互联网和前端技术的飞速发展，各种不同的前端框架和平台层出不穷，这使得构建和维护一个符合所有平台需求的 API 变得十分困难，而使用 GraphQL 每个客户端都可以精确地访问它所需要的数据。还有就是在产品快速迭代的过程中，对于 RESTful API，服务器公开数据的方式常常需要修改，以满足客户端的特定需求和设计更改，这阻碍了产品的快速开发和迭代。
 
-## GraphQL 如何使用
+### GraphQL 如何使用
 
 和所有的 API 接口一样，你需要一个服务端和一个客户端，服务端主要包括 Schema 的定义和 Resolver（等价于传统 API 中的 Handler）。而客户端则要写不同场景下的查询语句。
 
-### 查询、变更与订阅
+#### 查询、变更与订阅
 
 GraphQL 有三种操作，分别是 query（查询）、mutation（变更）和 subscription （订阅）
 
@@ -47,7 +47,7 @@ GraphQL 有三种操作，分别是 query（查询）、mutation（变更）和 
 
 这些前端使用向的东西我就不做过多介绍了，可以参考 [GraphQL 官方教程](https://graphql.cn/learn/queries/)，下面着重介绍一下 GraphQL 的服务器开发。
 
-### Schema 和类型
+#### Schema 和类型
 
 GraphQL 的 Schema 定义有自己的一套语言，叫做 GraphQL SDL （GraphQL Schema Definition Language）。下面以一个博客程序的 Schema 定义为例：
 
@@ -70,7 +70,7 @@ type Blog {
 
 它主要定义了接口的字段和类型，其他信息包括默认值和关联关系等。这其实和数据库的 Schema 定义很像。
 
-#### Type
+##### Type
 
 Type （类型）有一个名字，并且可以实现一个或多个 Interface（接口）：
 
@@ -80,7 +80,7 @@ type Post implements Item {
 }
 ```
 
-#### Field
+##### Field
 
 Field（字段）有一个名字和类型：
 
@@ -114,7 +114,7 @@ age: Int!
 names: [String!]
 ```
 
-#### Enum
+##### Enum
 
 Enum（枚举）是具有一组指定值的标量：
 
@@ -125,7 +125,7 @@ enum Category {
 }
 ```
 
-#### Interface
+##### Interface
 
 在 GraphQL 中，接口是字段列表。 GraphQL 类型必须与其实现的所有接口都具有相同的字段，并且所有接口字段都必须具有相同的类型。
 
@@ -135,7 +135,7 @@ interface Item {
 }
 ```
 
-#### Schema directive
+##### Schema directive
 
 Directive （指令）没有内在的含义。 每个 GraphQL 实现都可以定义自己的自定义指令，以添加新功能。
 
@@ -143,9 +143,9 @@ Directive （指令）没有内在的含义。 每个 GraphQL 实现都可以定
 name: String! @defaultValue(value: "new blogpost")
 ```
 
-### SDL 优先 vs 代码优先
+#### SDL 优先 vs 代码优先
 
-#### GraphQL 服务器开发的演变
+##### GraphQL 服务器开发的演变
 
 ![](https://i.loli.net/2019/11/05/Ri1TysQZrELkCzm.jpg)
 
@@ -224,9 +224,9 @@ const schema = makeExecutableSchema({
 
 学习，管理和集成所有这些工具的开销减慢了开发人员的速度，并使其难以跟上 GraphQL 生态系统的步伐。
 
-#### 分析 SDL 优先开发的问题
+##### 分析 SDL 优先开发的问题
 
-##### 问题1：模式定义和解析器之间的不一致
+###### 问题1：模式定义和解析器之间的不一致
 
 如果使用 SDL 优先，则 Schema 定义必须与 Resolver 程序实现的确切结构匹配。这意味着开发人员需要确保 Schema 定义始终与 Resolver 同步！
 
@@ -234,19 +234,19 @@ const schema = makeExecutableSchema({
 
 **工具 / 解决方案**：有一些工具可帮助保持 Schema 定义和 Resolver 同步。例如，通过使用诸如[`graphqlgen`](https://github.com/prisma/graphqlgen)或库的代码生成[`graphql-code-generator`](https://github.com/dotansimha/graphql-code-generator)。
 
-##### 问题2：GraphQL Schema 的模块化
+###### 问题2：GraphQL Schema 的模块化
 
 编写大型 GraphQL 模式时，通常不希望所有 GraphQL 类型定义都驻留在同一文件中。相反，您想将它们分成较小的部分（例如，根据功能或产品）。
 
 **工具/解决方案**：类似[`graphql-import`](https://github.com/prisma/graphql-import)的工具或更新的[`graphql-modules`](https://graphql-modules.com/)库对此提供了帮助。`graphql-import`使用编写为 SDL 注释的自定义导入语法。`graphql-modules`是一个工具集，可帮助进行 Schema 分离，Resolver 组合以及为 GraphQL 服务器实现可伸缩结构。
 
-##### 问题3：Schema 定义中的冗余（代码重用）
+###### 问题3：Schema 定义中的冗余（代码重用）
 
 另一个问题是如何重用 SDL 定义。
 
 当前没有工具可以解决此问题。开发人员可以编写自定义工具来减少重复代码的需求，但是目前该问题尚缺乏通用的解决方案。
 
-##### 问题4：IDE 支持和开发人员经验
+###### 问题4：IDE 支持和开发人员经验
 
 GraphQL 模式基于强大的类型系统，这可以在开发期间带来巨大的好处，因为它允许对代码进行静态分析。不幸的是，SDL 通常在程序中表示为纯字符串，这意味着该工具无法识别其中的任何结构。
 
@@ -254,7 +254,7 @@ GraphQL 模式基于强大的类型系统，这可以在开发期间带来巨大
 
 **工具 / 解决方案**：该[`graphql-tag`](https://github.com/apollographql/graphql-tag)库提供了`gql`将 GraphQL 字符串转换为 AST（抽象语法树） 的功能，因此可以进行静态分析以及随之而来的功能。除此之外，还有各种编辑器插件，例如 VS Code 的 [GraphQL](https://marketplace.visualstudio.com/items?itemName=Prisma.vscode-graphql) 或 [Apollo GraphQL](https://marketplace.visualstudio.com/items?itemName=apollographql.vscode-apollo) 插件。
 
-#### 结论：SDL 优先可以工作，但需要无数的工具
+##### 结论：SDL 优先可以工作，但需要无数的工具
 
 在探究了问题领域和开发出解决问题的各种工具之后，似乎 SDL 优先的开发最终可以工作——但它也要求开发人员学习和使用大量其他工具。
 
@@ -311,41 +311,41 @@ const schema = makeSchema({
 
 API 文档等其他好处也不会因代码优先方法而丢失。
 
-## GraphQL 的更多优势
+### GraphQL 的更多优势
 
 在“为什么需要 GraphQL ”部分我已经介绍了许多 GraphQL 相对于传统 API 的优势，但 GraphQL 的优势远不止这些。下面我再介绍几个 GraphQL 比较明显的优势：
 
-### 版本控制
+#### 版本控制
 
 使用 REST API，通常会看到许多带有 v1 或 v2 的 API。这些在 GraphQL 中并不需要，因为你可以通过添加或删除类型来改进 API。
 
 在 GraphQL 中，你所需要做的就是写新代码。可以编写新类型、查询和修改，而无需维护其他版本的 API。
 
-### 接口校验
+#### 接口校验
 
 显而易见，由于强类型的使用，我们对收到的数据进行检验的操作变得更为容易和严格，自动化的简便度和有效性也大大提高。对 query 本身的结构的校验也相当于是在Schema 完成后就自动得到了，所以我们甚至不需要再引入任何别的工具或者依赖，就可以很方便地解决所有的 validation。
 
-### 接口文档
+#### 接口文档
 
 前面提到，由于 GraphQL 的 Schema 已经定义了字段和类型，正常情况后端不必再提供额外的接口文档，一些 GraphQL 的工具自带了文档展示功能，例如 [graphql-playground](https://github.com/prisma-labs/graphql-playground) 和 [graphiql](https://github.com/graphql/graphiql)。流行的 GraphQL 框架中都集成了这些工具，这很大程度上提升了 GraphQL 的开发体验，也提高了前后端的沟通效率，这在前后端分离的架构下是很重要的。
 
-### 自动生成代码
+#### 自动生成代码
 
 无论是 SDL 优先的从 SDL 生成代码还是代码优先的从代码生成 SDL 都还只是开发流程上的简化，还是需要自己写Resolver 才能使用，而类似 [prisma](https://www.prisma.io/) 的项目已经可以让你直接将数据库变成一个 GraphQL Server，无需手写 Resolver，他会自动生成常见的查询方法。
 
-## GraphQL 的劣势与难点
+### GraphQL 的劣势与难点
 
-### 性能
+#### 性能
 
 一个 RESTful 应用，由于每个 API 的确定性，我们可以针对每一个 API 的逻辑，非常好的优化它们的性能，所以就算存在一定程度的 Overfetching / Underfetching，前后端的性能都可以保持在能够接受的范围内。然而想要更普适性一些的 GraphQL，则可能会因为一个层级结构复杂而且许多域都有很大数据量的 Query 跑许多个Resolvers，使得数据库的查询性能成为了瓶颈。使用 [DataLoader](https://github.com/graphql/dataloader) 可以在一定程度上解决这个问题。
 
-### 缓存
+#### 缓存
 
 在 RESTful 等基于 URL 的 API 中，客户端可以根据 URL 使用 HTTP 缓存。这些 API 中的 URL 就是全局唯一标识符。而 GraphQL 是单入口的 API，无法用 URL 实现缓存。
 GraphQL 中提供 Global ID 字段作为全局唯一标识符。可以将一个字段（如 id）保留为全局唯一标识符，例如`"id": "MDEwOlJlcG9zaXRvcnk2MDE4MTY4OA=="`。
 如果后端使用类似 UUID 的标识符，那么直接暴露这个全局唯一 ID 即可。如果后端并没有给每个对象分配全局唯一 ID，则 GraphQL 层需要构造此 ID。
 
-### 资源与速率限制
+#### 资源与速率限制
 
 对于 RESTful 请求，简单的限制请求次数即可。而对于 GraphQL，一个复杂的 GraphQL 调用可能等同于数千个 RESTful 请求，而一个简单的 GraphQL 调用可能只等同于一两个 RESTful 请求。
 
@@ -431,15 +431,15 @@ query {
 }
 ```
 
-### 生态
+#### 生态
 
 尽管 GraphQL 有着很好的社区支持，但本质上使用 GraphQL，就等于要使用 React 与 NodeJS，其他语言和框架的成熟度和社区活跃度都比较低。
 
-## 总结
+### 总结
 
 GraphQL 是 API 的未来吗？至少在数据聚合和网关层是的。当然 Restful 也不会被完全替代，只是今后提到开放 API 不再只有 Restful 这一种选项了。
 
-## 参考文献
+### 参考文献
 
 - [GraphQL SDL — Schema Definition Language](https://www.prisma.io/blog/graphql-sdl-schema-definition-language-6755bcb9ce51)
 
