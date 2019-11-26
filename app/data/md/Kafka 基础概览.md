@@ -94,7 +94,7 @@ Kafka 只保证分区内的记录是有序的，而不保证主题中不同分�
 
 #### 设置 producer 是否需要 broker 的反馈
 
-可以设置的值为：`all, -1, 0, 1` 
+可以设置的值为：`all, -1, 0, 1`
 
 - 0：producer不会等待 broker 发送 ack，无法保证服务器已收到记录。
 
@@ -116,7 +116,7 @@ spring.kafka.producer.retries = 1000
 
 #### 设置 producer 数据压缩类型
 
-可以设置的值为 `none、gzip、snappy` ，默认是 `none`
+可以设置的值为`none、gzip、snappy`，默认是`none`
 
 压缩最好用于批量处理，批量处理消息越多，压缩性能越好。
 
@@ -140,7 +140,7 @@ spring.kafka.consumer.group-id = xxx
 - latest：自动将偏移重置为最新偏移
 - none：如果没有为消费者组找到以前的偏移，则向消费者抛出异常
 
-可以设置的值为 `latest, earliest, none` ，默认是 `latest`
+可以设置的值为`latest, earliest, none`，默认是`latest`
 
 ```
 spring.kafka.consumer.auto-offset-reset = earliest
@@ -154,7 +154,7 @@ spring.kafka.consumer.auto-offset-reset = earliest
   spring.kafka.consumer.enable-auto-commit = true
   ```
   
-  这种方式也被称为 `at most once` ，获取到消息后就可以更新 offset，无论是否消费成功。
+  这种方式也被称为`at most once`，获取到消息后就可以更新 offset，无论是否消费成功。
 
 - 手动提交
   
@@ -162,7 +162,7 @@ spring.kafka.consumer.auto-offset-reset = earliest
   spring.kafka.consumer.enable-auto-commit = false
   ```
   
-  这种方式称为 `at least once` 。获取到消息后，等消费完成再调用 `commitSync()` 方法 ，手动更新 offset。如果消费失败，则 offset 也不会更新，此条消息会被重复消费一次。如果消费者保证幂等性，则即便会有重复消息也影响不大。当然也可以通过事务实现 `exactly once` 。
+  这种方式称为`at least once`。获取到消息后，等消费完成再调用`commitSync()`方法 ，手动更新 offset。如果消费失败，则 offset 也不会更新，此条消息会被重复消费一次。如果消费者保证幂等性，则即便会有重复消息也影响不大。当然也可以通过事务实现`exactly once`。
   
   手动提交又有好几种方式：
   
@@ -174,7 +174,7 @@ spring.kafka.consumer.auto-offset-reset = earliest
   - MANUAL：listener 负责 ack，但是背后也是批量提交上去的
   - MANUAL_IMMEDIATE：listener 负责 ack，每调用一次，就立即 commit
   
-  一般设置为 listener 立即 commit，此设置只有设置 `spring.kafka.consumer.enable-auto-commit = false` 时才会生效。
+  一般设置为 listener 立即 commit，此设置只有设置`spring.kafka.consumer.enable-auto-commit = false`时才会生效。
   
   ```
   spring.kafka.listener.ack-mode = MANUAL_IMMEDIATE

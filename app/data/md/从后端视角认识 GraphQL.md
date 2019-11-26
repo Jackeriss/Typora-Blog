@@ -32,7 +32,7 @@ GraphQL 既是一种用于 API 的查询语言也是一个满足你数据查询�
 
 GraphQL 有三种操作，分别是 query（查询）、mutation（变更）和 subscription （订阅）
 
-可以尝试一下这个[在线例子](https://www.graphqlbin.com/v2/6RQ6TM)，点击右侧的 `DOCS` 可以打开文档。
+可以尝试一下这个[在线例子](https://www.graphqlbin.com/v2/6RQ6TM)，点击右侧的`DOCS`可以打开文档。
 
 ```graphql
 {
@@ -102,7 +102,7 @@ GraphQL 规范定义了一些内置标准类型，但可以通过具体实现来
 
 在字段中除了使用标准类型外还可以使用任何在 Schema 中定义过的类型。
 
-不可为空的字段通过在后面加 `!` 来表示：
+不可为空的字段通过在后面加`!`来表示：
 
 ```graphql
 age: Int!
@@ -276,7 +276,7 @@ SDL 优先的另一个有问题的方面是，无论使用哪种编程语言，�
 
 还记得在中定义 Schema 的最初示例`graphql-js`吗？这就是“ 代码优先”。没有任何手动维护的 Schema 定义，而是从实现该 Schema 的代码生成了 SDL 。
 
-尽管`graphql-js`非常冗长，但其他语言中有许多流行的框架都基于代码优先方法工作，例如已经提到的，以及适用于 Python 或 Elixir 的框架：[`graphlq-ruby`](https://github.com/rmosolgo/graphql-ruby) [`sangria-graphql`](https://github.com/sangria-graphql/sangria) [`graphene`](https://github.com/graphql-python/graphene) [`absinthe-graphql`](https://github.com/absinthe-graphql/absinthe)
+尽管`graphql-js`非常冗长，但其他语言中有许多流行的框架都基于代码优先方法工作，例如已经提到的，以及适用于 Python 或 Elixir 的框架：[`graphlq-ruby`](https://github.com/rmosolgo/graphql-ruby)/[`sangria-graphql`](https://github.com/sangria-graphql/sangria)/[`graphene`](https://github.com/graphql-python/graphene)/[`absinthe-graphql`](https://github.com/absinthe-graphql/absinthe)
 
 ##### 实践中的代码优先
 
