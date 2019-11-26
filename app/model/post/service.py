@@ -16,11 +16,8 @@ class PostService(object):
         new_posts = os.listdir(os.path.join(config.base_dir, "data/html"))
         post_template_path = os.path.join(config.base_dir, "template/post")
         for template_file_name in os.listdir(post_template_path):
-            if template_file_name not in new_posts:
-                os.remove(os.path.join(post_template_path, template_file_name))
+            os.remove(os.path.join(post_template_path, template_file_name))
         for post_file_name in new_posts:
-            if "[草稿]" in post_file_name:
-                continue
             if ".html" in post_file_name:
                 post = {}
                 post["title"] = post_file_name.replace(".html", "")

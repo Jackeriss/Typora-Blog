@@ -2,313 +2,580 @@
 <html>
 <head>
 <meta charset='UTF-8'><meta name='viewport' content='width=device-width initial-scale=1'>
-<title>从后端视角认识 GraphQL</title></head>
-<body><h2>从后端视角认识 GraphQL</h2>
-<p>2019-11-26 13:54:47</p>
-<p>本文以一个后端开发者的视角去认识和学习 GraphQL，比较 SDL 优先和代码优先这两种 GraphQL 服务端开发方法，发现 GraphQL 的优势并分析目前存在的问题。最后对 GraphQL 的未来进行了展望。</p>
-<h3>什么是 GraphQL</h3>
-<p>GraphQL 既是一种用于 API 的查询语言也是一个满足你数据查询的运行时。 GraphQL 对你的 API 中的数据提供了一套易于理解的完整描述，使得客户端能够准确地获得它需要的数据，而且没有任何冗余，也让 API 更容易地随着时间推移而演进，还能用于构建强大的开发者工具。</p>
-<p><img src="https://i.loli.net/2019/11/03/aHRLVuiSE895CJy.gif" referrerpolicy="no-referrer"></p>
-<p>以上便是 GraphQL 官网上对它的介绍。形象点说就是把服务器作为一个数据源，使用 GraphQL 接口就好像使用数据库的 SQL 语句一样，前端可以自由查询自己需要的数据。</p>
-<h3>为什么需要 GraphQL</h3>
-<p>大家都知道 RESTful 一直是行业中 API 接口的通用规范，那么 GraphQL 是在什么背景下诞生的？它又解决了传统 API 的哪些问题呢？</p>
-<p>2012 年 Facebook 开发 GraphQL 的最初原因是移动用户的增加，当时的移动设备和网络性能很差，GraphQL 最小化了需要网络传输的数据量，从而极大地改善了在这些条件下运行的应用程序。而且 Facebook 的页面所需的接口数据十分复杂，用户之间的关注关系是网状的，使用 GraphQL 可以轻松实现递归关联查询。</p>
-<p><img src="https://i.loli.net/2019/11/03/3wUgiOYQatX9K6L.png" referrerpolicy="no-referrer">  <img src="https://i.loli.net/2019/11/03/VmNi5KUq2P7Fpt3.png" referrerpolicy="no-referrer"></p>
-<p>上面的图片对比了 RESTful API 与 GraphQL API 在查询用户详情页时的请求情况。可以看到， 使用 RESTful API 需要同时完成三个请求而 GraphQL 只需要一次请求。</p>
-<p>然而，GraphQL 带来的好处远不止这些。随着移动互联网和前端技术的飞速发展，各种不同的前端框架和平台层出不穷，这使得构建和维护一个符合所有平台需求的 API 变得十分困难，而使用 GraphQL 每个客户端都可以精确地访问它所需要的数据。还有就是在产品快速迭代的过程中，对于 RESTful API，服务器公开数据的方式常常需要修改，以满足客户端的特定需求和设计更改，这阻碍了产品的快速开发和迭代。</p>
-<h3>GraphQL 如何使用</h3>
-<p>和所有的 API 接口一样，你需要一个服务端和一个客户端，服务端主要包括 Schema 的定义和 Resolver（等价于传统 API 中的 Handler）。而客户端则要写不同场景下的查询语句。</p>
-<h4>查询、变更与订阅</h4>
-<p>GraphQL 有三种操作，分别是 query（查询）、mutation（变更）和 subscription （订阅）</p>
-<p>可以尝试一下这个<a href='https://www.graphqlbin.com/v2/6RQ6TM'>在线例子</a>，点击右侧的 <code>DOCS</code> 可以打开文档。</p>
-<pre><code class='language-graphql' lang='graphql'>{
-  allPersons(orderBy: name_ASC) {
-    name
-    films {
-      director
+<title>从后端视角认识 GraphQL</title><link href='https://fonts.loli.net/css?family=Open+Sans:400italic,700italic,700,400&subset=latin,latin-ext' rel='stylesheet' type='text/css' /><style type='text/css'>html {overflow-x: initial !important;}:root { --bg-color: #ffffff; --text-color: #333333; --select-text-bg-color: #B5D6FC; --select-text-font-color: auto; --monospace: "Lucida Console",Consolas,"Courier",monospace; }
+html { font-size: 14px; background-color: var(--bg-color); color: var(--text-color); font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; -webkit-font-smoothing: antialiased; }
+body { margin: 0px; padding: 0px; height: auto; bottom: 0px; top: 0px; left: 0px; right: 0px; font-size: 1rem; line-height: 1.42857143; overflow-x: hidden; background-image: inherit; background-size: inherit; background-attachment: inherit; background-origin: inherit; background-clip: inherit; background-color: inherit; tab-size: 4; background-position: inherit inherit; background-repeat: inherit inherit; }
+iframe { margin: auto; }
+a.url { word-break: break-all; }
+a:active, a:hover { outline: 0px; }
+.in-text-selection, ::selection { text-shadow: none; background: var(--select-text-bg-color); color: var(--select-text-font-color); }
+#write { margin: 0px auto; height: auto; width: inherit; word-break: normal; word-wrap: break-word; position: relative; white-space: normal; overflow-x: visible; padding-top: 40px; }
+#write.first-line-indent p { text-indent: 2em; }
+#write.first-line-indent li p, #write.first-line-indent p * { text-indent: 0px; }
+#write.first-line-indent li { margin-left: 2em; }
+.for-image #write { padding-left: 8px; padding-right: 8px; }
+body.typora-export { padding-left: 30px; padding-right: 30px; }
+.typora-export .footnote-line, .typora-export li, .typora-export p { white-space: pre-wrap; }
+@media screen and (max-width: 500px) { 
+  body.typora-export { padding-left: 0px; padding-right: 0px; }
+  #write { padding-left: 20px; padding-right: 20px; }
+  .CodeMirror-sizer { margin-left: 0px !important; }
+  .CodeMirror-gutters { display: none !important; }
+}
+#write li > figure:last-child { margin-bottom: 0.5rem; }
+#write ol, #write ul { position: relative; }
+img { max-width: 100%; vertical-align: middle; }
+button, input, select, textarea { color: inherit; font-family: inherit; font-size: inherit; font-style: inherit; font-variant-caps: inherit; font-weight: inherit; font-stretch: inherit; line-height: inherit; }
+input[type="checkbox"], input[type="radio"] { line-height: normal; padding: 0px; }
+*, ::after, ::before { box-sizing: border-box; }
+#write h1, #write h2, #write h3, #write h4, #write h5, #write h6, #write p, #write pre { width: inherit; }
+#write h1, #write h2, #write h3, #write h4, #write h5, #write h6, #write p { position: relative; }
+p { line-height: inherit; }
+h1, h2, h3, h4, h5, h6 { break-after: avoid-page; break-inside: avoid; orphans: 2; }
+p { orphans: 4; }
+h1 { font-size: 2rem; }
+h2 { font-size: 1.8rem; }
+h3 { font-size: 1.6rem; }
+h4 { font-size: 1.4rem; }
+h5 { font-size: 1.2rem; }
+h6 { font-size: 1rem; }
+.md-math-block, .md-rawblock, h1, h2, h3, h4, h5, h6, p { margin-top: 1rem; margin-bottom: 1rem; }
+.hidden { display: none; }
+.md-blockmeta { color: rgb(204, 204, 204); font-weight: 700; font-style: italic; }
+a { cursor: pointer; }
+sup.md-footnote { padding: 2px 4px; background-color: rgba(238, 238, 238, 0.701961); color: rgb(85, 85, 85); border-top-left-radius: 4px; border-top-right-radius: 4px; border-bottom-right-radius: 4px; border-bottom-left-radius: 4px; cursor: pointer; }
+sup.md-footnote a, sup.md-footnote a:hover { color: inherit; text-transform: inherit; text-decoration: inherit; }
+#write input[type="checkbox"] { cursor: pointer; width: inherit; height: inherit; }
+figure { overflow-x: auto; margin: 1.2em 0px; max-width: calc(100% + 16px); padding: 0px; }
+figure > table { margin: 0px !important; }
+tr { break-inside: avoid; break-after: auto; }
+thead { display: table-header-group; }
+table { border-collapse: collapse; border-spacing: 0px; width: 100%; overflow: auto; break-inside: auto; text-align: left; }
+table.md-table td { min-width: 32px; }
+.CodeMirror-gutters { border-right-width: 0px; background-color: inherit; }
+.CodeMirror-linenumber { }
+.CodeMirror { text-align: left; }
+.CodeMirror-placeholder { opacity: 0.3; }
+.CodeMirror pre { padding: 0px 4px; }
+.CodeMirror-lines { padding: 0px; }
+div.hr:focus { cursor: none; }
+#write pre { white-space: pre-wrap; }
+#write.fences-no-line-wrapping pre { white-space: pre; }
+#write pre.ty-contain-cm { white-space: normal; }
+.CodeMirror-gutters { margin-right: 4px; }
+.md-fences { font-size: 0.9rem; display: block; break-inside: avoid; text-align: left; overflow: visible; white-space: pre; background-image: inherit; background-size: inherit; background-attachment: inherit; background-origin: inherit; background-clip: inherit; background-color: inherit; position: relative !important; background-position: inherit inherit; background-repeat: inherit inherit; }
+.md-diagram-panel { width: 100%; margin-top: 10px; text-align: center; padding-top: 0px; padding-bottom: 8px; overflow-x: auto; }
+#write .md-fences.mock-cm { white-space: pre-wrap; }
+.md-fences.md-fences-with-lineno { padding-left: 0px; }
+#write.fences-no-line-wrapping .md-fences.mock-cm { white-space: pre; overflow-x: auto; }
+.md-fences.mock-cm.md-fences-with-lineno { padding-left: 8px; }
+.CodeMirror-line, twitterwidget { break-inside: avoid; }
+.footnotes { opacity: 0.8; font-size: 0.9rem; margin-top: 1em; margin-bottom: 1em; }
+.footnotes + .footnotes { margin-top: 0px; }
+.md-reset { margin: 0px; padding: 0px; border: 0px; outline: 0px; vertical-align: top; text-decoration: none; text-shadow: none; float: none; position: static; width: auto; height: auto; white-space: nowrap; cursor: inherit; line-height: normal; font-weight: 400; text-align: left; box-sizing: content-box; direction: ltr; background-position: 0px 0px; background-repeat: initial initial; }
+li div { padding-top: 0px; }
+blockquote { margin: 1rem 0px; }
+li .mathjax-block, li p { margin: 0.5rem 0px; }
+li { margin: 0px; position: relative; }
+blockquote > :last-child { margin-bottom: 0px; }
+blockquote > :first-child, li > :first-child { margin-top: 0px; }
+.footnotes-area { color: rgb(136, 136, 136); margin-top: 0.714rem; padding-bottom: 0.143rem; white-space: normal; }
+#write .footnote-line { white-space: pre-wrap; }
+@media print { 
+  body, html { border: 1px solid transparent; height: 99%; break-after: avoid-page; break-before: avoid-page; }
+  #write { margin-top: 0px; padding-top: 0px; border-color: transparent !important; }
+  .typora-export * { -webkit-print-color-adjust: exact; }
+  html.blink-to-pdf { font-size: 13px; }
+  .typora-export #write { padding-left: 32px; padding-right: 32px; padding-bottom: 0px; break-after: avoid-page; }
+  .typora-export #write::after { height: 0px; }
+}
+.footnote-line { margin-top: 0.714em; font-size: 0.7em; }
+a img, img a { cursor: pointer; }
+pre.md-meta-block { font-size: 0.8rem; min-height: 0.8rem; white-space: pre-wrap; background-color: rgb(204, 204, 204); display: block; overflow-x: hidden; background-position: initial initial; background-repeat: initial initial; }
+p > .md-image:only-child:not(.md-img-error) img, p > img:only-child { display: block; margin: auto; }
+p > .md-image:only-child { display: inline-block; width: 100%; }
+#write .MathJax_Display { margin: 0.8em 0px 0px; }
+.md-math-block { width: 100%; }
+.md-math-block:not(:empty)::after { display: none; }
+[contenteditable="true"]:active, [contenteditable="true"]:focus { outline: 0px; box-shadow: none; }
+.md-task-list-item { position: relative; list-style-type: none; }
+.task-list-item.md-task-list-item { padding-left: 0px; }
+.md-task-list-item > input { position: absolute; top: 0px; left: 0px; margin-left: -1.2em; margin-top: calc(1em - 10px); border: none; }
+.math { font-size: 1rem; }
+.md-toc { min-height: 3.58rem; position: relative; font-size: 0.9rem; border-top-left-radius: 10px; border-top-right-radius: 10px; border-bottom-right-radius: 10px; border-bottom-left-radius: 10px; }
+.md-toc-content { position: relative; margin-left: 0px; }
+.md-toc-content::after, .md-toc::after { display: none; }
+.md-toc-item { display: block; color: rgb(65, 131, 196); }
+.md-toc-item a { text-decoration: none; }
+.md-toc-inner:hover { text-decoration: underline; }
+.md-toc-inner { display: inline-block; cursor: pointer; }
+.md-toc-h1 .md-toc-inner { margin-left: 0px; font-weight: 700; }
+.md-toc-h2 .md-toc-inner { margin-left: 2em; }
+.md-toc-h3 .md-toc-inner { margin-left: 4em; }
+.md-toc-h4 .md-toc-inner { margin-left: 6em; }
+.md-toc-h5 .md-toc-inner { margin-left: 8em; }
+.md-toc-h6 .md-toc-inner { margin-left: 10em; }
+@media screen and (max-width: 48em) { 
+  .md-toc-h3 .md-toc-inner { margin-left: 3.5em; }
+  .md-toc-h4 .md-toc-inner { margin-left: 5em; }
+  .md-toc-h5 .md-toc-inner { margin-left: 6.5em; }
+  .md-toc-h6 .md-toc-inner { margin-left: 8em; }
+}
+a.md-toc-inner { font-size: inherit; font-style: inherit; font-weight: inherit; line-height: inherit; }
+.footnote-line a:not(.reversefootnote) { color: inherit; }
+.md-attr { display: none; }
+.md-fn-count::after { content: "."; }
+code, pre, samp, tt { font-family: var(--monospace); }
+kbd { margin: 0px 0.1em; padding: 0.1em 0.6em; font-size: 0.8em; color: rgb(36, 39, 41); background-color: rgb(255, 255, 255); border: 1px solid rgb(173, 179, 185); border-top-left-radius: 3px; border-top-right-radius: 3px; border-bottom-right-radius: 3px; border-bottom-left-radius: 3px; box-shadow: rgba(12, 13, 14, 0.2) 0px 1px 0px, rgb(255, 255, 255) 0px 0px 0px 2px inset; white-space: nowrap; vertical-align: middle; background-position: initial initial; background-repeat: initial initial; }
+.md-comment { color: rgb(162, 127, 3); opacity: 0.8; font-family: var(--monospace); }
+code { text-align: left; }
+a.md-print-anchor { white-space: pre !important; border: none !important; display: inline-block !important; position: absolute !important; width: 1px !important; right: 0px !important; outline: 0px !important; text-shadow: initial !important; background-position: 0px 0px !important; background-repeat: initial initial !important; }
+.md-inline-math .MathJax_SVG .noError { display: none !important; }
+.html-for-mac .inline-math-svg .MathJax_SVG { vertical-align: 0.2px; }
+.md-math-block .MathJax_SVG_Display { text-align: center; margin: 0px; position: relative; text-indent: 0px; max-width: none; max-height: none; min-height: 0px; min-width: 100%; width: auto; overflow-y: hidden; display: block !important; }
+.MathJax_SVG_Display, .md-inline-math .MathJax_SVG_Display { width: auto; margin: inherit; display: inline-block !important; }
+.MathJax_SVG .MJX-monospace { font-family: var(--monospace); }
+.MathJax_SVG .MJX-sans-serif { font-family: sans-serif; }
+.MathJax_SVG { display: inline; font-style: normal; font-weight: 400; line-height: normal; zoom: 90%; text-indent: 0px; text-align: left; text-transform: none; letter-spacing: normal; word-spacing: normal; word-wrap: normal; white-space: nowrap; float: none; direction: ltr; max-width: none; max-height: none; min-width: 0px; min-height: 0px; border: 0px; padding: 0px; margin: 0px; }
+.MathJax_SVG * { transition: none; }
+.MathJax_SVG_Display svg { vertical-align: middle !important; margin-bottom: 0px !important; margin-top: 0px !important; }
+.os-windows.monocolor-emoji .md-emoji { font-family: "Segoe UI Symbol", sans-serif; }
+.md-diagram-panel > svg { max-width: 100%; }
+[lang="mermaid"] svg, [lang="flow"] svg { max-width: 100%; height: auto; }
+[lang="mermaid"] .node text { font-size: 1rem; }
+table tr th { border-bottom-width: 0px; }
+video { max-width: 100%; display: block; margin: 0px auto; }
+iframe { max-width: 100%; width: 100%; border: none; }
+.highlight td, .highlight tr { border: 0px; }
+svg[id^="mermaidChart"] { line-height: 1em; }
+
+
+.CodeMirror { height: auto; }
+.CodeMirror.cm-s-inner { background-image: inherit; background-size: inherit; background-attachment: inherit; background-origin: inherit; background-clip: inherit; background-color: inherit; background-position: inherit inherit; background-repeat: inherit inherit; }
+.CodeMirror-scroll { overflow-y: hidden; overflow-x: auto; z-index: 3; }
+.CodeMirror-gutter-filler, .CodeMirror-scrollbar-filler { background-color: rgb(255, 255, 255); }
+.CodeMirror-gutters { border-right-width: 1px; border-right-style: solid; border-right-color: rgb(221, 221, 221); background-image: inherit; background-size: inherit; background-attachment: inherit; background-origin: inherit; background-clip: inherit; background-color: inherit; white-space: nowrap; background-position: inherit inherit; background-repeat: inherit inherit; }
+.CodeMirror-linenumber { padding: 0px 3px 0px 5px; text-align: right; color: rgb(153, 153, 153); }
+.cm-s-inner .cm-keyword { color: rgb(119, 0, 136); }
+.cm-s-inner .cm-atom, .cm-s-inner.cm-atom { color: rgb(34, 17, 153); }
+.cm-s-inner .cm-number { color: rgb(17, 102, 68); }
+.cm-s-inner .cm-def { color: rgb(0, 0, 255); }
+.cm-s-inner .cm-variable { color: rgb(0, 0, 0); }
+.cm-s-inner .cm-variable-2 { color: rgb(0, 85, 170); }
+.cm-s-inner .cm-variable-3 { color: rgb(0, 136, 85); }
+.cm-s-inner .cm-string { color: rgb(170, 17, 17); }
+.cm-s-inner .cm-property { color: rgb(0, 0, 0); }
+.cm-s-inner .cm-operator { color: rgb(152, 26, 26); }
+.cm-s-inner .cm-comment, .cm-s-inner.cm-comment { color: rgb(170, 85, 0); }
+.cm-s-inner .cm-string-2 { color: rgb(255, 85, 0); }
+.cm-s-inner .cm-meta { color: rgb(85, 85, 85); }
+.cm-s-inner .cm-qualifier { color: rgb(85, 85, 85); }
+.cm-s-inner .cm-builtin { color: rgb(51, 0, 170); }
+.cm-s-inner .cm-bracket { color: rgb(153, 153, 119); }
+.cm-s-inner .cm-tag { color: rgb(17, 119, 0); }
+.cm-s-inner .cm-attribute { color: rgb(0, 0, 204); }
+.cm-s-inner .cm-header, .cm-s-inner.cm-header { color: rgb(0, 0, 255); }
+.cm-s-inner .cm-quote, .cm-s-inner.cm-quote { color: rgb(0, 153, 0); }
+.cm-s-inner .cm-hr, .cm-s-inner.cm-hr { color: rgb(153, 153, 153); }
+.cm-s-inner .cm-link, .cm-s-inner.cm-link { color: rgb(0, 0, 204); }
+.cm-negative { color: rgb(221, 68, 68); }
+.cm-positive { color: rgb(34, 153, 34); }
+.cm-header, .cm-strong { font-weight: 700; }
+.cm-del { text-decoration: line-through; }
+.cm-em { font-style: italic; }
+.cm-link { text-decoration: underline; }
+.cm-error { color: red; }
+.cm-invalidchar { color: red; }
+.cm-constant { color: rgb(38, 139, 210); }
+.cm-defined { color: rgb(181, 137, 0); }
+div.CodeMirror span.CodeMirror-matchingbracket { color: rgb(0, 255, 0); }
+div.CodeMirror span.CodeMirror-nonmatchingbracket { color: rgb(255, 34, 34); }
+.cm-s-inner .CodeMirror-activeline-background { background-image: inherit; background-size: inherit; background-attachment: inherit; background-origin: inherit; background-clip: inherit; background-color: inherit; background-position: inherit inherit; background-repeat: inherit inherit; }
+.CodeMirror { position: relative; overflow: hidden; }
+.CodeMirror-scroll { height: 100%; outline: 0px; position: relative; box-sizing: content-box; background-image: inherit; background-size: inherit; background-attachment: inherit; background-origin: inherit; background-clip: inherit; background-color: inherit; background-position: inherit inherit; background-repeat: inherit inherit; }
+.CodeMirror-sizer { position: relative; }
+.CodeMirror-gutter-filler, .CodeMirror-hscrollbar, .CodeMirror-scrollbar-filler, .CodeMirror-vscrollbar { position: absolute; z-index: 6; display: none; }
+.CodeMirror-vscrollbar { right: 0px; top: 0px; overflow: hidden; }
+.CodeMirror-hscrollbar { bottom: 0px; left: 0px; overflow: hidden; }
+.CodeMirror-scrollbar-filler { right: 0px; bottom: 0px; }
+.CodeMirror-gutter-filler { left: 0px; bottom: 0px; }
+.CodeMirror-gutters { position: absolute; left: 0px; top: 0px; padding-bottom: 30px; z-index: 3; }
+.CodeMirror-gutter { white-space: normal; height: 100%; box-sizing: content-box; padding-bottom: 30px; margin-bottom: -32px; display: inline-block; }
+.CodeMirror-gutter-wrapper { position: absolute; z-index: 4; border: none !important; background-position: 0px 0px !important; background-repeat: initial initial !important; }
+.CodeMirror-gutter-background { position: absolute; top: 0px; bottom: 0px; z-index: 4; }
+.CodeMirror-gutter-elt { position: absolute; cursor: default; z-index: 4; }
+.CodeMirror-lines { cursor: text; }
+.CodeMirror pre { border-top-left-radius: 0px; border-top-right-radius: 0px; border-bottom-right-radius: 0px; border-bottom-left-radius: 0px; border-width: 0px; font-family: inherit; font-size: inherit; margin: 0px; white-space: pre; word-wrap: normal; color: inherit; z-index: 2; position: relative; overflow: visible; background-position: 0px 0px; background-repeat: initial initial; }
+.CodeMirror-wrap pre { word-wrap: break-word; white-space: pre-wrap; word-break: normal; }
+.CodeMirror-code pre { border-right-width: 30px; border-right-style: solid; border-right-color: transparent; width: fit-content; }
+.CodeMirror-wrap .CodeMirror-code pre { border-right-style: none; width: auto; }
+.CodeMirror-linebackground { position: absolute; left: 0px; right: 0px; top: 0px; bottom: 0px; z-index: 0; }
+.CodeMirror-linewidget { position: relative; z-index: 2; overflow: auto; }
+.CodeMirror-wrap .CodeMirror-scroll { overflow-x: hidden; }
+.CodeMirror-measure { position: absolute; width: 100%; height: 0px; overflow: hidden; visibility: hidden; }
+.CodeMirror-measure pre { position: static; }
+.CodeMirror div.CodeMirror-cursor { position: absolute; visibility: hidden; border-right-style: none; width: 0px; }
+.CodeMirror div.CodeMirror-cursor { visibility: hidden; }
+.CodeMirror-focused div.CodeMirror-cursor { visibility: inherit; }
+.cm-searching { background-color: rgba(255, 255, 0, 0.4); background-position: initial initial; background-repeat: initial initial; }
+@media print { 
+  .CodeMirror div.CodeMirror-cursor { visibility: hidden; }
+}
+
+
+:root {
+    --side-bar-bg-color: #fafafa;
+    --control-text-color: #777;
+}
+
+@include-when-export url(https://fonts.loli.net/css?family=Open+Sans:400italic,700italic,700,400&subset=latin,latin-ext);
+
+html {
+    font-size: 16px;
+}
+
+body {
+    font-family: "Open Sans","Clear Sans","Helvetica Neue",Helvetica,Arial,sans-serif;
+    color: rgb(51, 51, 51);
+    line-height: 1.6;
+}
+
+#write {
+    max-width: 860px;
+  	margin: 0 auto;
+  	padding: 30px;
+    padding-bottom: 100px;
+}
+#write > ul:first-child,
+#write > ol:first-child{
+    margin-top: 30px;
+}
+
+a {
+    color: #4183C4;
+}
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    position: relative;
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+    font-weight: bold;
+    line-height: 1.4;
+    cursor: text;
+}
+h1:hover a.anchor,
+h2:hover a.anchor,
+h3:hover a.anchor,
+h4:hover a.anchor,
+h5:hover a.anchor,
+h6:hover a.anchor {
+    text-decoration: none;
+}
+h1 tt,
+h1 code {
+    font-size: inherit;
+}
+h2 tt,
+h2 code {
+    font-size: inherit;
+}
+h3 tt,
+h3 code {
+    font-size: inherit;
+}
+h4 tt,
+h4 code {
+    font-size: inherit;
+}
+h5 tt,
+h5 code {
+    font-size: inherit;
+}
+h6 tt,
+h6 code {
+    font-size: inherit;
+}
+h1 {
+    padding-bottom: .3em;
+    font-size: 2.25em;
+    line-height: 1.2;
+    border-bottom: 1px solid #eee;
+}
+h2 {
+   padding-bottom: .3em;
+    font-size: 1.75em;
+    line-height: 1.225;
+    border-bottom: 1px solid #eee;
+}
+h3 {
+    font-size: 1.5em;
+    line-height: 1.43;
+}
+h4 {
+    font-size: 1.25em;
+}
+h5 {
+    font-size: 1em;
+}
+h6 {
+   font-size: 1em;
+    color: #777;
+}
+p,
+blockquote,
+ul,
+ol,
+dl,
+table{
+    margin: 0.8em 0;
+}
+li>ol,
+li>ul {
+    margin: 0 0;
+}
+hr {
+    height: 2px;
+    padding: 0;
+    margin: 16px 0;
+    background-color: #e7e7e7;
+    border: 0 none;
+    overflow: hidden;
+    box-sizing: content-box;
+}
+
+li p.first {
+    display: inline-block;
+}
+ul,
+ol {
+    padding-left: 30px;
+}
+ul:first-child,
+ol:first-child {
+    margin-top: 0;
+}
+ul:last-child,
+ol:last-child {
+    margin-bottom: 0;
+}
+blockquote {
+    border-left: 4px solid #dfe2e5;
+    padding: 0 15px;
+    color: #777777;
+}
+blockquote blockquote {
+    padding-right: 0;
+}
+table {
+    padding: 0;
+    word-break: initial;
+}
+table tr {
+    border-top: 1px solid #dfe2e5;
+    margin: 0;
+    padding: 0;
+}
+table tr:nth-child(2n),
+thead {
+    background-color: #f8f8f8;
+}
+table tr th {
+    font-weight: bold;
+    border: 1px solid #dfe2e5;
+    border-bottom: 0;
+    margin: 0;
+    padding: 6px 13px;
+}
+table tr td {
+    border: 1px solid #dfe2e5;
+    margin: 0;
+    padding: 6px 13px;
+}
+table tr th:first-child,
+table tr td:first-child {
+    margin-top: 0;
+}
+table tr th:last-child,
+table tr td:last-child {
+    margin-bottom: 0;
+}
+
+.CodeMirror-lines {
+    padding-left: 4px;
+}
+
+.code-tooltip {
+    box-shadow: 0 1px 1px 0 rgba(0,28,36,.3);
+    border-top: 1px solid #eef2f2;
+}
+
+.md-fences,
+code,
+tt {
+    border: 1px solid #e7eaed;
+    background-color: #f8f8f8;
+    border-radius: 3px;
+    padding: 0;
+    padding: 2px 4px 0px 4px;
+    font-size: 0.9em;
+}
+
+code {
+    background-color: #f3f4f4;
+    padding: 0 2px 0 2px;
+}
+
+.md-fences {
+    margin-bottom: 15px;
+    margin-top: 15px;
+    padding-top: 8px;
+    padding-bottom: 6px;
+}
+
+
+.md-task-list-item > input {
+  margin-left: -1.3em;
+}
+
+@media print {
+    html {
+        font-size: 13px;
     }
-  }
-}
-</code></pre>
-<p>这些前端使用向的东西我就不做过多介绍了，可以参考 <a href='https://graphql.cn/learn/queries/'>GraphQL 官方教程</a>，下面着重介绍一下 GraphQL 的服务器开发。</p>
-<h4>Schema 和类型</h4>
-<p>GraphQL 的 Schema 定义有自己的一套语言，叫做 GraphQL SDL （GraphQL Schema Definition Language）。下面以一个博客程序的 Schema 定义为例：</p>
-<pre><code class='language-graphql' lang='graphql'>type Post {
-  id: String!
-  title: String!
-  publishedAt: DateTime!
-  likes: Int! @default(value: 0)
-  blog: Blog @relation(name: &quot;Posts&quot;)
-}
-
-type Blog {
-  id: String!
-  name: String!
-  description: String
-  posts: [Post!]! @relation(name: &quot;Posts&quot;)
-}
-</code></pre>
-<p>它主要定义了接口的字段和类型，其他信息包括默认值和关联关系等。这其实和数据库的 Schema 定义很像。</p>
-<h5>Type</h5>
-<p>Type （类型）有一个名字，并且可以实现一个或多个 Interface（接口）：</p>
-<pre><code class='language-graphql' lang='graphql'>type Post implements Item {
-  # ...
-}
-</code></pre>
-<h5>Field</h5>
-<p>Field（字段）有一个名字和类型：</p>
-<pre><code class='language-graphql' lang='graphql'>age: Int
-</code></pre>
-<p>GraphQL 规范定义了一些内置标准类型，但可以通过具体实现来定义更多类型。内置的标准类型包括：</p>
-<ul>
-<li>Int</li>
-<li>Float</li>
-<li>String</li>
-<li>Boolean</li>
-<li>ID</li>
-
-</ul>
-<p>在字段中除了使用标准类型外还可以使用任何在 Schema 中定义过的类型。</p>
-<p>不可为空的字段通过在后面加 <code>!</code> 来表示：</p>
-<pre><code class='language-graphql' lang='graphql'>age: Int!
-</code></pre>
-<p>列表用方括号表示：</p>
-<pre><code class='language-graphql' lang='graphql'>names: [String!]
-</code></pre>
-<h5>Enum</h5>
-<p>Enum（枚举）是具有一组指定值的标量：</p>
-<pre><code class='language-graphql' lang='graphql'>enum Category {
-  PROGRAMMING_LANGUAGES
-  API_DESIGN
-}
-</code></pre>
-<h5>Interface</h5>
-<p>在 GraphQL 中，接口是字段列表。 GraphQL 类型必须与其实现的所有接口都具有相同的字段，并且所有接口字段都必须具有相同的类型。</p>
-<pre><code class='language-graphql' lang='graphql'>interface Item {
-  title: String!
-}
-</code></pre>
-<h5>Schema directive</h5>
-<p>Directive （指令）没有内在的含义。 每个 GraphQL 实现都可以定义自己的自定义指令，以添加新功能。</p>
-<pre><code class='language-graphql' lang='graphql'>name: String! @defaultValue(value: &quot;new blogpost&quot;)
-</code></pre>
-<h4>SDL 优先 vs 代码优先</h4>
-<h5>GraphQL 服务器开发的演变</h5>
-<p><img src="https://i.loli.net/2019/11/05/Ri1TysQZrELkCzm.jpg" referrerpolicy="no-referrer"></p>
-<p>当 GraphQL 于 2015 年发布时，工具生态系统十分匮乏。只有官方<a href='https://facebook.github.io/graphql/'>规范</a>及其在 JavaScript 中的参考实现：<a href='https://github.com/graphql/graphql-js'><code>graphql-js</code></a>。直到今天，<code>graphql-js</code>仍在最流行的 GraphQL 服务器框架中被使用，如<code>apollo-server</code>，<code>express-graphql</code>和<code>graphql-yoga</code>。</p>
-<p>使用<code>graphql-js</code>构建 GraphQL 服务器时，Schema 被定义为普通的 JavaScript 对象：</p>
-<pre><code class='language-javascript' lang='javascript'>const { GraphQLSchema, GraphQLObjectType, GraphQLString } = require(&#39;graphql&#39;)
-
-const schema = new GraphQLSchema({
-  query: new GraphQLObjectType({
-    name: &#39;Query&#39;,
-    fields: {
-      hello: {
-        type: GraphQLString,
-        args: {
-          name: { type: GraphQLString },
-        },
-        resolve: (_, args) =&gt; `Hello ${args.name || &#39;World!&#39;}`,
-      },
-    },
-  }),
-})
-</code></pre>
-<p>从这些示例可以看出，使用<code>graphql-js</code>来创建 GraphQL 的 Schema 非常的冗长。而 Schema 的 SDL 表示则更加简洁，易于掌握：</p>
-<pre><code class='language-graphql' lang='graphql'>type Query {
-  hello(name: String): String
-}
-</code></pre>
-<p>为了简化开发并提高对实际 API 定义的可见性，Apollo 于 2016 年 3 月开始构建<a href='https://github.com/apollographql/graphql-tools'><code>graphql-tools</code></a>。目标是将 Schema 的定义与实际实现分开，从而诞生了当前流行的 SDL 优先（SDL-first）开发方法：</p>
-<ol start='' >
-<li>在 GraphQL SDL 中手动编写 GraphQL Schema 定义</li>
-<li>实现所需的解析器功能</li>
-
-</ol>
-<p>通过这种方法，上面的示例现在看起来像这样：</p>
-<pre><code class='language-javascript' lang='javascript'>const { makeExecutableSchema } = require(&#39;graphql-tools&#39;)
-
-const typeDefs = `
-type Query {
-  hello(name: String): String
-}
-`
-
-const resolvers = {
-  Query: {
-    hello: (_, args) =&gt; `Hello ${args.name || &#39;World!&#39;}`,
-  },
-}
-
-const schema = makeExecutableSchema({
-  typeDefs,
-  resolvers,
-})
-</code></pre>
-<p>这些代码段与上面使用的代码 100％ 等效，不同之处在于它们更具可读性。</p>
-<p>可读性不是 SDL 优先的唯一优势：</p>
-<ul>
-<li>该方法<strong>易于理解</strong>，<strong>非常适合快速构建</strong></li>
-<li>由于每个新的 API 操作都首先需要在 Schema 中体现，因此 <strong>GraphQL Schema 应优先设计</strong></li>
-<li>Schema 定义可以用作 <strong>API 文档</strong></li>
-<li>Schema 定义可以用作<strong>前端团队和后端团队之间</strong>的<strong>交流工具</strong>，前端开发人员更多地参与了 API 设计</li>
-<li>Schema 定义可以<strong>快速 mock API</strong></li>
-
-</ul>
-<p>尽管 SDL 优先具有许多优势，但最近两年表明将其扩展到更大的项目具有挑战性。在更复杂的环境中会出现许多问题（我们将在下一节中详细讨论）。</p>
-<p>实际上，这些问题实际上基本上可以解决——实际的问题是解决这些问题需要使用（和学习）许多其他工具。在过去的两年中，已经发布了无数工具，这些工具试图改善围绕 SDL 优先开发的工作流程：从编辑器插件，CLI 到语言库。</p>
-<p>学习，管理和集成所有这些工具的开销减慢了开发人员的速度，并使其难以跟上 GraphQL 生态系统的步伐。</p>
-<h5>分析 SDL 优先开发的问题</h5>
-<h6>问题1：模式定义和解析器之间的不一致</h6>
-<p>如果使用 SDL 优先，则 Schema 定义必须与 Resolver 程序实现的确切结构匹配。这意味着开发人员需要确保 Schema 定义始终与 Resolver 同步！</p>
-<p>尽管即使对于小型 Schema 而言，这已经是一个挑战，但随着 Schema 增长到成百上千行（实际上，<a href='https://gist.github.com/nikolasburk/15f30bb3e19e5bf8329ff52787fa72b5'>GitHub 的 GraphQL Schema</a> 有超过一万行），这几乎变得不可能。</p>
-<p><strong>工具 / 解决方案</strong>：有一些工具可帮助保持 Schema 定义和 Resolver 同步。例如，通过使用诸如<a href='https://github.com/prisma/graphqlgen'><code>graphqlgen</code></a>或库的代码生成<a href='https://github.com/dotansimha/graphql-code-generator'><code>graphql-code-generator</code></a>。</p>
-<h6>问题2：GraphQL Schema 的模块化</h6>
-<p>编写大型 GraphQL 模式时，通常不希望所有 GraphQL 类型定义都驻留在同一文件中。相反，您想将它们分成较小的部分（例如，根据功能或产品）。</p>
-<p><strong>工具/解决方案</strong>：类似<a href='https://github.com/prisma/graphql-import'><code>graphql-import</code></a>的工具或更新的<a href='https://graphql-modules.com/'><code>graphql-modules</code></a>库对此提供了帮助。<code>graphql-import</code>使用编写为 SDL 注释的自定义导入语法。<code>graphql-modules</code>是一个工具集，可帮助进行 Schema 分离，Resolver 组合以及为 GraphQL 服务器实现可伸缩结构。</p>
-<h6>问题3：Schema 定义中的冗余（代码重用）</h6>
-<p>另一个问题是如何重用 SDL 定义。</p>
-<p>当前没有工具可以解决此问题。开发人员可以编写自定义工具来减少重复代码的需求，但是目前该问题尚缺乏通用的解决方案。</p>
-<h6>问题4：IDE 支持和开发人员经验</h6>
-<p>GraphQL 模式基于强大的类型系统，这可以在开发期间带来巨大的好处，因为它允许对代码进行静态分析。不幸的是，SDL 通常在程序中表示为纯字符串，这意味着该工具无法识别其中的任何结构。</p>
-<p>然后，问题就变成了如何在编辑器工作流程中利用 GraphQL 类型来受益于诸如 SDL 代码自动完成和构建时错误检查之类的功能。</p>
-<p><strong>工具 / 解决方案</strong>：该<a href='https://github.com/apollographql/graphql-tag'><code>graphql-tag</code></a>库提供了<code>gql</code>将 GraphQL 字符串转换为 AST（抽象语法树） 的功能，因此可以进行静态分析以及随之而来的功能。除此之外，还有各种编辑器插件，例如 VS Code 的 <a href='https://marketplace.visualstudio.com/items?itemName=Prisma.vscode-graphql'>GraphQL</a> 或 <a href='https://marketplace.visualstudio.com/items?itemName=apollographql.vscode-apollo'>Apollo GraphQL</a> 插件。</p>
-<h5>结论：SDL 优先可以工作，但需要无数的工具</h5>
-<p>在探究了问题领域和开发出解决问题的各种工具之后，似乎 SDL 优先的开发最终可以工作——但它也要求开发人员学习和使用大量其他工具。</p>
-<h5>SDL 优先忽略编程语言的个别特征</h5>
-<p>SDL 优先的另一个有问题的方面是，无论使用哪种编程语言，它都通过施加相似的原理而忽略了编程语言的各个功能。</p>
-<p>代码优先方法在其他语言中确实非常有效：Scala 库<a href='https://github.com/sangria-graphql/sangria'><code>sangria-graphql</code></a>利用 Scala 强大的类型系统来优雅地构建 GraphQL 模式，并<a href='https://github.com/rmosolgo/graphql-ruby'><code>graphlq-ruby</code></a>使用了 Ruby 语言的许多很棒的DSL 功能。</p>
-<h4>代码优先</h4>
-<h5>你唯一需要的工具是编程语言</h5>
-<p>大多数 SDL 优先问题来自以下事实：我们需要将手动编写的 SDL 模式映射到编程语言。这种映射是导致需要其他工具的原因。如果我们遵循以 SDL 优先的道路，则需要为每种语言生态系统重新设计所需的工具，并且每种工具的外观也将有所不同。</p>
-<p>与其使用更多的工具来增加 GraphQL 服务器开发的复杂性，我们应该争取一种更简单的开发模型。理想的情况是，开发人员可以利用他们已经在使用的编程语言——这就是代码优先的想法。</p>
-<h5>什么是代码优先？</h5>
-<p>还记得在中定义 Schema 的最初示例<code>graphql-js</code>吗？这就是“ 代码优先”。没有任何手动维护的 Schema 定义，而是从实现该 Schema 的代码生成了 SDL 。</p>
-<p>尽管<code>graphql-js</code>非常冗长，但其他语言中有许多流行的框架都基于代码优先方法工作，例如已经提到的，以及适用于 Python 或 Elixir 的框架：<a href='https://github.com/rmosolgo/graphql-ruby'><code>graphlq-ruby</code></a> <a href='https://github.com/sangria-graphql/sangria'><code>sangria-graphql</code></a> <a href='https://github.com/graphql-python/graphene'><code>graphene</code></a> <a href='https://github.com/absinthe-graphql/absinthe'><code>absinthe-graphql</code></a></p>
-<h5>实践中的代码优先</h5>
-<p>使用代码优先的框架构建 GraphQL Schema 的例子：</p>
-<pre><code class='language-typescript' lang='typescript'>const Query = objectType(&#39;Query&#39;, t =&gt; {
-  t.string(&#39;hello&#39;, {
-    args: { name: stringArg() },
-    resolve: (_, { name }) =&gt; `Hello ${name || `World`}!`,
-  })
-})
-
-const schema = makeSchema({
-  types: [Query],
-  outputs: {
-    schema: &#39;./schema.graphql&#39;),
-    typegen: &#39;./typegen.ts&#39;,
-  },
-})
-</code></pre>
-<p>通过这种方法，可以直接在 TypeScript / JavaScript 中定义 GraphQL 类型。借助智能的代码补全功能，可以在定义它们时提示可用的 GraphQL 类型，字段和参数。</p>
-<p>定义所有 GraphQL 类型后，会将它们传递到函数中以创建<a href='https://graphql.org/graphql-js/type/#graphqlschema'><code>GraphQLSchema</code></a>——可在 GraphQL 服务器中使用的实例。通过指定<code>ouputs</code>，可以定义所生成的 SDL 和类型应该位于何处。</p>
-<h5>无需所有工具即可获得 SDL 的好处</h5>
-<p>之前我们列举了 SDL 优先开发的好处。实际上，在使用代码优先方法时，无需折中大多数。</p>
-<p>以 GitHub GraphQL API 为例：GitHub 使用 Ruby 和代码优先的方法来实现其 API。SDL 模式定义是基于实现 API 的代码生成的。但是，Schema 定义仍被纳入版本控制中。这使得在开发过程中跟踪 API 的更改变得异常容易，并改善了各个团队之间的沟通。</p>
-<p>API 文档等其他好处也不会因代码优先方法而丢失。</p>
-<h3>GraphQL 的更多优势</h3>
-<p>在“为什么需要 GraphQL ”部分我已经介绍了许多 GraphQL 相对于传统 API 的优势，但 GraphQL 的优势远不止这些。下面我再介绍几个 GraphQL 比较明显的优势：</p>
-<h4>版本控制</h4>
-<p>使用 REST API，通常会看到许多带有 v1 或 v2 的 API。这些在 GraphQL 中并不需要，因为你可以通过添加或删除类型来改进 API。</p>
-<p>在 GraphQL 中，你所需要做的就是写新代码。可以编写新类型、查询和修改，而无需维护其他版本的 API。</p>
-<h4>接口校验</h4>
-<p>显而易见，由于强类型的使用，我们对收到的数据进行检验的操作变得更为容易和严格，自动化的简便度和有效性也大大提高。对 query 本身的结构的校验也相当于是在Schema 完成后就自动得到了，所以我们甚至不需要再引入任何别的工具或者依赖，就可以很方便地解决所有的 validation。</p>
-<h4>接口文档</h4>
-<p>前面提到，由于 GraphQL 的 Schema 已经定义了字段和类型，正常情况后端不必再提供额外的接口文档，一些 GraphQL 的工具自带了文档展示功能，例如 <a href='https://github.com/prisma-labs/graphql-playground'>graphql-playground</a> 和 <a href='https://github.com/graphql/graphiql'>graphiql</a>。流行的 GraphQL 框架中都集成了这些工具，这很大程度上提升了 GraphQL 的开发体验，也提高了前后端的沟通效率，这在前后端分离的架构下是很重要的。</p>
-<h4>自动生成代码</h4>
-<p>无论是 SDL 优先的从 SDL 生成代码还是代码优先的从代码生成 SDL 都还只是开发流程上的简化，还是需要自己写Resolver 才能使用，而类似 <a href='https://www.prisma.io/'>prisma</a> 的项目已经可以让你直接将数据库变成一个 GraphQL Server，无需手写 Resolver，他会自动生成常见的查询方法。</p>
-<h3>GraphQL 的劣势与难点</h3>
-<h4>性能</h4>
-<p>一个 RESTful 应用，由于每个 API 的确定性，我们可以针对每一个 API 的逻辑，非常好的优化它们的性能，所以就算存在一定程度的 Overfetching / Underfetching，前后端的性能都可以保持在能够接受的范围内。然而想要更普适性一些的 GraphQL，则可能会因为一个层级结构复杂而且许多域都有很大数据量的 Query 跑许多个Resolvers，使得数据库的查询性能成为了瓶颈。使用 <a href='https://github.com/graphql/dataloader'>DataLoader</a> 可以在一定程度上解决这个问题。</p>
-<h4>缓存</h4>
-<p>在 RESTful 等基于 URL 的 API 中，客户端可以根据 URL 使用 HTTP 缓存。这些 API 中的 URL 就是全局唯一标识符。而 GraphQL 是单入口的 API，无法用 URL 实现缓存。
-GraphQL 中提供 Global ID 字段作为全局唯一标识符。可以将一个字段（如 id）保留为全局唯一标识符，例如<code>&quot;id&quot;: &quot;MDEwOlJlcG9zaXRvcnk2MDE4MTY4OA==&quot;</code>。
-如果后端使用类似 UUID 的标识符，那么直接暴露这个全局唯一 ID 即可。如果后端并没有给每个对象分配全局唯一 ID，则 GraphQL 层需要构造此 ID。</p>
-<h4>资源与速率限制</h4>
-<p>对于 RESTful 请求，简单的限制请求次数即可。而对于 GraphQL，一个复杂的 GraphQL 调用可能等同于数千个 RESTful 请求，而一个简单的 GraphQL 调用可能只等同于一两个 RESTful 请求。</p>
-<p>为了准确地计算一个查询带来的服务器负载，GitHub 的 GraphQL API v4 根据标准化点数（normalized scale of points）来计算速率限制分数（rate limit score）。每个 GraphQL 请求的分数，由父连接及其子节点上 的 first 和 last 参数决定。</p>
-<ul>
-<li>客户必须为每个 connection 提供 first 或 last 参数。</li>
-<li>first 或 last 参数的取值范围在 1-100 之间。</li>
-<li>每一个独立调用最多可以请求 50 万个节点。</li>
-
-</ul>
-<p>查询：</p>
-<pre><code class='language-graphql' lang='graphql'>query {
-  viewer {
-    repositories(first: 50) {
-      edges {
-        repository:node {
-          name
-
-          issues(first: 10) {
-            totalCount
-            edges {
-              node {
-                title
-                bodyHTML
-              }
-            }
-          }
-        }
-      }
+    table,
+    pre {
+        page-break-inside: avoid;
     }
-  }
-}
-</code></pre>
-<p>计算：</p>
-<pre><code class='language-svg' lang='svg'>50       = 50 repositories
-+
-50 x 10  = 500 repository issues
-
-         = 550 total nodes
-</code></pre>
-<ul>
-<li>公式使用父连接及其子级上的 first 和 last 参数来预先计算 GitHub 系统（如MySQL，ElasticSearch 和 Git）上的潜在负载。</li>
-<li>每个新连接都有自己的点数。这个点数与请求中的其他点数合并为一个总体的速率限制分数（rate limit score）。</li>
-<li>GraphQL API v4 速率限制是每小时 5000 点。</li>
-
-</ul>
-<p>请求：</p>
-<pre><code class='language-graphql' lang='graphql'>query {
-  viewer {
-    login
-  }
-  rateLimit {
-    limit
-    cost
-    remaining
-    resetAt
-  }
-}
-</code></pre>
-<p>响应：</p>
-<pre><code class='language-json' lang='json'>{
-  &quot;data&quot;: {
-    &quot;viewer&quot;: {
-      &quot;login&quot;: &quot;kikajack&quot;
-    },
-    &quot;rateLimit&quot;: {
-      &quot;limit&quot;: 5000,
-      &quot;cost&quot;: 1,
-      &quot;remaining&quot;: 4999,
-      &quot;resetAt&quot;: &quot;2018-01-21T04:42:30Z&quot;
+    pre {
+        word-wrap: break-word;
     }
-  }
 }
-</code></pre>
-<h4>生态</h4>
-<p>尽管 GraphQL 有着很好的社区支持，但本质上使用 GraphQL，就等于要使用 React 与 NodeJS，其他语言和框架的成熟度和社区活跃度都比较低。</p>
-<h3>总结</h3>
-<p>GraphQL 是 API 的未来吗？至少在数据聚合和网关层是的。当然 Restful 也不会被完全替代，只是今后提到开放 API 不再只有 Restful 这一种选项了。</p>
-<h3>参考文献</h3>
-<ul>
-<li><a href='https://www.prisma.io/blog/graphql-sdl-schema-definition-language-6755bcb9ce51'>GraphQL SDL — Schema Definition Language</a></li>
-<li><a href='https://www.prisma.io/blog/the-problems-of-schema-first-graphql-development-x1mn4cb0tyl3/'>The Problems of &quot;Schema-First&quot; GraphQL Server Development</a></li>
-<li><a href='https://developer.github.com/v4/guides/resource-limitations/'>GraphQL resource limitations</a></li>
 
-</ul>
+.md-fences {
+	background-color: #f8f8f8;
+}
+#write pre.md-meta-block {
+	padding: 1rem;
+    font-size: 85%;
+    line-height: 1.45;
+    background-color: #f7f7f7;
+    border: 0;
+    border-radius: 3px;
+    color: #777777;
+    margin-top: 0 !important;
+}
+
+.mathjax-block>.code-tooltip {
+	bottom: .375rem;
+}
+
+.md-mathjax-midline {
+    background: #fafafa;
+}
+
+#write>h3.md-focus:before{
+	left: -1.5625rem;
+	top: .375rem;
+}
+#write>h4.md-focus:before{
+	left: -1.5625rem;
+	top: .285714286rem;
+}
+#write>h5.md-focus:before{
+	left: -1.5625rem;
+	top: .285714286rem;
+}
+#write>h6.md-focus:before{
+	left: -1.5625rem;
+	top: .285714286rem;
+}
+.md-image>.md-meta {
+    /*border: 1px solid #ddd;*/
+    border-radius: 3px;
+    padding: 2px 0px 0px 4px;
+    font-size: 0.9em;
+    color: inherit;
+}
+
+.md-tag {
+    color: #a7a7a7;
+    opacity: 1;
+}
+
+.md-toc { 
+    margin-top:20px;
+    padding-bottom:20px;
+}
+
+.sidebar-tabs {
+    border-bottom: none;
+}
+
+#typora-quick-open {
+    border: 1px solid #ddd;
+    background-color: #f8f8f8;
+}
+
+#typora-quick-open-item {
+    background-color: #FAFAFA;
+    border-color: #FEFEFE #e5e5e5 #e5e5e5 #eee;
+    border-style: solid;
+    border-width: 1px;
+}
+
+/** focus mode */
+.on-focus-mode blockquote {
+    border-left-color: rgba(85, 85, 85, 0.12);
+}
+
+header, .context-menu, .megamenu-content, footer{
+    font-family: "Segoe UI", "Arial", sans-serif;
+}
+
+.file-node-content:hover .file-node-icon,
+.file-node-content:hover .file-node-open-state{
+    visibility: visible;
+}
+
+.mac-seamless-mode #typora-sidebar {
+    background-color: #fafafa;
+    background-color: var(--side-bar-bg-color);
+}
+
+.md-lang {
+    color: #b4654d;
+}
+
+.html-for-mac .context-menu {
+    --item-hover-bg-color: #E6F0FE;
+}
+
+#md-notification .btn {
+    border: 0;
+}
+
+.dropdown-menu .divider {
+    border-color: #e5e5e5;
+}
+
+.ty-preferences .window-content {
+    background-color: #fafafa;
+}
+
+.ty-preferences .nav-group-item.active {
+    color: white;
+    background: #999;
+}
+
+ .typora-export li, .typora-export p, .typora-export,  .footnote-line {white-space: normal;} 
+</style>
+</head>
+<body class='typora-export' >
+<div  id='write'  class = 'is-mac'><h2><a name="从后端视角认识-graphql" class="md-header-anchor"></a><span>从后端视角认识 GraphQL</span></h2><p><span>2019-11-26 13:54:47</span></p><p><span>本文以一个后端开发者的视角去认识和学习 GraphQL，比较 SDL 优先和代码优先这两种 GraphQL 服务端开发方法，发现 GraphQL 的优势并分析目前存在的问题。最后对 GraphQL 的未来进行了展望。</span></p><h3><a name="什么是-graphql" class="md-header-anchor"></a><span>什么是 GraphQL</span></h3><p><span>GraphQL 既是一种用于 API 的查询语言也是一个满足你数据查询的运行时。 GraphQL 对你的 API 中的数据提供了一套易于理解的完整描述，使得客户端能够准确地获得它需要的数据，而且没有任何冗余，也让 API 更容易地随着时间推移而演进，还能用于构建强大的开发者工具。</span></p><p><img src="https://i.loli.net/2019/11/03/aHRLVuiSE895CJy.gif" referrerpolicy="no-referrer"></p><p><span>以上便是 GraphQL 官网上对它的介绍。形象点说就是把服务器作为一个数据源，使用 GraphQL 接口就好像使用数据库的 SQL 语句一样，前端可以自由查询自己需要的数据。</span></p><h3><a name="为什么需要-graphql" class="md-header-anchor"></a><span>为什么需要 GraphQL</span></h3><p><span>大家都知道 RESTful 一直是行业中 API 接口的通用规范，那么 GraphQL 是在什么背景下诞生的？它又解决了传统 API 的哪些问题呢？</span></p><p><span>2012 年 Facebook 开发 GraphQL 的最初原因是移动用户的增加，当时的移动设备和网络性能很差，GraphQL 最小化了需要网络传输的数据量，从而极大地改善了在这些条件下运行的应用程序。而且 Facebook 的页面所需的接口数据十分复杂，用户之间的关注关系是网状的，使用 GraphQL 可以轻松实现递归关联查询。</span></p><p><img src="https://i.loli.net/2019/11/03/3wUgiOYQatX9K6L.png" referrerpolicy="no-referrer"><span>  </span><img src="https://i.loli.net/2019/11/03/VmNi5KUq2P7Fpt3.png" referrerpolicy="no-referrer"></p><p><span>上面的图片对比了 RESTful API 与 GraphQL API 在查询用户详情页时的请求情况。可以看到， 使用 RESTful API 需要同时完成三个请求而 GraphQL 只需要一次请求。</span></p><p><span>然而，GraphQL 带来的好处远不止这些。随着移动互联网和前端技术的飞速发展，各种不同的前端框架和平台层出不穷，这使得构建和维护一个符合所有平台需求的 API 变得十分困难，而使用 GraphQL 每个客户端都可以精确地访问它所需要的数据。还有就是在产品快速迭代的过程中，对于 RESTful API，服务器公开数据的方式常常需要修改，以满足客户端的特定需求和设计更改，这阻碍了产品的快速开发和迭代。</span></p><h3><a name="graphql-如何使用" class="md-header-anchor"></a><span>GraphQL 如何使用</span></h3><p><span>和所有的 API 接口一样，你需要一个服务端和一个客户端，服务端主要包括 Schema 的定义和 Resolver（等价于传统 API 中的 Handler）。而客户端则要写不同场景下的查询语句。</span></p><h4><a name="查询变更与订阅" class="md-header-anchor"></a><span>查询、变更与订阅</span></h4><p><span>GraphQL 有三种操作，分别是 query（查询）、mutation（变更）和 subscription （订阅）</span></p><p><span>可以尝试一下这个</span><a href='https://www.graphqlbin.com/v2/6RQ6TM'><span>在线例子</span></a><span>，点击右侧的 </span><code>DOCS</code><span> 可以打开文档。</span></p><pre spellcheck="false" class="md-fences md-end-block ty-contain-cm modeLoaded" lang="graphql"><div class="CodeMirror cm-s-inner CodeMirror-wrap" lang="graphql"><div style="overflow: hidden; position: relative; width: 3px; height: 0px; top: 0px; left: 8px;"><textarea autocorrect="off" autocapitalize="off" spellcheck="false" tabindex="0" style="position: absolute; bottom: -1em; padding: 0px; width: 1000px; height: 1em; outline: none;"></textarea></div><div class="CodeMirror-scrollbar-filler" cm-not-content="true"></div><div class="CodeMirror-gutter-filler" cm-not-content="true"></div><div class="CodeMirror-scroll" tabindex="-1"><div class="CodeMirror-sizer" style="margin-left: 0px; margin-bottom: 0px; border-right-width: 0px; padding-right: 0px; padding-bottom: 0px;"><div style="position: relative; top: 0px;"><div class="CodeMirror-lines" role="presentation"><div role="presentation" style="position: relative; outline: none;"><div class="CodeMirror-measure"></div><div class="CodeMirror-measure"></div><div style="position: relative; z-index: 1;"></div><div class="CodeMirror-code" role="presentation" style=""><div class="CodeMirror-activeline" style="position: relative;"><div class="CodeMirror-activeline-background CodeMirror-linebackground"></div><div class="CodeMirror-gutter-background CodeMirror-activeline-gutter" style="left: 0px; width: 0px;"></div><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;">{</span></pre></div><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;">  allPersons(orderBy: name_ASC) {</span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"> &nbsp;  name</span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"> &nbsp;  films {</span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"> &nbsp; &nbsp;  director</span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"> &nbsp;  }</span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;">  }</span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;">}</span></pre></div></div></div></div></div><div style="position: absolute; height: 0px; width: 1px; border-bottom-width: 0px; border-bottom-style: solid; border-bottom-color: transparent; top: 176px;"></div><div class="CodeMirror-gutters" style="display: none; height: 176px;"></div></div></div></pre><p><span>这些前端使用向的东西我就不做过多介绍了，可以参考 </span><a href='https://graphql.cn/learn/queries/'><span>GraphQL 官方教程</span></a><span>，下面着重介绍一下 GraphQL 的服务器开发。</span></p><h4><a name="schema-和类型" class="md-header-anchor"></a><span>Schema 和类型</span></h4><p><span>GraphQL 的 Schema 定义有自己的一套语言，叫做 GraphQL SDL （GraphQL Schema Definition Language）。下面以一个博客程序的 Schema 定义为例：</span></p><pre spellcheck="false" class="md-fences md-end-block ty-contain-cm modeLoaded" lang="graphql" style="page-break-inside: unset;"><div class="CodeMirror cm-s-inner CodeMirror-wrap" lang="graphql"><div style="overflow: hidden; position: relative; width: 3px; height: 0px; top: 0px; left: 8px;"><textarea autocorrect="off" autocapitalize="off" spellcheck="false" tabindex="0" style="position: absolute; bottom: -1em; padding: 0px; width: 1000px; height: 1em; outline: none;"></textarea></div><div class="CodeMirror-scrollbar-filler" cm-not-content="true"></div><div class="CodeMirror-gutter-filler" cm-not-content="true"></div><div class="CodeMirror-scroll" tabindex="-1"><div class="CodeMirror-sizer" style="margin-left: 0px; margin-bottom: 0px; border-right-width: 0px; padding-right: 0px; padding-bottom: 0px;"><div style="position: relative; top: 0px;"><div class="CodeMirror-lines" role="presentation"><div role="presentation" style="position: relative; outline: none;"><div class="CodeMirror-measure"><span><span>​</span>x</span></div><div class="CodeMirror-measure"></div><div style="position: relative; z-index: 1;"></div><div class="CodeMirror-code" role="presentation" style=""><div class="CodeMirror-activeline" style="position: relative;"><div class="CodeMirror-activeline-background CodeMirror-linebackground"></div><div class="CodeMirror-gutter-background CodeMirror-activeline-gutter" style="left: 0px; width: 0px;"></div><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;">type Post {</span></pre></div><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;">  id: String!</span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;">  title: String!</span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;">  publishedAt: DateTime!</span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;">  likes: Int! @default(value: 0)</span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;">  blog: Blog @relation(name: "Posts")</span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;">}</span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"><span cm-text="">​</span></span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;">type Blog {</span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;">  id: String!</span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;">  name: String!</span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;">  description: String</span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;">  posts: [Post!]! @relation(name: "Posts")</span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;">}</span></pre></div></div></div></div></div><div style="position: absolute; height: 0px; width: 1px; border-bottom-width: 0px; border-bottom-style: solid; border-bottom-color: transparent; top: 308px;"></div><div class="CodeMirror-gutters" style="display: none; height: 308px;"></div></div></div></pre><p><span>它主要定义了接口的字段和类型，其他信息包括默认值和关联关系等。这其实和数据库的 Schema 定义很像。</span></p><h5><a name="type" class="md-header-anchor"></a><span>Type</span></h5><p><span>Type （类型）有一个名字，并且可以实现一个或多个 Interface（接口）：</span></p><pre spellcheck="false" class="md-fences md-end-block ty-contain-cm modeLoaded" lang="graphql"><div class="CodeMirror cm-s-inner CodeMirror-wrap" lang="graphql"><div style="overflow: hidden; position: relative; width: 3px; height: 0px; top: 0px; left: 8px;"><textarea autocorrect="off" autocapitalize="off" spellcheck="false" tabindex="0" style="position: absolute; bottom: -1em; padding: 0px; width: 1000px; height: 1em; outline: none;"></textarea></div><div class="CodeMirror-scrollbar-filler" cm-not-content="true"></div><div class="CodeMirror-gutter-filler" cm-not-content="true"></div><div class="CodeMirror-scroll" tabindex="-1"><div class="CodeMirror-sizer" style="margin-left: 0px; margin-bottom: 0px; border-right-width: 0px; padding-right: 0px; padding-bottom: 0px;"><div style="position: relative; top: 0px;"><div class="CodeMirror-lines" role="presentation"><div role="presentation" style="position: relative; outline: none;"><div class="CodeMirror-measure"><pre><span>xxxxxxxxxx</span></pre></div><div class="CodeMirror-measure"></div><div style="position: relative; z-index: 1;"></div><div class="CodeMirror-code" role="presentation"><div class="CodeMirror-activeline" style="position: relative;"><div class="CodeMirror-activeline-background CodeMirror-linebackground"></div><div class="CodeMirror-gutter-background CodeMirror-activeline-gutter" style="left: 0px; width: 0px;"></div><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;">type Post implements Item {</span></pre></div><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;">  # ...</span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;">}</span></pre></div></div></div></div></div><div style="position: absolute; height: 0px; width: 1px; border-bottom-width: 0px; border-bottom-style: solid; border-bottom-color: transparent; top: 66px;"></div><div class="CodeMirror-gutters" style="display: none; height: 66px;"></div></div></div></pre><h5><a name="field" class="md-header-anchor"></a><span>Field</span></h5><p><span>Field（字段）有一个名字和类型：</span></p><pre spellcheck="false" class="md-fences md-end-block ty-contain-cm modeLoaded" lang="graphql"><div class="CodeMirror cm-s-inner CodeMirror-wrap" lang="graphql"><div style="overflow: hidden; position: relative; width: 3px; height: 0px; top: 0px; left: 8px;"><textarea autocorrect="off" autocapitalize="off" spellcheck="false" tabindex="0" style="position: absolute; bottom: -1em; padding: 0px; width: 1000px; height: 1em; outline: none;"></textarea></div><div class="CodeMirror-scrollbar-filler" cm-not-content="true"></div><div class="CodeMirror-gutter-filler" cm-not-content="true"></div><div class="CodeMirror-scroll" tabindex="-1"><div class="CodeMirror-sizer" style="margin-left: 0px; margin-bottom: 0px; border-right-width: 0px; padding-right: 0px; padding-bottom: 0px;"><div style="position: relative; top: 0px;"><div class="CodeMirror-lines" role="presentation"><div role="presentation" style="position: relative; outline: none;"><div class="CodeMirror-measure"><pre><span>xxxxxxxxxx</span></pre></div><div class="CodeMirror-measure"></div><div style="position: relative; z-index: 1;"></div><div class="CodeMirror-code" role="presentation"><div class="CodeMirror-activeline" style="position: relative;"><div class="CodeMirror-activeline-background CodeMirror-linebackground"></div><div class="CodeMirror-gutter-background CodeMirror-activeline-gutter" style="left: 0px; width: 0px;"></div><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;">age: Int</span></pre></div></div></div></div></div></div><div style="position: absolute; height: 0px; width: 1px; border-bottom-width: 0px; border-bottom-style: solid; border-bottom-color: transparent; top: 22px;"></div><div class="CodeMirror-gutters" style="display: none; height: 22px;"></div></div></div></pre><p><span>GraphQL 规范定义了一些内置标准类型，但可以通过具体实现来定义更多类型。内置的标准类型包括：</span></p><ul><li><span>Int</span></li><li><span>Float</span></li><li><span>String</span></li><li><span>Boolean</span></li><li><span>ID</span></li></ul><p><span>在字段中除了使用标准类型外还可以使用任何在 Schema 中定义过的类型。</span></p><p><span>不可为空的字段通过在后面加 </span><code>!</code><span> 来表示：</span></p><pre spellcheck="false" class="md-fences md-end-block ty-contain-cm modeLoaded" lang="graphql"><div class="CodeMirror cm-s-inner CodeMirror-wrap" lang="graphql"><div style="overflow: hidden; position: relative; width: 3px; height: 0px; top: 0px; left: 8px;"><textarea autocorrect="off" autocapitalize="off" spellcheck="false" tabindex="0" style="position: absolute; bottom: -1em; padding: 0px; width: 1000px; height: 1em; outline: none;"></textarea></div><div class="CodeMirror-scrollbar-filler" cm-not-content="true"></div><div class="CodeMirror-gutter-filler" cm-not-content="true"></div><div class="CodeMirror-scroll" tabindex="-1"><div class="CodeMirror-sizer" style="margin-left: 0px; margin-bottom: 0px; border-right-width: 0px; padding-right: 0px; padding-bottom: 0px;"><div style="position: relative; top: 0px;"><div class="CodeMirror-lines" role="presentation"><div role="presentation" style="position: relative; outline: none;"><div class="CodeMirror-measure"><pre><span>xxxxxxxxxx</span></pre></div><div class="CodeMirror-measure"></div><div style="position: relative; z-index: 1;"></div><div class="CodeMirror-code" role="presentation"><div class="CodeMirror-activeline" style="position: relative;"><div class="CodeMirror-activeline-background CodeMirror-linebackground"></div><div class="CodeMirror-gutter-background CodeMirror-activeline-gutter" style="left: 0px; width: 0px;"></div><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;">age: Int!</span></pre></div></div></div></div></div></div><div style="position: absolute; height: 0px; width: 1px; border-bottom-width: 0px; border-bottom-style: solid; border-bottom-color: transparent; top: 22px;"></div><div class="CodeMirror-gutters" style="display: none; height: 22px;"></div></div></div></pre><p><span>列表用方括号表示：</span></p><pre spellcheck="false" class="md-fences md-end-block ty-contain-cm modeLoaded" lang="graphql"><div class="CodeMirror cm-s-inner CodeMirror-wrap" lang="graphql"><div style="overflow: hidden; position: relative; width: 3px; height: 0px; top: 0px; left: 8px;"><textarea autocorrect="off" autocapitalize="off" spellcheck="false" tabindex="0" style="position: absolute; bottom: -1em; padding: 0px; width: 1000px; height: 1em; outline: none;"></textarea></div><div class="CodeMirror-scrollbar-filler" cm-not-content="true"></div><div class="CodeMirror-gutter-filler" cm-not-content="true"></div><div class="CodeMirror-scroll" tabindex="-1"><div class="CodeMirror-sizer" style="margin-left: 0px; margin-bottom: 0px; border-right-width: 0px; padding-right: 0px; padding-bottom: 0px;"><div style="position: relative; top: 0px;"><div class="CodeMirror-lines" role="presentation"><div role="presentation" style="position: relative; outline: none;"><div class="CodeMirror-measure"><pre><span>xxxxxxxxxx</span></pre></div><div class="CodeMirror-measure"></div><div style="position: relative; z-index: 1;"></div><div class="CodeMirror-code" role="presentation"><div class="CodeMirror-activeline" style="position: relative;"><div class="CodeMirror-activeline-background CodeMirror-linebackground"></div><div class="CodeMirror-gutter-background CodeMirror-activeline-gutter" style="left: 0px; width: 0px;"></div><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;">names: [String!]</span></pre></div></div></div></div></div></div><div style="position: absolute; height: 0px; width: 1px; border-bottom-width: 0px; border-bottom-style: solid; border-bottom-color: transparent; top: 22px;"></div><div class="CodeMirror-gutters" style="display: none; height: 22px;"></div></div></div></pre><h5><a name="enum" class="md-header-anchor"></a><span>Enum</span></h5><p><span>Enum（枚举）是具有一组指定值的标量：</span></p><pre spellcheck="false" class="md-fences md-end-block ty-contain-cm modeLoaded" lang="graphql"><div class="CodeMirror cm-s-inner CodeMirror-wrap" lang="graphql"><div style="overflow: hidden; position: relative; width: 3px; height: 0px; top: 0px; left: 8px;"><textarea autocorrect="off" autocapitalize="off" spellcheck="false" tabindex="0" style="position: absolute; bottom: -1em; padding: 0px; width: 1000px; height: 1em; outline: none;"></textarea></div><div class="CodeMirror-scrollbar-filler" cm-not-content="true"></div><div class="CodeMirror-gutter-filler" cm-not-content="true"></div><div class="CodeMirror-scroll" tabindex="-1"><div class="CodeMirror-sizer" style="margin-left: 0px; margin-bottom: 0px; border-right-width: 0px; padding-right: 0px; padding-bottom: 0px;"><div style="position: relative; top: 0px;"><div class="CodeMirror-lines" role="presentation"><div role="presentation" style="position: relative; outline: none;"><div class="CodeMirror-measure"><pre><span>xxxxxxxxxx</span></pre></div><div class="CodeMirror-measure"></div><div style="position: relative; z-index: 1;"></div><div class="CodeMirror-code" role="presentation"><div class="CodeMirror-activeline" style="position: relative;"><div class="CodeMirror-activeline-background CodeMirror-linebackground"></div><div class="CodeMirror-gutter-background CodeMirror-activeline-gutter" style="left: 0px; width: 0px;"></div><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;">enum Category {</span></pre></div><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;">  PROGRAMMING_LANGUAGES</span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;">  API_DESIGN</span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;">}</span></pre></div></div></div></div></div><div style="position: absolute; height: 0px; width: 1px; border-bottom-width: 0px; border-bottom-style: solid; border-bottom-color: transparent; top: 88px;"></div><div class="CodeMirror-gutters" style="display: none; height: 88px;"></div></div></div></pre><h5><a name="interface" class="md-header-anchor"></a><span>Interface</span></h5><p><span>在 GraphQL 中，接口是字段列表。 GraphQL 类型必须与其实现的所有接口都具有相同的字段，并且所有接口字段都必须具有相同的类型。</span></p><pre spellcheck="false" class="md-fences md-end-block ty-contain-cm modeLoaded" lang="graphql"><div class="CodeMirror cm-s-inner CodeMirror-wrap" lang="graphql"><div style="overflow: hidden; position: relative; width: 3px; height: 0px; top: 0px; left: 8px;"><textarea autocorrect="off" autocapitalize="off" spellcheck="false" tabindex="0" style="position: absolute; bottom: -1em; padding: 0px; width: 1000px; height: 1em; outline: none;"></textarea></div><div class="CodeMirror-scrollbar-filler" cm-not-content="true"></div><div class="CodeMirror-gutter-filler" cm-not-content="true"></div><div class="CodeMirror-scroll" tabindex="-1"><div class="CodeMirror-sizer" style="margin-left: 0px; margin-bottom: 0px; border-right-width: 0px; padding-right: 0px; padding-bottom: 0px;"><div style="position: relative; top: 0px;"><div class="CodeMirror-lines" role="presentation"><div role="presentation" style="position: relative; outline: none;"><div class="CodeMirror-measure"><pre><span>xxxxxxxxxx</span></pre></div><div class="CodeMirror-measure"></div><div style="position: relative; z-index: 1;"></div><div class="CodeMirror-code" role="presentation"><div class="CodeMirror-activeline" style="position: relative;"><div class="CodeMirror-activeline-background CodeMirror-linebackground"></div><div class="CodeMirror-gutter-background CodeMirror-activeline-gutter" style="left: 0px; width: 0px;"></div><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;">interface Item {</span></pre></div><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;">  title: String!</span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;">}</span></pre></div></div></div></div></div><div style="position: absolute; height: 0px; width: 1px; border-bottom-width: 0px; border-bottom-style: solid; border-bottom-color: transparent; top: 66px;"></div><div class="CodeMirror-gutters" style="display: none; height: 66px;"></div></div></div></pre><h5><a name="schema-directive" class="md-header-anchor"></a><span>Schema directive</span></h5><p><span>Directive （指令）没有内在的含义。 每个 GraphQL 实现都可以定义自己的自定义指令，以添加新功能。</span></p><pre spellcheck="false" class="md-fences md-end-block ty-contain-cm modeLoaded" lang="graphql"><div class="CodeMirror cm-s-inner CodeMirror-wrap" lang="graphql"><div style="overflow: hidden; position: relative; width: 3px; height: 0px; top: 0px; left: 8px;"><textarea autocorrect="off" autocapitalize="off" spellcheck="false" tabindex="0" style="position: absolute; bottom: -1em; padding: 0px; width: 1000px; height: 1em; outline: none;"></textarea></div><div class="CodeMirror-scrollbar-filler" cm-not-content="true"></div><div class="CodeMirror-gutter-filler" cm-not-content="true"></div><div class="CodeMirror-scroll" tabindex="-1"><div class="CodeMirror-sizer" style="margin-left: 0px; margin-bottom: 0px; border-right-width: 0px; padding-right: 0px; padding-bottom: 0px;"><div style="position: relative; top: 0px;"><div class="CodeMirror-lines" role="presentation"><div role="presentation" style="position: relative; outline: none;"><div class="CodeMirror-measure"><pre><span>xxxxxxxxxx</span></pre></div><div class="CodeMirror-measure"></div><div style="position: relative; z-index: 1;"></div><div class="CodeMirror-code" role="presentation"><div class="CodeMirror-activeline" style="position: relative;"><div class="CodeMirror-activeline-background CodeMirror-linebackground"></div><div class="CodeMirror-gutter-background CodeMirror-activeline-gutter" style="left: 0px; width: 0px;"></div><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;">name: String! @defaultValue(value: "new blogpost")</span></pre></div></div></div></div></div></div><div style="position: absolute; height: 0px; width: 1px; border-bottom-width: 0px; border-bottom-style: solid; border-bottom-color: transparent; top: 22px;"></div><div class="CodeMirror-gutters" style="display: none; height: 22px;"></div></div></div></pre><h4><a name="sdl-优先-vs-代码优先" class="md-header-anchor"></a><span>SDL 优先 vs 代码优先</span></h4><h5><a name="graphql-服务器开发的演变" class="md-header-anchor"></a><span>GraphQL 服务器开发的演变</span></h5><p><img src="https://i.loli.net/2019/11/05/Ri1TysQZrELkCzm.jpg" referrerpolicy="no-referrer"></p><p><span>当 GraphQL 于 2015 年发布时，工具生态系统十分匮乏。只有官方</span><a href='https://facebook.github.io/graphql/'><span>规范</span></a><span>及其在 JavaScript 中的参考实现：</span><a href='https://github.com/graphql/graphql-js'><code>graphql-js</code></a><span>。直到今天，</span><code>graphql-js</code><span>仍在最流行的 GraphQL 服务器框架中被使用，如</span><code>apollo-server</code><span>，</span><code>express-graphql</code><span>和</span><code>graphql-yoga</code><span>。</span></p><p><span>使用</span><code>graphql-js</code><span>构建 GraphQL 服务器时，Schema 被定义为普通的 JavaScript 对象：</span></p><pre spellcheck="false" class="md-fences md-end-block ty-contain-cm modeLoaded" lang="js" style="page-break-inside: unset;"><div class="CodeMirror cm-s-inner CodeMirror-wrap" lang="js"><div style="overflow: hidden; position: relative; width: 3px; height: 0px; top: 0px; left: 8px;"><textarea autocorrect="off" autocapitalize="off" spellcheck="false" tabindex="0" style="position: absolute; bottom: -1em; padding: 0px; width: 1000px; height: 1em; outline: none;"></textarea></div><div class="CodeMirror-scrollbar-filler" cm-not-content="true"></div><div class="CodeMirror-gutter-filler" cm-not-content="true"></div><div class="CodeMirror-scroll" tabindex="-1"><div class="CodeMirror-sizer" style="margin-left: 0px; margin-bottom: 0px; border-right-width: 0px; padding-right: 0px; padding-bottom: 0px;"><div style="position: relative; top: 0px;"><div class="CodeMirror-lines" role="presentation"><div role="presentation" style="position: relative; outline: none;"><div class="CodeMirror-measure"><pre><span>xxxxxxxxxx</span></pre></div><div class="CodeMirror-measure"></div><div style="position: relative; z-index: 1;"></div><div class="CodeMirror-code" role="presentation" style=""><div class="CodeMirror-activeline" style="position: relative;"><div class="CodeMirror-activeline-background CodeMirror-linebackground"></div><div class="CodeMirror-gutter-background CodeMirror-activeline-gutter" style="left: 0px; width: 0px;"></div><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"><span class="cm-keyword">const</span> { <span class="cm-def">GraphQLSchema</span>, <span class="cm-def">GraphQLObjectType</span>, <span class="cm-def">GraphQLString</span> } <span class="cm-operator">=</span> <span class="cm-variable">require</span>(<span class="cm-string">'graphql'</span>)</span></pre></div><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"><span cm-text="">​</span></span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"><span class="cm-keyword">const</span> <span class="cm-def">schema</span> <span class="cm-operator">=</span> <span class="cm-keyword">new</span> <span class="cm-variable">GraphQLSchema</span>({</span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"> &nbsp;<span class="cm-property">query</span>: <span class="cm-keyword">new</span> <span class="cm-variable">GraphQLObjectType</span>({</span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"> &nbsp; &nbsp;<span class="cm-property">name</span>: <span class="cm-string">'Query'</span>,</span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"> &nbsp; &nbsp;<span class="cm-property">fields</span>: {</span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"> &nbsp; &nbsp; &nbsp;<span class="cm-property">hello</span>: {</span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"> &nbsp; &nbsp; &nbsp; &nbsp;<span class="cm-property">type</span>: <span class="cm-variable">GraphQLString</span>,</span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"> &nbsp; &nbsp; &nbsp; &nbsp;<span class="cm-property">args</span>: {</span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"> &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;<span class="cm-property">name</span>: { <span class="cm-property">type</span>: <span class="cm-variable">GraphQLString</span> },</span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"> &nbsp; &nbsp; &nbsp;  },</span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"> &nbsp; &nbsp; &nbsp; &nbsp;<span class="cm-property">resolve</span>: (<span class="cm-def">_</span>, <span class="cm-def">args</span>) <span class="cm-operator">=&gt;</span> <span class="cm-string-2">`Hello ${</span><span class="cm-variable-2">args</span>.<span class="cm-property">name</span> <span class="cm-operator">||</span> <span class="cm-string">'World!'</span><span class="cm-string-2">}`</span>,</span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"> &nbsp; &nbsp;  },</span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"> &nbsp;  },</span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;">  }),</span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;">})</span></pre></div></div></div></div></div><div style="position: absolute; height: 0px; width: 1px; border-bottom-width: 0px; border-bottom-style: solid; border-bottom-color: transparent; top: 352px;"></div><div class="CodeMirror-gutters" style="display: none; height: 352px;"></div></div></div></pre><p><span>从这些示例可以看出，使用</span><code>graphql-js</code><span>来创建 GraphQL 的 Schema 非常的冗长。而 Schema 的 SDL 表示则更加简洁，易于掌握：</span></p><pre spellcheck="false" class="md-fences md-end-block ty-contain-cm modeLoaded" lang="graphql"><div class="CodeMirror cm-s-inner CodeMirror-wrap" lang="graphql"><div style="overflow: hidden; position: relative; width: 3px; height: 0px; top: 0px; left: 8px;"><textarea autocorrect="off" autocapitalize="off" spellcheck="false" tabindex="0" style="position: absolute; bottom: -1em; padding: 0px; width: 1000px; height: 1em; outline: none;"></textarea></div><div class="CodeMirror-scrollbar-filler" cm-not-content="true"></div><div class="CodeMirror-gutter-filler" cm-not-content="true"></div><div class="CodeMirror-scroll" tabindex="-1"><div class="CodeMirror-sizer" style="margin-left: 0px; margin-bottom: 0px; border-right-width: 0px; padding-right: 0px; padding-bottom: 0px;"><div style="position: relative; top: 0px;"><div class="CodeMirror-lines" role="presentation"><div role="presentation" style="position: relative; outline: none;"><div class="CodeMirror-measure"><pre><span>xxxxxxxxxx</span></pre></div><div class="CodeMirror-measure"></div><div style="position: relative; z-index: 1;"></div><div class="CodeMirror-code" role="presentation"><div class="CodeMirror-activeline" style="position: relative;"><div class="CodeMirror-activeline-background CodeMirror-linebackground"></div><div class="CodeMirror-gutter-background CodeMirror-activeline-gutter" style="left: 0px; width: 0px;"></div><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;">type Query {</span></pre></div><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;">  hello(name: String): String</span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;">}</span></pre></div></div></div></div></div><div style="position: absolute; height: 0px; width: 1px; border-bottom-width: 0px; border-bottom-style: solid; border-bottom-color: transparent; top: 66px;"></div><div class="CodeMirror-gutters" style="display: none; height: 66px;"></div></div></div></pre><p><span>为了简化开发并提高对实际 API 定义的可见性，Apollo 于 2016 年 3 月开始构建</span><a href='https://github.com/apollographql/graphql-tools'><code>graphql-tools</code></a><span>。目标是将 Schema 的定义与实际实现分开，从而诞生了当前流行的 SDL 优先（SDL-first）开发方法：</span></p><ol start='' ><li><span>在 GraphQL SDL 中手动编写 GraphQL Schema 定义</span></li><li><span>实现所需的解析器功能</span></li></ol><p><span>通过这种方法，上面的示例现在看起来像这样：</span></p><pre spellcheck="false" class="md-fences md-end-block ty-contain-cm modeLoaded" lang="js" style="page-break-inside: unset;"><div class="CodeMirror cm-s-inner CodeMirror-wrap" lang="js"><div style="overflow: hidden; position: relative; width: 3px; height: 0px; top: 0px; left: 8px;"><textarea autocorrect="off" autocapitalize="off" spellcheck="false" tabindex="0" style="position: absolute; bottom: -1em; padding: 0px; width: 1000px; height: 1em; outline: none;"></textarea></div><div class="CodeMirror-scrollbar-filler" cm-not-content="true"></div><div class="CodeMirror-gutter-filler" cm-not-content="true"></div><div class="CodeMirror-scroll" tabindex="-1"><div class="CodeMirror-sizer" style="margin-left: 0px; margin-bottom: 0px; border-right-width: 0px; padding-right: 0px; padding-bottom: 0px;"><div style="position: relative; top: 0px;"><div class="CodeMirror-lines" role="presentation"><div role="presentation" style="position: relative; outline: none;"><div class="CodeMirror-measure"><pre><span>xxxxxxxxxx</span></pre></div><div class="CodeMirror-measure"></div><div style="position: relative; z-index: 1;"></div><div class="CodeMirror-code" role="presentation" style=""><div class="CodeMirror-activeline" style="position: relative;"><div class="CodeMirror-activeline-background CodeMirror-linebackground"></div><div class="CodeMirror-gutter-background CodeMirror-activeline-gutter" style="left: 0px; width: 0px;"></div><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"><span class="cm-keyword">const</span> { <span class="cm-def">makeExecutableSchema</span> } <span class="cm-operator">=</span> <span class="cm-variable">require</span>(<span class="cm-string">'graphql-tools'</span>)</span></pre></div><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"><span cm-text="">​</span></span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"><span class="cm-keyword">const</span> <span class="cm-def">typeDefs</span> <span class="cm-operator">=</span> <span class="cm-string-2">`</span></span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"><span class="cm-string-2">type Query {</span></span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"> &nbsp;<span class="cm-string-2">hello(name: String): String</span></span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"><span class="cm-string-2">}</span></span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"><span class="cm-string-2">`</span></span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"><span cm-text="">​</span></span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"><span class="cm-keyword">const</span> <span class="cm-def">resolvers</span> <span class="cm-operator">=</span> {</span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"> &nbsp;<span class="cm-property">Query</span>: {</span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"> &nbsp; &nbsp;<span class="cm-property">hello</span>: (<span class="cm-def">_</span>, <span class="cm-def">args</span>) <span class="cm-operator">=&gt;</span> <span class="cm-string-2">`Hello ${</span><span class="cm-variable-2">args</span>.<span class="cm-property">name</span> <span class="cm-operator">||</span> <span class="cm-string">'World!'</span><span class="cm-string-2">}`</span>,</span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;">  },</span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;">}</span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"><span cm-text="">​</span></span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"><span class="cm-keyword">const</span> <span class="cm-def">schema</span> <span class="cm-operator">=</span> <span class="cm-variable">makeExecutableSchema</span>({</span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"> &nbsp;<span class="cm-property">typeDefs</span>,</span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"> &nbsp;<span class="cm-property">resolvers</span>,</span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;">})</span></pre></div></div></div></div></div><div style="position: absolute; height: 0px; width: 1px; border-bottom-width: 0px; border-bottom-style: solid; border-bottom-color: transparent; top: 396px;"></div><div class="CodeMirror-gutters" style="display: none; height: 396px;"></div></div></div></pre><p><span>这些代码段与上面使用的代码 100％ 等效，不同之处在于它们更具可读性。</span></p><p><span>可读性不是 SDL 优先的唯一优势：</span></p><ul><li><span>该方法</span><strong><span>易于理解</span></strong><span>，</span><strong><span>非常适合快速构建</span></strong></li><li><span>由于每个新的 API 操作都首先需要在 Schema 中体现，因此 </span><strong><span>GraphQL Schema 应优先设计</span></strong></li><li><span>Schema 定义可以用作 </span><strong><span>API 文档</span></strong></li><li><span>Schema 定义可以用作</span><strong><span>前端团队和后端团队之间</span></strong><span>的</span><strong><span>交流工具</span></strong><span>，前端开发人员更多地参与了 API 设计</span></li><li><span>Schema 定义可以</span><strong><span>快速 mock API</span></strong></li></ul><p><span>尽管 SDL 优先具有许多优势，但最近两年表明将其扩展到更大的项目具有挑战性。在更复杂的环境中会出现许多问题（我们将在下一节中详细讨论）。</span></p><p><span>实际上，这些问题实际上基本上可以解决——实际的问题是解决这些问题需要使用（和学习）许多其他工具。在过去的两年中，已经发布了无数工具，这些工具试图改善围绕 SDL 优先开发的工作流程：从编辑器插件，CLI 到语言库。</span></p><p><span>学习，管理和集成所有这些工具的开销减慢了开发人员的速度，并使其难以跟上 GraphQL 生态系统的步伐。</span></p><h5><a name="分析-sdl-优先开发的问题" class="md-header-anchor"></a><span>分析 SDL 优先开发的问题</span></h5><h6><a name="问题1模式定义和解析器之间的不一致" class="md-header-anchor"></a><span>问题1：模式定义和解析器之间的不一致</span></h6><p><span>如果使用 SDL 优先，则 Schema 定义必须与 Resolver 程序实现的确切结构匹配。这意味着开发人员需要确保 Schema 定义始终与 Resolver 同步！</span></p><p><span>尽管即使对于小型 Schema 而言，这已经是一个挑战，但随着 Schema 增长到成百上千行（实际上，</span><a href='https://gist.github.com/nikolasburk/15f30bb3e19e5bf8329ff52787fa72b5'><span>GitHub 的 GraphQL Schema</span></a><span> 有超过一万行），这几乎变得不可能。</span></p><p><strong><span>工具 / 解决方案</span></strong><span>：有一些工具可帮助保持 Schema 定义和 Resolver 同步。例如，通过使用诸如</span><a href='https://github.com/prisma/graphqlgen'><code>graphqlgen</code></a><span>或库的代码生成</span><a href='https://github.com/dotansimha/graphql-code-generator'><code>graphql-code-generator</code></a><span>。</span></p><h6><a name="问题2graphql-schema-的模块化" class="md-header-anchor"></a><span>问题2：GraphQL Schema 的模块化</span></h6><p><span>编写大型 GraphQL 模式时，通常不希望所有 GraphQL 类型定义都驻留在同一文件中。相反，您想将它们分成较小的部分（例如，根据功能或产品）。</span></p><p><strong><span>工具/解决方案</span></strong><span>：类似</span><a href='https://github.com/prisma/graphql-import'><code>graphql-import</code></a><span>的工具或更新的</span><a href='https://graphql-modules.com/'><code>graphql-modules</code></a><span>库对此提供了帮助。</span><code>graphql-import</code><span>使用编写为 SDL 注释的自定义导入语法。</span><code>graphql-modules</code><span>是一个工具集，可帮助进行 Schema 分离，Resolver 组合以及为 GraphQL 服务器实现可伸缩结构。</span></p><h6><a name="问题3schema-定义中的冗余代码重用）" class="md-header-anchor"></a><span>问题3：Schema 定义中的冗余（代码重用）</span></h6><p><span>另一个问题是如何重用 SDL 定义。</span></p><p><span>当前没有工具可以解决此问题。开发人员可以编写自定义工具来减少重复代码的需求，但是目前该问题尚缺乏通用的解决方案。</span></p><h6><a name="问题4ide-支持和开发人员经验" class="md-header-anchor"></a><span>问题4：IDE 支持和开发人员经验</span></h6><p><span>GraphQL 模式基于强大的类型系统，这可以在开发期间带来巨大的好处，因为它允许对代码进行静态分析。不幸的是，SDL 通常在程序中表示为纯字符串，这意味着该工具无法识别其中的任何结构。</span></p><p><span>然后，问题就变成了如何在编辑器工作流程中利用 GraphQL 类型来受益于诸如 SDL 代码自动完成和构建时错误检查之类的功能。</span></p><p><strong><span>工具 / 解决方案</span></strong><span>：该</span><a href='https://github.com/apollographql/graphql-tag'><code>graphql-tag</code></a><span>库提供了</span><code>gql</code><span>将 GraphQL 字符串转换为 AST（抽象语法树） 的功能，因此可以进行静态分析以及随之而来的功能。除此之外，还有各种编辑器插件，例如 VS Code 的 </span><a href='https://marketplace.visualstudio.com/items?itemName=Prisma.vscode-graphql'><span>GraphQL</span></a><span> 或 </span><a href='https://marketplace.visualstudio.com/items?itemName=apollographql.vscode-apollo'><span>Apollo GraphQL</span></a><span> 插件。</span></p><h5><a name="结论sdl-优先可以工作但需要无数的工具" class="md-header-anchor"></a><span>结论：SDL 优先可以工作，但需要无数的工具</span></h5><p><span>在探究了问题领域和开发出解决问题的各种工具之后，似乎 SDL 优先的开发最终可以工作——但它也要求开发人员学习和使用大量其他工具。</span></p><h5><a name="sdl-优先忽略编程语言的个别特征" class="md-header-anchor"></a><span>SDL 优先忽略编程语言的个别特征</span></h5><p><span>SDL 优先的另一个有问题的方面是，无论使用哪种编程语言，它都通过施加相似的原理而忽略了编程语言的各个功能。</span></p><p><span>代码优先方法在其他语言中确实非常有效：Scala 库</span><a href='https://github.com/sangria-graphql/sangria'><code>sangria-graphql</code></a><span>利用 Scala 强大的类型系统来优雅地构建 GraphQL 模式，并</span><a href='https://github.com/rmosolgo/graphql-ruby'><code>graphlq-ruby</code></a><span>使用了 Ruby 语言的许多很棒的DSL 功能。</span></p><h4><a name="代码优先" class="md-header-anchor"></a><span>代码优先</span></h4><h5><a name="你唯一需要的工具是编程语言" class="md-header-anchor"></a><span>你唯一需要的工具是编程语言</span></h5><p><span>大多数 SDL 优先问题来自以下事实：我们需要将手动编写的 SDL 模式映射到编程语言。这种映射是导致需要其他工具的原因。如果我们遵循以 SDL 优先的道路，则需要为每种语言生态系统重新设计所需的工具，并且每种工具的外观也将有所不同。</span></p><p><span>与其使用更多的工具来增加 GraphQL 服务器开发的复杂性，我们应该争取一种更简单的开发模型。理想的情况是，开发人员可以利用他们已经在使用的编程语言——这就是代码优先的想法。</span></p><h5><a name="什么是代码优先" class="md-header-anchor"></a><span>什么是代码优先？</span></h5><p><span>还记得在中定义 Schema 的最初示例</span><code>graphql-js</code><span>吗？这就是“ 代码优先”。没有任何手动维护的 Schema 定义，而是从实现该 Schema 的代码生成了 SDL 。</span></p><p><span>尽管</span><code>graphql-js</code><span>非常冗长，但其他语言中有许多流行的框架都基于代码优先方法工作，例如已经提到的，以及适用于 Python 或 Elixir 的框架：</span><a href='https://github.com/rmosolgo/graphql-ruby'><code>graphlq-ruby</code></a><span> </span><a href='https://github.com/sangria-graphql/sangria'><code>sangria-graphql</code></a><span> </span><a href='https://github.com/graphql-python/graphene'><code>graphene</code></a><span> </span><a href='https://github.com/absinthe-graphql/absinthe'><code>absinthe-graphql</code></a></p><h5><a name="实践中的代码优先" class="md-header-anchor"></a><span>实践中的代码优先</span></h5><p><span>使用代码优先的框架构建 GraphQL Schema 的例子：</span></p><pre spellcheck="false" class="md-fences md-end-block ty-contain-cm modeLoaded" lang="ts" style="page-break-inside: unset;"><div class="CodeMirror cm-s-inner CodeMirror-wrap" lang="ts"><div style="overflow: hidden; position: relative; width: 3px; height: 0px; top: 0px; left: 8px;"><textarea autocorrect="off" autocapitalize="off" spellcheck="false" tabindex="0" style="position: absolute; bottom: -1em; padding: 0px; width: 1000px; height: 1em; outline: none;"></textarea></div><div class="CodeMirror-scrollbar-filler" cm-not-content="true"></div><div class="CodeMirror-gutter-filler" cm-not-content="true"></div><div class="CodeMirror-scroll" tabindex="-1"><div class="CodeMirror-sizer" style="margin-left: 0px; margin-bottom: 0px; border-right-width: 0px; padding-right: 0px; padding-bottom: 0px;"><div style="position: relative; top: 0px;"><div class="CodeMirror-lines" role="presentation"><div role="presentation" style="position: relative; outline: none;"><div class="CodeMirror-measure"><pre><span>xxxxxxxxxx</span></pre></div><div class="CodeMirror-measure"></div><div style="position: relative; z-index: 1;"></div><div class="CodeMirror-code" role="presentation" style=""><div class="CodeMirror-activeline" style="position: relative;"><div class="CodeMirror-activeline-background CodeMirror-linebackground"></div><div class="CodeMirror-gutter-background CodeMirror-activeline-gutter" style="left: 0px; width: 0px;"></div><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"><span class="cm-keyword">const</span> <span class="cm-def">Query</span> <span class="cm-operator">=</span> <span class="cm-variable">objectType</span>(<span class="cm-string">'Query'</span>, <span class="cm-def">t</span> <span class="cm-operator">=&gt;</span> {</span></pre></div><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"> &nbsp;<span class="cm-variable-2">t</span>.<span class="cm-property">string</span>(<span class="cm-string">'hello'</span>, {</span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"> &nbsp; &nbsp;<span class="cm-property">args</span>: { <span class="cm-property">name</span>: <span class="cm-variable">stringArg</span>() },</span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"> &nbsp; &nbsp;<span class="cm-property">resolve</span>: (<span class="cm-def">_</span>, { <span class="cm-def">name</span> }) <span class="cm-operator">=&gt;</span> <span class="cm-string-2">`Hello ${</span><span class="cm-variable-2">name</span> <span class="cm-operator">||</span> <span class="cm-string-2">`World`}!`</span>,</span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;">  })</span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;">})</span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"><span cm-text="">​</span></span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"><span class="cm-keyword">const</span> <span class="cm-def">schema</span> <span class="cm-operator">=</span> <span class="cm-variable">makeSchema</span>({</span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"> &nbsp;<span class="cm-property">types</span>: [<span class="cm-variable">Query</span>],</span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"> &nbsp;<span class="cm-property">outputs</span>: {</span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"> &nbsp; &nbsp;<span class="cm-property">schema</span>: <span class="cm-string">'./schema.graphql'</span>),</span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"> &nbsp; &nbsp;<span class="cm-variable">typegen</span>: <span class="cm-string">'./typegen.ts'</span>,</span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;">  },</span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;">})</span></pre></div></div></div></div></div><div style="position: absolute; height: 0px; width: 1px; border-bottom-width: 0px; border-bottom-style: solid; border-bottom-color: transparent; top: 308px;"></div><div class="CodeMirror-gutters" style="display: none; height: 308px;"></div></div></div></pre><p><span>通过这种方法，可以直接在 TypeScript / JavaScript 中定义 GraphQL 类型。借助智能的代码补全功能，可以在定义它们时提示可用的 GraphQL 类型，字段和参数。</span></p><p><span>定义所有 GraphQL 类型后，会将它们传递到函数中以创建</span><a href='https://graphql.org/graphql-js/type/#graphqlschema'><code>GraphQLSchema</code></a><span>——可在 GraphQL 服务器中使用的实例。通过指定</span><code>ouputs</code><span>，可以定义所生成的 SDL 和类型应该位于何处。</span></p><h5><a name="无需所有工具即可获得-sdl-的好处" class="md-header-anchor"></a><span>无需所有工具即可获得 SDL 的好处</span></h5><p><span>之前我们列举了 SDL 优先开发的好处。实际上，在使用代码优先方法时，无需折中大多数。</span></p><p><span>以 GitHub GraphQL API 为例：GitHub 使用 Ruby 和代码优先的方法来实现其 API。SDL 模式定义是基于实现 API 的代码生成的。但是，Schema 定义仍被纳入版本控制中。这使得在开发过程中跟踪 API 的更改变得异常容易，并改善了各个团队之间的沟通。</span></p><p><span>API 文档等其他好处也不会因代码优先方法而丢失。</span></p><h3><a name="graphql-的更多优势" class="md-header-anchor"></a><span>GraphQL 的更多优势</span></h3><p><span>在“为什么需要 GraphQL ”部分我已经介绍了许多 GraphQL 相对于传统 API 的优势，但 GraphQL 的优势远不止这些。下面我再介绍几个 GraphQL 比较明显的优势：</span></p><h4><a name="版本控制" class="md-header-anchor"></a><span>版本控制</span></h4><p><span>使用 REST API，通常会看到许多带有 v1 或 v2 的 API。这些在 GraphQL 中并不需要，因为你可以通过添加或删除类型来改进 API。</span></p><p><span>在 GraphQL 中，你所需要做的就是写新代码。可以编写新类型、查询和修改，而无需维护其他版本的 API。</span></p><h4><a name="接口校验" class="md-header-anchor"></a><span>接口校验</span></h4><p><span>显而易见，由于强类型的使用，我们对收到的数据进行检验的操作变得更为容易和严格，自动化的简便度和有效性也大大提高。对 query 本身的结构的校验也相当于是在Schema 完成后就自动得到了，所以我们甚至不需要再引入任何别的工具或者依赖，就可以很方便地解决所有的 validation。</span></p><h4><a name="接口文档" class="md-header-anchor"></a><span>接口文档</span></h4><p><span>前面提到，由于 GraphQL 的 Schema 已经定义了字段和类型，正常情况后端不必再提供额外的接口文档，一些 GraphQL 的工具自带了文档展示功能，例如 </span><a href='https://github.com/prisma-labs/graphql-playground'><span>graphql-playground</span></a><span> 和 </span><a href='https://github.com/graphql/graphiql'><span>graphiql</span></a><span>。流行的 GraphQL 框架中都集成了这些工具，这很大程度上提升了 GraphQL 的开发体验，也提高了前后端的沟通效率，这在前后端分离的架构下是很重要的。</span></p><h4><a name="自动生成代码" class="md-header-anchor"></a><span>自动生成代码</span></h4><p><span>无论是 SDL 优先的从 SDL 生成代码还是代码优先的从代码生成 SDL 都还只是开发流程上的简化，还是需要自己写Resolver 才能使用，而类似 </span><a href='https://www.prisma.io/'><span>prisma</span></a><span> 的项目已经可以让你直接将数据库变成一个 GraphQL Server，无需手写 Resolver，他会自动生成常见的查询方法。</span></p><h3><a name="graphql-的劣势与难点" class="md-header-anchor"></a><span>GraphQL 的劣势与难点</span></h3><h4><a name="性能" class="md-header-anchor"></a><span>性能</span></h4><p><span>一个 RESTful 应用，由于每个 API 的确定性，我们可以针对每一个 API 的逻辑，非常好的优化它们的性能，所以就算存在一定程度的 Overfetching / Underfetching，前后端的性能都可以保持在能够接受的范围内。然而想要更普适性一些的 GraphQL，则可能会因为一个层级结构复杂而且许多域都有很大数据量的 Query 跑许多个Resolvers，使得数据库的查询性能成为了瓶颈。使用 </span><a href='https://github.com/graphql/dataloader'><span>DataLoader</span></a><span> 可以在一定程度上解决这个问题。</span></p><h4><a name="缓存" class="md-header-anchor"></a><span>缓存</span></h4><p><span>在 RESTful 等基于 URL 的 API 中，客户端可以根据 URL 使用 HTTP 缓存。这些 API 中的 URL 就是全局唯一标识符。而 GraphQL 是单入口的 API，无法用 URL 实现缓存。</span>
+<span>GraphQL 中提供 Global ID 字段作为全局唯一标识符。可以将一个字段（如 id）保留为全局唯一标识符，例如</span><code>&quot;id&quot;: &quot;MDEwOlJlcG9zaXRvcnk2MDE4MTY4OA==&quot;</code><span>。</span>
+<span>如果后端使用类似 UUID 的标识符，那么直接暴露这个全局唯一 ID 即可。如果后端并没有给每个对象分配全局唯一 ID，则 GraphQL 层需要构造此 ID。</span></p><h4><a name="资源与速率限制" class="md-header-anchor"></a><span>资源与速率限制</span></h4><p><span>对于 RESTful 请求，简单的限制请求次数即可。而对于 GraphQL，一个复杂的 GraphQL 调用可能等同于数千个 RESTful 请求，而一个简单的 GraphQL 调用可能只等同于一两个 RESTful 请求。</span></p><p><span>为了准确地计算一个查询带来的服务器负载，GitHub 的 GraphQL API v4 根据标准化点数（normalized scale of points）来计算速率限制分数（rate limit score）。每个 GraphQL 请求的分数，由父连接及其子节点上 的 first 和 last 参数决定。</span></p><ul><li><span>客户必须为每个 connection 提供 first 或 last 参数。</span></li><li><span>first 或 last 参数的取值范围在 1-100 之间。</span></li><li><span>每一个独立调用最多可以请求 50 万个节点。</span></li></ul><p><span>查询：</span></p><pre spellcheck="false" class="md-fences md-end-block ty-contain-cm modeLoaded" lang="graphql" style="page-break-inside: unset;"><div class="CodeMirror cm-s-inner CodeMirror-wrap" lang="graphql"><div style="overflow: hidden; position: relative; width: 3px; height: 0px; top: 0px; left: 8px;"><textarea autocorrect="off" autocapitalize="off" spellcheck="false" tabindex="0" style="position: absolute; bottom: -1em; padding: 0px; width: 1000px; height: 1em; outline: none;"></textarea></div><div class="CodeMirror-scrollbar-filler" cm-not-content="true"></div><div class="CodeMirror-gutter-filler" cm-not-content="true"></div><div class="CodeMirror-scroll" tabindex="-1"><div class="CodeMirror-sizer" style="margin-left: 0px; margin-bottom: 0px; border-right-width: 0px; padding-right: 0px; padding-bottom: 0px;"><div style="position: relative; top: 0px;"><div class="CodeMirror-lines" role="presentation"><div role="presentation" style="position: relative; outline: none;"><div class="CodeMirror-measure"><pre><span>xxxxxxxxxx</span></pre></div><div class="CodeMirror-measure"></div><div style="position: relative; z-index: 1;"></div><div class="CodeMirror-code" role="presentation" style=""><div class="CodeMirror-activeline" style="position: relative;"><div class="CodeMirror-activeline-background CodeMirror-linebackground"></div><div class="CodeMirror-gutter-background CodeMirror-activeline-gutter" style="left: 0px; width: 0px;"></div><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;">query {</span></pre></div><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;">  viewer {</span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"> &nbsp;  repositories(first: 50) {</span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"> &nbsp; &nbsp;  edges {</span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"> &nbsp; &nbsp; &nbsp;  repository:node {</span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"> &nbsp; &nbsp; &nbsp; &nbsp;  name</span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"><span cm-text="">​</span></span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"> &nbsp; &nbsp; &nbsp; &nbsp;  issues(first: 10) {</span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"> &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;  totalCount</span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"> &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;  edges {</span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"> &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;  node {</span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"> &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;  title</span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"> &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;  bodyHTML</span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"> &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;  }</span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"> &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;  }</span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"> &nbsp; &nbsp; &nbsp; &nbsp;  }</span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"> &nbsp; &nbsp; &nbsp;  }</span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"> &nbsp; &nbsp;  }</span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"> &nbsp;  }</span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;">  }</span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;">}</span></pre></div></div></div></div></div><div style="position: absolute; height: 0px; width: 1px; border-bottom-width: 0px; border-bottom-style: solid; border-bottom-color: transparent; top: 462px;"></div><div class="CodeMirror-gutters" style="display: none; height: 462px;"></div></div></div></pre><p><span>计算：</span></p><pre spellcheck="false" class="md-fences md-end-block ty-contain-cm modeLoaded" lang="svg"><div class="CodeMirror cm-s-inner CodeMirror-wrap" lang="svg"><div style="overflow: hidden; position: relative; width: 3px; height: 0px; top: 0px; left: 8px;"><textarea autocorrect="off" autocapitalize="off" spellcheck="false" tabindex="0" style="position: absolute; bottom: -1em; padding: 0px; width: 1000px; height: 1em; outline: none;"></textarea></div><div class="CodeMirror-scrollbar-filler" cm-not-content="true"></div><div class="CodeMirror-gutter-filler" cm-not-content="true"></div><div class="CodeMirror-scroll" tabindex="-1"><div class="CodeMirror-sizer" style="margin-left: 0px; margin-bottom: 0px; border-right-width: 0px; padding-right: 0px; padding-bottom: 0px;"><div style="position: relative; top: 0px;"><div class="CodeMirror-lines" role="presentation"><div role="presentation" style="position: relative; outline: none;"><div class="CodeMirror-measure"><pre><span>xxxxxxxxxx</span></pre></div><div class="CodeMirror-measure"></div><div style="position: relative; z-index: 1;"></div><div class="CodeMirror-code" role="presentation" style=""><div class="CodeMirror-activeline" style="position: relative;"><div class="CodeMirror-activeline-background CodeMirror-linebackground"></div><div class="CodeMirror-gutter-background CodeMirror-activeline-gutter" style="left: 0px; width: 0px;"></div><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;">50 &nbsp; &nbsp; &nbsp; = 50 repositories</span></pre></div><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;">+</span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;">50 x 10  = 500 repository issues</span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"><span cm-text="">​</span></span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"> &nbsp; &nbsp; &nbsp; &nbsp; = 550 total nodes</span></pre></div></div></div></div></div><div style="position: absolute; height: 0px; width: 1px; border-bottom-width: 0px; border-bottom-style: solid; border-bottom-color: transparent; top: 110px;"></div><div class="CodeMirror-gutters" style="display: none; height: 110px;"></div></div></div></pre><ul><li><span>公式使用父连接及其子级上的 first 和 last 参数来预先计算 GitHub 系统（如MySQL，ElasticSearch 和 Git）上的潜在负载。</span></li><li><span>每个新连接都有自己的点数。这个点数与请求中的其他点数合并为一个总体的速率限制分数（rate limit score）。</span></li><li><span>GraphQL API v4 速率限制是每小时 5000 点。</span></li></ul><p><span>请求：</span></p><pre spellcheck="false" class="md-fences md-end-block ty-contain-cm modeLoaded" lang="graphql"><div class="CodeMirror cm-s-inner CodeMirror-wrap" lang="graphql"><div style="overflow: hidden; position: relative; width: 3px; height: 0px; top: 0px; left: 8px;"><textarea autocorrect="off" autocapitalize="off" spellcheck="false" tabindex="0" style="position: absolute; bottom: -1em; padding: 0px; width: 1000px; height: 1em; outline: none;"></textarea></div><div class="CodeMirror-scrollbar-filler" cm-not-content="true"></div><div class="CodeMirror-gutter-filler" cm-not-content="true"></div><div class="CodeMirror-scroll" tabindex="-1"><div class="CodeMirror-sizer" style="margin-left: 0px; margin-bottom: 0px; border-right-width: 0px; padding-right: 0px; padding-bottom: 0px;"><div style="position: relative; top: 0px;"><div class="CodeMirror-lines" role="presentation"><div role="presentation" style="position: relative; outline: none;"><div class="CodeMirror-measure"><pre><span>xxxxxxxxxx</span></pre></div><div class="CodeMirror-measure"></div><div style="position: relative; z-index: 1;"></div><div class="CodeMirror-code" role="presentation" style=""><div class="CodeMirror-activeline" style="position: relative;"><div class="CodeMirror-activeline-background CodeMirror-linebackground"></div><div class="CodeMirror-gutter-background CodeMirror-activeline-gutter" style="left: 0px; width: 0px;"></div><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;">query {</span></pre></div><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;">  viewer {</span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"> &nbsp;  login</span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;">  }</span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;">  rateLimit {</span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"> &nbsp;  limit</span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"> &nbsp;  cost</span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"> &nbsp;  remaining</span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"> &nbsp;  resetAt</span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;">  }</span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;">}</span></pre></div></div></div></div></div><div style="position: absolute; height: 0px; width: 1px; border-bottom-width: 0px; border-bottom-style: solid; border-bottom-color: transparent; top: 242px;"></div><div class="CodeMirror-gutters" style="display: none; height: 242px;"></div></div></div></pre><p><span>响应：</span></p><pre spellcheck="false" class="md-fences md-end-block ty-contain-cm modeLoaded" lang="json"><div class="CodeMirror cm-s-inner CodeMirror-wrap" lang="json"><div style="overflow: hidden; position: relative; width: 3px; height: 0px; top: 0px; left: 8px;"><textarea autocorrect="off" autocapitalize="off" spellcheck="false" tabindex="0" style="position: absolute; bottom: -1em; padding: 0px; width: 1000px; height: 1em; outline: none;"></textarea></div><div class="CodeMirror-scrollbar-filler" cm-not-content="true"></div><div class="CodeMirror-gutter-filler" cm-not-content="true"></div><div class="CodeMirror-scroll" tabindex="-1"><div class="CodeMirror-sizer" style="margin-left: 0px; margin-bottom: 0px; border-right-width: 0px; padding-right: 0px; padding-bottom: 0px;"><div style="position: relative; top: 0px;"><div class="CodeMirror-lines" role="presentation"><div role="presentation" style="position: relative; outline: none;"><div class="CodeMirror-measure"><pre><span>xxxxxxxxxx</span></pre></div><div class="CodeMirror-measure"></div><div style="position: relative; z-index: 1;"></div><div class="CodeMirror-code" role="presentation" style=""><div class="CodeMirror-activeline" style="position: relative;"><div class="CodeMirror-activeline-background CodeMirror-linebackground"></div><div class="CodeMirror-gutter-background CodeMirror-activeline-gutter" style="left: 0px; width: 0px;"></div><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;">{</span></pre></div><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"> &nbsp;<span class="cm-string cm-property">"data"</span>: {</span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"> &nbsp; &nbsp;<span class="cm-string cm-property">"viewer"</span>: {</span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"> &nbsp; &nbsp; &nbsp;<span class="cm-string cm-property">"login"</span>: <span class="cm-string">"kikajack"</span></span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"> &nbsp;  },</span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"> &nbsp; &nbsp;<span class="cm-string cm-property">"rateLimit"</span>: {</span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"> &nbsp; &nbsp; &nbsp;<span class="cm-string cm-property">"limit"</span>: <span class="cm-number">5000</span>,</span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"> &nbsp; &nbsp; &nbsp;<span class="cm-string cm-property">"cost"</span>: <span class="cm-number">1</span>,</span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"> &nbsp; &nbsp; &nbsp;<span class="cm-string cm-property">"remaining"</span>: <span class="cm-number">4999</span>,</span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"> &nbsp; &nbsp; &nbsp;<span class="cm-string cm-property">"resetAt"</span>: <span class="cm-string">"2018-01-21T04:42:30Z"</span></span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"> &nbsp;  }</span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;">  }</span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;">}</span></pre></div></div></div></div></div><div style="position: absolute; height: 0px; width: 1px; border-bottom-width: 0px; border-bottom-style: solid; border-bottom-color: transparent; top: 286px;"></div><div class="CodeMirror-gutters" style="display: none; height: 286px;"></div></div></div></pre><h4><a name="生态" class="md-header-anchor"></a><span>生态</span></h4><p><span>尽管 GraphQL 有着很好的社区支持，但本质上使用 GraphQL，就等于要使用 React 与 NodeJS，其他语言和框架的成熟度和社区活跃度都比较低。</span></p><h3><a name="总结" class="md-header-anchor"></a><span>总结</span></h3><p><span>GraphQL 是 API 的未来吗？至少在数据聚合和网关层是的。当然 Restful 也不会被完全替代，只是今后提到开放 API 不再只有 Restful 这一种选项了。</span></p><h3><a name="参考文献" class="md-header-anchor"></a><span>参考文献</span></h3><ul><li><a href='https://www.prisma.io/blog/graphql-sdl-schema-definition-language-6755bcb9ce51'><span>GraphQL SDL — Schema Definition Language</span></a></li><li><a href='https://www.prisma.io/blog/the-problems-of-schema-first-graphql-development-x1mn4cb0tyl3/'><span>The Problems of &quot;Schema-First&quot; GraphQL Server Development</span></a></li><li><a href='https://developer.github.com/v4/guides/resource-limitations/'><span>GraphQL resource limitations</span></a></li></ul></div>
 </body>
 </html>

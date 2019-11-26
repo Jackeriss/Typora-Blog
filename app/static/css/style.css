@@ -18,21 +18,31 @@
 }
 
 ::selection {
-  background: rgba(0, 149, 255, .2); /* WebKit/Blink Browsers */
+  background: rgba(0, 149, 255, .2);
+  /* WebKit/Blink Browsers */
 }
 
 ::-moz-selection {
-  background: rgba(0, 149, 255, .2); /* Gecko Browsers */
+  background: rgba(0, 149, 255, .2);
+  /* Gecko Browsers */
 }
 
 html {
   overflow-x: initial !important;
 }
 
+:root {
+  --bg-color: #ffffff;
+  --text-color: #333333;
+  --select-text-bg-color: #B5D6FC;
+  --select-text-font-color: auto;
+  --monospace: "Lucida Console", Consolas, "Courier", monospace;
+}
+
 html {
   font-size: 14px;
-  background-color: #ffffff;
-  color: #333333;
+  background-color: var(--bg-color);
+  color: var(--text-color);
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
 }
@@ -54,6 +64,7 @@ body {
   background-origin: inherit;
   background-clip: inherit;
   background-color: inherit;
+  tab-size: 4;
   background-position: inherit inherit;
   background-repeat: inherit inherit;
 }
@@ -71,6 +82,13 @@ a:hover {
   outline: 0px;
 }
 
+.in-text-selection,
+::selection {
+  text-shadow: none;
+  background: var(--select-text-bg-color);
+  color: var(--select-text-font-color);
+}
+
 #write {
   margin: 0px auto;
   height: auto;
@@ -80,6 +98,7 @@ a:hover {
   position: relative;
   white-space: normal;
   overflow-x: visible;
+  padding-top: 40px;
 }
 
 #write.first-line-indent p {
@@ -106,6 +125,7 @@ body.typora-export {
 }
 
 .typora-export .footnote-line,
+.typora-export li,
 .typora-export p {
   white-space: pre-wrap;
 }
@@ -114,6 +134,11 @@ body.typora-export {
   body.typora-export {
     padding-left: 0px;
     padding-right: 0px;
+  }
+
+  #write {
+    padding-left: 20px;
+    padding-right: 20px;
   }
 
   .CodeMirror-sizer {
@@ -125,8 +150,8 @@ body.typora-export {
   }
 }
 
-#write li>figure:first-child {
-  margin-top: -20px;
+#write li>figure:last-child {
+  margin-bottom: 0.5rem;
 }
 
 #write ol,
@@ -184,6 +209,10 @@ input[type="radio"] {
 #write h6,
 #write p {
   position: relative;
+}
+
+p {
+  line-height: inherit;
 }
 
 h1,
@@ -306,13 +335,15 @@ table {
 }
 
 table.md-table td {
-  min-width: 80px;
+  min-width: 32px;
 }
 
 .CodeMirror-gutters {
   border-right-width: 0px;
   background-color: inherit;
 }
+
+.CodeMirror-linenumber {}
 
 .CodeMirror {
   text-align: left;
@@ -483,6 +514,7 @@ li> :first-child {
 
   #write {
     margin-top: 0px;
+    padding-top: 0px;
     border-color: transparent !important;
   }
 
@@ -495,18 +527,14 @@ li> :first-child {
   }
 
   .typora-export #write {
-    padding-left: 1cm;
-    padding-right: 1cm;
+    padding-left: 32px;
+    padding-right: 32px;
     padding-bottom: 0px;
     break-after: avoid-page;
   }
 
   .typora-export #write::after {
     height: 0px;
-  }
-
-  @page {
-    margin: 20mm 0px;
   }
 }
 
@@ -575,6 +603,7 @@ p>.md-image:only-child {
   left: 0px;
   margin-left: -1.2em;
   margin-top: calc(1em - 10px);
+  border: none;
 }
 
 .math {
@@ -733,6 +762,10 @@ a.md-print-anchor {
   display: none !important;
 }
 
+.html-for-mac .inline-math-svg .MathJax_SVG {
+  vertical-align: 0.2px;
+}
+
 .md-math-block .MathJax_SVG_Display {
   text-align: center;
   margin: 0px;
@@ -793,6 +826,7 @@ a.md-print-anchor {
 .MathJax_SVG_Display svg {
   vertical-align: middle !important;
   margin-bottom: 0px !important;
+  margin-top: 0px !important;
 }
 
 .os-windows.monocolor-emoji .md-emoji {
@@ -806,6 +840,7 @@ a.md-print-anchor {
 [lang="mermaid"] svg,
 [lang="flow"] svg {
   max-width: 100%;
+  height: auto;
 }
 
 [lang="mermaid"] .node text {
@@ -831,6 +866,10 @@ iframe {
 .highlight td,
 .highlight tr {
   border: 0px;
+}
+
+svg[id^="mermaidChart"] {
+  line-height: 1em;
 }
 
 
@@ -1233,6 +1272,8 @@ div.CodeMirror span.CodeMirror-nonmatchingbracket {
   --control-text-color: #777;
 }
 
+@include-when-export url(https://fonts.loli.net/css?family=Open+Sans:400italic,700italic,700,400&subset=latin,latin-ext);
+
 html {
   font-size: 16px;
 }
@@ -1255,6 +1296,10 @@ body {
   margin-top: 30px;
 }
 
+a {
+  color: #4183C4;
+}
+
 h1,
 h2,
 h3,
@@ -1275,7 +1320,6 @@ h3:hover a.anchor,
 h4:hover a.anchor,
 h5:hover a.anchor,
 h6:hover a.anchor {
-  /*background: url("file:///Users/Jackeriss/Library/Application%20Support/images/modules/styleguide/para.png") no-repeat 10px center;*/
   text-decoration: none;
 }
 
@@ -1413,14 +1457,12 @@ table tr th {
   font-weight: bold;
   border: 1px solid #dfe2e5;
   border-bottom: 0;
-  text-align: left;
   margin: 0;
   padding: 6px 13px;
 }
 
 table tr td {
   border: 1px solid #dfe2e5;
-  text-align: left;
   margin: 0;
   padding: 6px 13px;
 }
@@ -1457,13 +1499,12 @@ tt {
 
 code {
   background-color: #f3f4f4;
-  padding: 0 4px 2px 4px;
+  padding: 0 2px 0 2px;
 }
 
 .md-fences {
   margin-bottom: 15px;
   margin-top: 15px;
-  padding: 0.2em 1em;
   padding-top: 8px;
   padding-bottom: 6px;
 }
@@ -1603,8 +1644,19 @@ footer {
   border-color: #e5e5e5;
 }
 
+.ty-preferences .window-content {
+  background-color: #fafafa;
+}
+
+.ty-preferences .nav-group-item.active {
+  color: white;
+  background: #999;
+}
+
+.typora-export li,
 .typora-export p,
-.typora-export .footnote-line {
+.typora-export,
+.footnote-line {
   white-space: normal;
 }
 
@@ -1714,7 +1766,7 @@ header {
 }
 
 .active {
-  color: #157efb!important;
+  color: #157efb !important;
 }
 
 .nav-main {
