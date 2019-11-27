@@ -27,6 +27,7 @@ class PostService(object):
                 )
                 with open(post_html_path, "r") as source_file:
                     text = source_file.read()
+                text.replace('<a href="', '<a target="_blank" href="')
                 soup = BeautifulSoup(text, "lxml")
                 post["year"], post["timestamp"] = time_str2timestamp(
                     soup.find("p").get_text()
