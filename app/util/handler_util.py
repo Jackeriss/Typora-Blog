@@ -9,7 +9,7 @@ from schema import Schema, SchemaError
 
 from app.util import error_util
 from app.util.config_util import config
-from app.config import const_config
+from app.config import constant
 
 
 class BasicHandler(tornado.web.RequestHandler):
@@ -118,7 +118,7 @@ class BasicHandler(tornado.web.RequestHandler):
         response = {"code": code.value, "message": message, "body": None}
         return self.finish(orjson.dumps(response))
 
-    def success(self, data, status=const_config.HTTPCode.OK):
+    def success(self, data, status=constant.HTTPCode.OK):
         self.set_status(status)
         response = {
             "code": error_util.ERROR_CODE.SUCCESS.value,
@@ -147,7 +147,7 @@ class PageNotFoundHandler(BasicHandler):
     """ 404 页面 handler """
 
     def get(self):
-        self.render_error(const_config.HTTPCode.NOT_FOUND)
+        self.render_error(constant.HTTPCode.NOT_FOUND)
 
     def post(self):
         return self.error(error_util.ERROR_CODE.NOT_FOUND)

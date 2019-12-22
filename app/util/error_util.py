@@ -3,7 +3,7 @@ import logging
 import asyncio
 from enum import IntEnum
 
-from app.config.const_config import HTTPCode
+from app.config.constant import HTTPCode
 
 
 class ERROR_CODE(IntEnum):

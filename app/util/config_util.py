@@ -4,7 +4,7 @@ import os
 
 import yaml
 
-from app.config import const_config
+from app.config import constant
 
 
 parser = argparse.ArgumentParser()
@@ -18,14 +18,14 @@ port = args.port
 
 def _read_config(_env):
     with open(
-        os.path.join(const_config.BASE_DIR, "config", f"config.{_env}.yaml"),
+        os.path.join(constant.BASE_DIR, "config", f"config.{_env}.yaml"),
         "r",
         encoding="utf-8",
     ) as stream:
         return yaml.full_load(stream)
 
 
-if os.path.exists(os.path.join(const_config.BASE_DIR, "config", "config.local.yaml")):
+if os.path.exists(os.path.join(constant.BASE_DIR, "config", "config.local.yaml")):
     content = _read_config("local")
 else:
     content = _read_config(env)
@@ -40,15 +40,15 @@ class Config:
 
     @property
     def base_dir(self):
-        return const_config.BASE_DIR
+        return constant.BASE_DIR
 
     @property
     def static_path(self):
-        return os.path.join(const_config.BASE_DIR, "static")
+        return os.path.join(constant.BASE_DIR, "static")
 
     @property
     def template_path(self):
-        return os.path.join(const_config.BASE_DIR, "template")
+        return os.path.join(constant.BASE_DIR, "template")
 
     @property
     def content(self):

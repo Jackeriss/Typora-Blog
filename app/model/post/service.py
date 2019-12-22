@@ -3,7 +3,7 @@ from functools import lru_cache
 
 from bs4 import BeautifulSoup
 
-from app.config import const_config
+from app.config import constant
 from app.util.config_util import config
 from app.util.time_util import time_str2timestamp
 
@@ -73,8 +73,8 @@ class PostService(object):
     @classmethod
     def get_total_page(cls):
         total_page = int(
-            (len(cls.gen_posts()) + const_config.PAGE_LIMIT - 1)
-            / const_config.PAGE_LIMIT
+            (len(cls.gen_posts()) + constant.PAGE_LIMIT - 1)
+            / constant.PAGE_LIMIT
         )
         return total_page
 
@@ -86,11 +86,11 @@ class PostService(object):
             if page < total_page:
                 posts = posts[
                     (page - 1)
-                    * const_config.PAGE_LIMIT : page
-                    * const_config.PAGE_LIMIT
+                    * constant.PAGE_LIMIT : page
+                    * constant.PAGE_LIMIT
                 ]
             elif page == total_page:
-                posts = posts[(page - 1) * const_config.PAGE_LIMIT : len(posts)]
+                posts = posts[(page - 1) * constant.PAGE_LIMIT : len(posts)]
         return posts
 
     @classmethod
