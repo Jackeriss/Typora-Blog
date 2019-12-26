@@ -3,6 +3,8 @@ import logging
 import asyncio
 from enum import IntEnum
 
+from tornado.web import HTTPError
+
 from app.config.constant import HTTPCode
 
 
@@ -56,12 +58,15 @@ def try_exception(func):
     """ 给每一个 request 加上全局异常捕获 """
 
     @functools.wraps(func)
-    async def _async_wrapper(handler, *args, **kwargs):
+    async def _wrapper(handler, *args, **kwargs):
         try:
-            result = await func(handler, *args, **kwargs)
-            return result
+            if asyncio.iscoroutinefunction(func):
+                return await func(handler, *args, **kwargs)
+            return func(handler, *args, **kwargs)
         except BasicException as error:
             logging.error(f"BasicException: {error.code}\nMessage: {error.message}")
+            return handler.error(error.code, error.message, error.status)
+        except HTTPError as exception:
             return handler.error(error.code, error.message, error.status)
         except BaseException as exception:
             try:
@@ -75,26 +80,4 @@ def try_exception(func):
             )
             return handler.error(ERROR_CODE.SYSTEM_ERROR, status=500)
 
-    @functools.wraps(func)
-    def _sync_wrapper(handler, *args, **kwargs):
-        try:
-            result = func(handler, *args, **kwargs)
-            return result
-        except BasicException as error:
-            logging.error(f"BasicException: {error.code}\nMessage: {error.message}")
-            return handler.error(error.code, error.message, error.status)
-        except BaseException as exception:
-            try:
-                url = handler.request.uri
-                arg = handler.all_arguments
-                basic_info = handler.basic_info_str
-            except:
-                url, arg, basic_info = "", "", ""
-            logging.exception(
-                f"SystemError:{exception}\nURL:{url}\nArguments:{arg}\nBasicInfo:{basic_info}"
-            )
-            return handler.error(ERROR_CODE.SYSTEM_ERROR, status=500)
-
-    if asyncio.iscoroutinefunction(func):
-        return _async_wrapper
-    return _sync_wrapper
+    return _wrapper
