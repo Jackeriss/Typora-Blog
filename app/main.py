@@ -21,7 +21,7 @@ root_logger = logging.getLogger()
 if debug:
     root_logger.setLevel(logging.DEBUG)
 else:
-    root_logger.setLevel(logging.WARNING)
+    root_logger.setLevel(logging.INFO)
 
 
 BEFORE_HOOKS = [before_hook.wrap_handler]
