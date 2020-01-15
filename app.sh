@@ -26,7 +26,6 @@ function get_num()
 
 function init_env()
 {
-    pipenv install --deploy
     if ! test -d ${LOG_DIR}; then mkdir -p ${LOG_DIR}; fi
 }
 
