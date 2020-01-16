@@ -1,5 +1,3 @@
-import logging
-
 from tornado import web
 from tornado.ioloop import PeriodicCallback
 import tornado
@@ -36,18 +34,15 @@ class Application(web.Application):
                 hook(self)
 
     def start_delay_tasks(self):
-        """ 启动延时任务 """
         for delay_task in self.delay_tasks:
             self.loop.call_later(**delay_task)
 
     def start_periodic_tasks(self):
-        """ 启动周期任务 """
         for periodic_task in self.periodic_tasks:
             self.periodic_task_runners.append(PeriodicCallback(**periodic_task))
             self.periodic_task_runners[-1].start()
 
     def stop_periodic_tasks(self):
-        """ 停止周期任务 """
         for periodic_task_runner in self.periodic_task_runners:
             periodic_task_runner.stop()
 
@@ -68,7 +63,6 @@ class Application(web.Application):
 
     @classmethod
     def prefix_model_routers(cls, model_routers):
-        """ 为子模块路由添加前缀 """
         prefixed_routers = []
         for service_router in model_routers:
             prefixed_routers += cls.prefix_routers(**service_router)

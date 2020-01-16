@@ -1,31 +1,12 @@
 ---
 server:
-  debug: false
+  debug: true
   host: 0.0.0.0
-  port: 10200
-  allow_origin: "*.jackeriss.com"
+  allow_origin: "*"
   thread_worker: 60
-
-http:
-  timeout: 3
-  retry: 3
 
 redis:
   host: "127.0.0.1"
   port: 6379
-  db: 0
+  db: 1
   password:
-  min_size: 1
-  max_size: 20
-  timeout: 60
-  encoding: "utf-8"
-
-pg:
-  host: ""
-  user: ""
-  password: ""
-  port: 5432
-  database: ""
-  minsize: 1
-  maxsize: 20
-  command_timeout: 60

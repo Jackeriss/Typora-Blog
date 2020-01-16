@@ -1,58 +1,44 @@
-const { src, dest, series, parallel } = require('gulp');
+const gulp = require('gulp');
 const del = require('del')
 const rev = require('gulp-rev')
 const clean_css = require('gulp-clean-css')
 const terser = require('gulp-terser')
-const image = require('gulp-image')
 const uploadQcloud = require('gulp-qcloud-cos-upload')
 const revCollector = require('gulp-rev-collector')
 const qcloud = require('./qcloud.json')
+const cp = require("child_process")
 
-function clean(cb) {
+
+gulp.task('clean', function (cb) {
   return del(['./dist'], cb)
-}
+})
 
-function build_js() {
-  return src('app/static/js/*.js')
+gulp.task('build_js', function () {
+  return gulp.src('app/static/js/*.js')
     .pipe(terser())
     .pipe(rev())
-    .pipe(dest('dist'))
+    .pipe(gulp.dest('dist'))
     .pipe(rev.manifest({
       path: 'dist/rev-manifest.json',
       base: 'dist',
       merge: true
     }))
-    .pipe(dest('dist'))
-}
-
-function build_css() {
-  return src('app/static/css/*.css')
+    .pipe(gulp.dest('dist'))
+})
+gulp.task('build_css', function () {
+  return gulp.src('app/static/css/*.css')
     .pipe(clean_css())
     .pipe(rev())
-    .pipe(dest('dist'))
+    .pipe(gulp.dest('dist'))
     .pipe(rev.manifest({
       path: 'dist/rev-manifest.json',
       base: 'dist',
       merge: true
     }))
-    .pipe(dest('dist'))
-}
-
-function build_image() {
-  return src('app/static/image/*.*')
-    .pipe(image())
-    .pipe(rev())
-    .pipe(dest('dist'))
-    .pipe(rev.manifest({
-      path: 'dist/rev-manifest.json',
-      base: 'dist',
-      merge: true
-    }))
-    .pipe(dest('dist'))
-}
-
-function upload() {
-  return src('*.*', {cwd: 'dist'})
+    .pipe(gulp.dest('dist'))
+})
+gulp.task('upload', function () {
+  return gulp.src('*.*', { cwd: 'dist' })
     .pipe(uploadQcloud({
       AppId: qcloud.AppId,
       SecretId: qcloud.SecretId,
@@ -61,10 +47,9 @@ function upload() {
       Region: qcloud.Region,
       prefix: qcloud.prefix
     }))
-}
-
-function rev_collect() {
-  return src(['dist/rev-manifest.json', 'app/template/*.html'])
+})
+gulp.task('rev_collect', function () {
+  return gulp.src(['dist/rev-manifest.json', 'app/template/*.html'])
     .pipe(revCollector({
       'replaceReved': true,
       'dirReplacements': {
@@ -73,7 +58,11 @@ function rev_collect() {
         '/image/': 'https://jackeriss-1252826939.file.myqcloud.com/' + qcloud.prefix + '/'
       }
     }))
-    .pipe(dest('app/template/dist'))
-}
+    .pipe(gulp.dest('app/template/dist'))
+})
 
-exports.default = series(clean, parallel(build_js, build_css, build_image), upload, rev_collect)
+gulp.task('start', function () {
+  return cp.exec('/usr/local/bin/pm2 startOrReload pm2.json')
+})
+
+exports.default = gulp.series('clean', gulp.parallel('build_js', 'build_css'), 'upload', 'rev_collect', 'start')

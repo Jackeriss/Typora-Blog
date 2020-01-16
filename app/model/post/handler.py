@@ -2,7 +2,7 @@ from schema import Optional, Use
 
 from app.model.post.service import PostService
 from app.util.handler_util import BasicHandler
-from app.config import constant
+from app.constant import constant
 
 
 class PostsHandler(BasicHandler):

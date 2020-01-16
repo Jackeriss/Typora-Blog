@@ -3,7 +3,7 @@ from functools import lru_cache
 
 from bs4 import BeautifulSoup
 
-from app.config import constant
+from app.constant import constant
 from app.util.config_util import config
 from app.util.time_util import time_str2timestamp
 

@@ -3,14 +3,12 @@ import functools
 import logging
 
 import aiohttp
-import orjson
+import json
 
 from app.util.config_util import config
 
 
 def as_asyncio_task(func):
-    """ aiohttp 的超时机制需要在 asyncio task 中执行 """
-
     @functools.wraps(func)
     async def _wrapper(self, *args, **kwargs):
         coro = func(self, *args, **kwargs)
@@ -20,8 +18,6 @@ def as_asyncio_task(func):
 
 
 class HTTPClient:
-    """ HTTP 客户端 """
-
     _session = None
 
     @classmethod
@@ -32,14 +28,7 @@ class HTTPClient:
 
     @as_asyncio_task
     async def request(
-        self,
-        url,
-        *,
-        method="GET",
-        format=None,
-        timeout=config.http["timeout"],
-        retry=config.http["retry"],
-        **kwargs,
+        self, url, *, method="GET", response_format=None, timeout=5, retry=2, **kwargs,
     ):
         session = await self.get_session()
         func = getattr(session, method.lower())
@@ -50,8 +39,8 @@ class HTTPClient:
             try:
                 response = await func(url, timeout=timeout, **kwargs)
                 response.text_data = await response.text()
-                if format == "json":
-                    response.json_data = response.json(content_type=None)
+                if response_format == "json":
+                    response.json_data = json.loads(response.text_data)
             except asyncio.TimeoutError:
                 logging.error(
                     f"request timeout {timeout}!request url:{url} kwargs:{kwargs}"

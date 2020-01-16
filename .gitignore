@@ -4,6 +4,4 @@ __pycache__
 *.pyc
 node_modules
 dist
-qcloud.json
 app/config/config.local.yaml
-app/template/post

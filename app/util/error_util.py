@@ -5,7 +5,7 @@ from enum import IntEnum
 
 from tornado.web import HTTPError
 
-from app.config.constant import HTTPCode
+from app.constant.constant import HTTPCode
 
 
 class ERROR_CODE(IntEnum):
@@ -55,8 +55,6 @@ class ResponseError(BasicException):
 
 
 def try_exception(func):
-    """ 给每一个 request 加上全局异常捕获 """
-
     @functools.wraps(func)
     async def _wrapper(handler, *args, **kwargs):
         try:
@@ -66,8 +64,8 @@ def try_exception(func):
         except BasicException as error:
             logging.error(f"BasicException: {error.code}\nMessage: {error.message}")
             return handler.error(error.code, error.message, error.status)
-        except HTTPError as exception:
-            return handler.error(error.code, error.message, error.status)
+        except HTTPError as error:
+            return handler.error(error.status_code, "HTTP_ERROR", error.status_code)
         except BaseException as exception:
             try:
                 url = handler.request.uri

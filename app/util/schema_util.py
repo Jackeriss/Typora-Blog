@@ -22,7 +22,6 @@ def change_bool(param):
 
 
 def list_parse(str_param, format_type=int):
-    """ 获取以逗号分隔的参数 """
     try:
         return [format_type(param) for param in str_param.strip().split(",")]
     except BaseException:
@@ -40,7 +39,6 @@ def validate_enum_type(enum_type):
 
 
 def email_schema():
-    """ 校验邮箱合法性 """
     return Regex(
         r"^[a-zA-Z0-9_.-]+@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+$",
         error="Please enter a valid email.",

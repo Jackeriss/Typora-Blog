@@ -1,15 +1,14 @@
 import functools
-import orjson
+import json
 import os
 import asyncio
 
 import tornado
-import aiotask_context
 from schema import Schema, SchemaError
 
 from app.util import error_util
 from app.util.config_util import config
-from app.config import constant
+from app.constant import constant
 
 
 class BasicHandler(tornado.web.RequestHandler):
@@ -46,13 +45,12 @@ class BasicHandler(tornado.web.RequestHandler):
 
     @property
     def basic_info_str(self):
-        """ 客户端可将常用信息以 JSON 形式放在这个 header 中 """
         return self.get_header("Basic-Info", "{}")
 
     @property
     def basic_info(self):
         if self._basic_info is None:
-            self._basic_info = orjson.loads(self.basic_info_str)
+            self._basic_info = json.loads(self.basic_info_str)
         return self._basic_info
 
     @property
@@ -76,14 +74,14 @@ class BasicHandler(tornado.web.RequestHandler):
             content_type = self.content_type
             if content_type and content_type.find(r"application/json") >= 0:
                 try:
-                    json_dict = orjson.loads(self.request.body)
+                    json_dict = json.loads(self.request.body)
                     if isinstance(json_dict, dict):
                         self._json_arguments = json_dict
                     else:
                         raise error_util.ResponseError(
                             error_util.ERROR_CODE.JSON_PARAMS_NOT_IN_DICT
                         )
-                except orjson.JSONDecodeError:
+                except json.JSONDecodeError:
                     raise error_util.ResponseError(
                         error_util.ERROR_CODE.JSON_PARAMS_FORMAT_ERROR
                     )
@@ -115,8 +113,12 @@ class BasicHandler(tornado.web.RequestHandler):
             or error_util.ERROR_MAP.get(code, {"message": "UNKNOWN ERROR"})["message"]
         )
         self.set_status(status)
-        response = {"code": code.value, "message": message, "body": None}
-        return self.finish(orjson.dumps(response))
+        response = {
+            "code": code.value if isinstance(code, error_util.ERROR_CODE) else code,
+            "message": message,
+            "body": None,
+        }
+        return self.finish(json.dumps(response))
 
     def success(self, data, status=constant.HTTPCode.OK):
         self.set_status(status)
@@ -127,13 +129,13 @@ class BasicHandler(tornado.web.RequestHandler):
             ],
             "body": data,
         }
-        return self.finish(orjson.dumps(response))
+        return self.finish(json.dumps(response))
 
     def page(self, template, **kwargs):
-        return self.render(os.path.join("dist", template) if config.env != "dev" else template, **kwargs)
-
-    def post_page(self, post, **kwargs):
-        return self.render(os.path.join("post", f"{post}.html"), **kwargs)
+        return self.render(
+            os.path.join("dist", template) if config.env != "dev" else template,
+            **kwargs
+        )
 
     def write_error(self, status_code, **kwargs):
         self.error(status_code)
@@ -144,32 +146,12 @@ class BasicHandler(tornado.web.RequestHandler):
 
 
 class PageNotFoundHandler(BasicHandler):
-    """ 404 页面 handler """
-
     def get(self):
-        self.render_error(constant.HTTPCode.NOT_FOUND)
+        return self.error(error_util.ERROR_CODE.NOT_FOUND)
 
     def post(self):
         return self.error(error_util.ERROR_CODE.NOT_FOUND)
 
 
 class StaticHandler(tornado.web.StaticFileHandler, BasicHandler):
-    """ 静态文件 handler """
-
-
-def set_context(func, *args, **kwargs):
-    """ request handler 的装饰器，给每一个 request 设置协程上下文 """
-
-    @functools.wraps(func)
-    async def _async_wrapper(handler, *args, **kwargs):
-        aiotask_context.set("handler", handler)
-        await func(handler, *args, **kwargs)
-
-    @functools.wraps(func)
-    def _sync_wrapper(handler, *args, **kwargs):
-        aiotask_context.set("handler", handler)
-        func(handler, *args, **kwargs)
-
-    if asyncio.iscoroutinefunction(func):
-        return _async_wrapper
-    return _sync_wrapper
+    """StaticHandler"""

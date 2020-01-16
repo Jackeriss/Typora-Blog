@@ -1,6 +1,6 @@
 import functools
 import logging
-import time
+import asyncio
 from datetime import datetime
 
 import pytz
@@ -71,21 +71,14 @@ def datetime2str(value, default="", time_format="%Y-%m-%d %H:%M:%S"):
 
 
 def timestamp():
-    """ 获取当前utc时间戳 """
     return int(datetime.utcnow().timestamp())
 
 
 def now():
-    """ 获取当前utc时间 """
     return datetime.utcnow()
 
 
 def timeout_log(timeout=10, tag="", debug=False):
-    """ 记录函数执行时间
-        timeout: 超过时长打印错误日志，单位（秒）
-        tag: 日志记录标签
-    """
-
     def decorator(func):
         def _time_log(time_start, time_end, function_name):
             if not debug and config.server["debug"]:

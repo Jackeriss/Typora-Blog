@@ -5,10 +5,6 @@ verify_ssl = true
 
 [scripts]
 serve = "python app/main.py"
-start = "./app.sh start"
-stop = "./app.sh stop"
-restart = "./app.sh restart"
-log = "./app.sh log"
 
 [dev-packages]
 black = "*"
@@ -17,18 +13,15 @@ black = "*"
 tornado = "*"
 schema = "*"
 uvloop = "*"
-aiotask-context = "*"
 pytz = "*"
 PyYAML = "*"
-orjson = "*"
 aiohttp = "*"
-# aioredis = "*"
-# asyncpg = "*"
+aioredis = "*"
 beautifulsoup4 = "*"
 lxml = "*"
 
 [requires]
-python_version = "3.7"
+python_version = "3.8.1"
 
 [pipenv]
 allow_prereleases = true
