@@ -137,6 +137,9 @@ class BasicHandler(tornado.web.RequestHandler):
             **kwargs
         )
 
+    def post_page(self, post, **kwargs):
+        return self.render(os.path.join("post", f"{post}.html"), **kwargs)
+
     def write_error(self, status_code, **kwargs):
         self.error(status_code)
 
