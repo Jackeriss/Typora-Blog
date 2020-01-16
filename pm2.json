@@ -12,7 +12,7 @@
         "increment_var": "PORT",
         "env": {
             "ENV": "prod",
-            "PORT": 10000
+            "PORT": 10200
         }
     }]
 }
