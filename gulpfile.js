@@ -25,6 +25,7 @@ gulp.task('build_js', function () {
     }))
     .pipe(gulp.dest('dist'))
 })
+
 gulp.task('build_css', function () {
   return gulp.src('app/static/css/*.css')
     .pipe(clean_css())
@@ -37,6 +38,7 @@ gulp.task('build_css', function () {
     }))
     .pipe(gulp.dest('dist'))
 })
+
 gulp.task('upload', function () {
   return gulp.src('*.*', { cwd: 'dist' })
     .pipe(uploadQcloud({
@@ -48,6 +50,7 @@ gulp.task('upload', function () {
       prefix: qcloud.prefix
     }))
 })
+
 gulp.task('rev_collect', function () {
   return gulp.src(['dist/rev-manifest.json', 'app/template/*.html'])
     .pipe(revCollector({
@@ -61,8 +64,12 @@ gulp.task('rev_collect', function () {
     .pipe(gulp.dest('app/template/dist'))
 })
 
+gulp.task('install', function () {
+  return cp.exec('pipenv install --deploy')
+})
+
 gulp.task('start', function () {
   return cp.exec('/usr/local/bin/pm2 startOrReload pm2.json')
 })
 
-exports.default = gulp.series('clean', gulp.parallel('build_js', 'build_css'), 'upload', 'rev_collect', 'start')
+exports.default = gulp.series('clean', gulp.parallel('build_js', 'build_css'), 'upload', 'rev_collect', 'install', 'start')
