@@ -59,4 +59,5 @@ class Config:
         address = (conf.pop("host", "localhost"), conf.pop("port", 6379))
         return address, conf
 
+
 config = Config()
