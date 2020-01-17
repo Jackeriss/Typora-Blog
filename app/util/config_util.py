@@ -58,10 +58,5 @@ class Config:
         conf = copy.deepcopy(self._config["redis"])
         address = (conf.pop("host", "localhost"), conf.pop("port", 6379))
         return address, conf
-    
-    @property
-    def solr(self):
-        return self._config["solr"]
-
 
 config = Config()
