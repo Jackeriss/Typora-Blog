@@ -1,18 +1,23 @@
 {
-    "apps": [{
-        "name": "typora-blog",
-        "script": "/bin/bash",
-        "args": ["-c", "pipenv run serve"],
-        "exec_mode": "fork_mode",
-        "instances": "1",
-        "autorestart": false,
-        "log_file": "/app/log/typora-blog/typora-blog.log",
-        "time": true,
-        "merge_logs": true,
-        "increment_var": "PORT",
-        "env": {
-            "ENV": "prod",
-            "PORT": 10200
+    "apps": [
+        {
+            "name": "typora-blog",
+            "script": "/bin/bash",
+            "args": [
+                "-c",
+                "pipenv run serve"
+            ],
+            "exec_mode": "fork_mode",
+            "instances": "1",
+            "autorestart": false,
+            "log_file": "/app/log/typora-blog/typora-blog.log",
+            "time": true,
+            "merge_logs": true,
+            "increment_var": "PORT",
+            "env": {
+                "ENV": "prod",
+                "PORT": 10200
+            }
         }
-    }]
+    ]
 }
