@@ -1,0 +1,128 @@
+<!doctype html>
+<html>
+<head>
+<meta charset='UTF-8'><meta name='viewport' content='width=device-width initial-scale=1'>
+<title>我的博客是如何自动部署的</title></head>
+<body><h2>我的博客是如何自动部署的</h2>
+<p>2020-01-20 20:19:27</p>
+<p>没错，利用现成的 CD（Continuous Deployment，持续部署）工具就可以实现自动部署。流行的 CI / CD 工具有 Jenkins、Travis CI 和 Drone……然而，它们对我来说都太笨重了（服务器资源有限），因此我自己实现了一个自动化部署程序。</p>
+<p>先来看一下一个自动部署程序需要具备哪些基本功能：</p>
+<ol start='' >
+<li>能够检测到指定代码仓库有代码提交，并执行后续一系列的部署命令</li>
+<li>能够拉取指定项目的仓库代码</li>
+<li>能够构建并重启指定项目</li>
+<li>能够把部署结果通知给我</li>
+
+</ol>
+<p>下面我重点介绍一下在这整个过程中我使用的一些关键工具：</p>
+<h4>Webhook</h4>
+<p><a href='https://developer.github.com/webhooks/'>GitHub</a>、<a href='https://confluence.atlassian.com/bitbucket/manage-webhooks-735643732.html'>Bitbucket</a> 等都提供了 <a href='https://www.wikiwand.com/zh-hans/网络钩子'>Webhook</a> 功能，第一个功能迎刃而解，但这就意味着我们需要起一个 web 服务来作为 Webhook 事件发送的目标地址。使用 <a href='https://github.com/Jackeriss/template-tornado'>template-tornado</a> 很快就可以写出处理方法：</p>
+<pre><code class='language-python' lang='python'>class DeployHandler(BasicHandler):
+    async def post(self):
+        params = self.validate_argument({&quot;repository&quot;: {&quot;id&quot;: Use(int)}})
+        message = await DeployService.deploy(repo_id=params[&quot;repository&quot;][&quot;id&quot;])
+        result = {&quot;message&quot;: message}
+        return self.success(result)
+</code></pre>
+<p>这里，我们只需要取出参数中的仓库 id 即可，我们再配一个仓库 id 与信息的映射就可以了：</p>
+<pre><code class='language-python' lang='python'>REPO_MAP = {
+    83530215: {
+        &quot;name&quot;: &quot;typora-blog&quot;,
+        &quot;path&quot;: &quot;/app/typora-blog&quot;,
+        &quot;url&quot;: &quot;https://www.jackeriss.com/&quot;,
+        &quot;deployer&quot;: Deployer.GULP,
+    },
+}
+</code></pre>
+<p>注意 deployer 我配的是一个枚举，这样就可以支持多种部署程序了。</p>
+<p>之后就可以根据仓库 id 在对应的目录下执行<code>git pull</code>并使用对应的部署程序进行部署了。</p>
+<h4>GitPython</h4>
+<p>你可以用 <a href='https://docs.python.org/zh-cn/3/library/subprocess.html#subprocess.Popen'>subprocess.Popen</a> 直接执行<code>git pull</code>命令，但我更推荐使用 <a href='https://github.com/gitpython-developers/GitPython'>GitPython</a> 这个第三方库来简化操作：</p>
+<pre><code class='language-python' lang='python'>import git
+
+git_repo = git.cmd.Git(&quot;/app/typora-blog&quot;)
+git_repo.checkout(&quot;.&quot;)
+git_repo.pull()
+</code></pre>
+<p>当然，它底层也是用 subprocess.Popen() 来执行 Git 命令的 。</p>
+<h4>gulp</h4>
+<p>不同的项目可能是用不同的脚本或守护进程管理的。我们的目标是支持任意项目的构建与重启。因此，构建与重启命令可以定义成一个字典，类型可以用枚举来定义：</p>
+<pre><code class='language-python' lang='python'>class Deployer(StrEnum):
+    NGINX = &quot;nginx&quot;
+    GULP = &quot;gulp&quot;
+    NONE = &quot;none&quot;
+
+DEPLOYER_MAP = {
+    Deployer.NGINX: [&quot;/usr/sbin/nginx -s reload&quot;],
+    Deployer.GULP: [&quot;/usr/local/bin/gulp&quot;],
+    Deployer.NONE: [&quot;&quot;],
+}
+</code></pre>
+<p>这里的<code>StrEnum</code>是我定义的一个字符串枚举类（这是 Python 官方文档中推荐的用法）：</p>
+<pre><code class='language-python' lang='python'>import Enum
+
+class StrEnum(str, Enum):
+    &quot;&quot;&quot;字符串类型的枚举&quot;&quot;&quot;
+</code></pre>
+<p>我的项目统一使用 gulp 来管理，它可以定义一系列的构建流程，而且有丰富的第三方插件可以使用。</p>
+<p>举个例子，对于普通的 Python 项目，使用下面的脚本就足以应付：</p>
+<pre><code class='language-javascript' lang='javascript'>const gulp = require(&#39;gulp&#39;);
+const cp = require(&quot;child_process&quot;)
+
+gulp.task(&#39;install&#39;, function () {
+  return cp.exec(&#39;pipenv install --deploy&#39;)
+})
+
+gulp.task(&#39;start&#39;, function () {
+  return cp.exec(&#39;/usr/local/bin/pm2 startOrReload pm2.json&#39;)
+})
+
+exports.default = gulp.series(&#39;install&#39;, &#39;start&#39;)
+</code></pre>
+<p>而对于前端项目 gulp 就更能大显身手了，你可以用它来构建压缩前端静态文件并上传到 CDN，还可以把 HTML 里所有的静态文件路径替换为 CDN 上对应的地址。</p>
+<h4>pm2</h4>
+<p>用过很多进程管理工具，比如用 python 写的 supervisor 和 circus，也试过自己手写 shell 脚本，但是它们用起来都不如 pm2 让人省心。pm2 一般被用来管理 JS 的项目，但其实管理其他项目也很好用。分享一下通过 pm2 管理使用 pipenv 的 python 项目的配置：</p>
+<pre><code class='language-json' lang='json'>{
+    &quot;apps&quot;: [
+        {
+            &quot;name&quot;: &quot;typora-blog&quot;,
+            &quot;script&quot;: &quot;/bin/bash&quot;,
+            &quot;args&quot;: [
+                &quot;-c&quot;,
+                &quot;pipenv run serve&quot;
+            ],
+            &quot;exec_mode&quot;: &quot;fork_mode&quot;,
+            &quot;instances&quot;: &quot;1&quot;,
+            &quot;autorestart&quot;: false,
+            &quot;log_file&quot;: &quot;/app/log/typora-blog/typora-blog.log&quot;,
+            &quot;time&quot;: true,
+            &quot;merge_logs&quot;: true,
+            &quot;increment_var&quot;: &quot;PORT&quot;,
+            &quot;env&quot;: {
+                &quot;ENV&quot;: &quot;prod&quot;,
+                &quot;PORT&quot;: 10200
+            }
+        }
+    ]
+}
+
+</code></pre>
+<p>注意：使用 pipenv 启动 python 项目或者要启动多个进程在不同的端口的话<code>exec_mode</code>必须是<code>fork_mode</code> 。<code>increment_var</code>是自增变量，但是当前版本（4.2.1）的这项配置有个 bug：使用 pm2 重启项目后这项配置会丢失，导致所有进程都会使用同一个端口，后面启动的进程都会报端口冲突错误（详见：<a href='https://github.com/Unitech/pm2/issues/4502' target='_blank' class='url'>https://github.com/Unitech/pm2/issues/4502</a>）。</p>
+<h4>subprocess 模块</h4>
+<p>subprocess 模块被推荐用来替换一些老的模块和函数，如：os.system()、os.spawn() 和 os.popen() 等。</p>
+<p>subprocess 模块引入了许多新的方法，如：<a href='https://docs.python.org/zh-cn/3/library/subprocess.html#subprocess.call'>subprecess.call()</a>、<a href='https://docs.python.org/zh-cn/3/library/subprocess.html#subprocess.check_call'>subprocess.check_call()</a> 和 <a href='https://docs.python.org/zh-cn/3/library/subprocess.html#subprocess.check_output'>subprocess.check_output()</a> 等，而这些方法在 Python 3.5 之后又可以用 <a href='https://docs.python.org/zh-cn/3/library/subprocess.html#subprocess.run'>subprecess.run()</a> 来替代。实际上这些方法都是对 subprocess.Popen() 的封装，这些封装的目的是为了让我们容易使用子进程。对于更进阶的用例，就要使用底层的 subprocess.Popen() 接口。</p>
+<p>直接调用 subprocess.Popen() 时父进程是不会等待子进程结束的，需要调用 wait() 方法等待子进程结束，而调用 subprocess.run() 则会等待子进程结束。这里我们用 subprocess.run() 就行了：</p>
+<pre><code class='language-python' lang='python'>completed_process = subprocess.run(
+    constant.DEPLOYER_MAP[self.deployer],
+    cwd=self.path,
+    capture_output=True,
+    check=True
+)
+</code></pre>
+<h4>bark</h4>
+<p>至此，我们其实已经实现了代码自动部署的功能，但是我们并不知道部署是否成功。重启命令执行成功并不意味着服务重启后没问题，我们可以通过在服务中预留一个健康检查接口的方式来检查服务是否启动正常。</p>
+<p>那如何把结果通知给我呢？使用邮件作为通知媒介是一个 比较普遍的做法。以前我也比较倾向于使用邮件，甚至还做过一个通过邮件远程监控电脑的桌面软件 <a href='https://jackeriss.github.io/email_my_pc/'>Email My PC</a>。但是对于这种即时性的通知我会更推荐使用 <a href='https://github.com/Finb/Bark'>bark</a>。通过 bark 可以很方便的给 iOS 设备发送消息通知。不足之处是只有 iOS 设备可以使用，以及无法查看历史消息（为了弥补这个缺陷，对于重要消息我通常会同时发送 bark 消息和邮件）。</p>
+<h4>进阶功能</h4>
+<p>一般 CD 工具都会提供诸如发布回滚、自动化测试、流程可视化以及集群部署等功能。这些就有些复杂了，虽然说起来也不是特别难实现，但如果真的需要完美支持这些功能的话建议还是直接搭建一套 Jenkins 吧……</p>
+</body>
+</html>
