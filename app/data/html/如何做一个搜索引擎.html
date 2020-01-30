@@ -1,0 +1,582 @@
+<!doctype html>
+<html>
+<head>
+<meta charset='UTF-8'><meta name='viewport' content='width=device-width initial-scale=1'>
+<title>如何做一个搜索引擎</title><link href='https://fonts.loli.net/css?family=Open+Sans:400italic,700italic,700,400&subset=latin,latin-ext' rel='stylesheet' type='text/css' /><style type='text/css'>html {overflow-x: initial !important;}:root { --bg-color: #ffffff; --text-color: #333333; --select-text-bg-color: #B5D6FC; --select-text-font-color: auto; --monospace: "Lucida Console",Consolas,"Courier",monospace; }
+html { font-size: 14px; background-color: var(--bg-color); color: var(--text-color); font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; -webkit-font-smoothing: antialiased; }
+body { margin: 0px; padding: 0px; height: auto; bottom: 0px; top: 0px; left: 0px; right: 0px; font-size: 1rem; line-height: 1.42857143; overflow-x: hidden; background-image: inherit; background-size: inherit; background-attachment: inherit; background-origin: inherit; background-clip: inherit; background-color: inherit; tab-size: 4; background-position: inherit inherit; background-repeat: inherit inherit; }
+iframe { margin: auto; }
+a.url { word-break: break-all; }
+a:active, a:hover { outline: 0px; }
+.in-text-selection, ::selection { text-shadow: none; background: var(--select-text-bg-color); color: var(--select-text-font-color); }
+#write { margin: 0px auto; height: auto; width: inherit; word-break: normal; word-wrap: break-word; position: relative; white-space: normal; overflow-x: visible; padding-top: 40px; }
+#write.first-line-indent p { text-indent: 2em; }
+#write.first-line-indent li p, #write.first-line-indent p * { text-indent: 0px; }
+#write.first-line-indent li { margin-left: 2em; }
+.for-image #write { padding-left: 8px; padding-right: 8px; }
+body.typora-export { padding-left: 30px; padding-right: 30px; }
+.typora-export .footnote-line, .typora-export li, .typora-export p { white-space: pre-wrap; }
+@media screen and (max-width: 500px) { 
+  body.typora-export { padding-left: 0px; padding-right: 0px; }
+  #write { padding-left: 20px; padding-right: 20px; }
+  .CodeMirror-sizer { margin-left: 0px !important; }
+  .CodeMirror-gutters { display: none !important; }
+}
+#write li > figure:last-child { margin-bottom: 0.5rem; }
+#write ol, #write ul { position: relative; }
+img { max-width: 100%; vertical-align: middle; }
+button, input, select, textarea { color: inherit; font-family: inherit; font-size: inherit; font-style: inherit; font-variant-caps: inherit; font-weight: inherit; font-stretch: inherit; line-height: inherit; }
+input[type="checkbox"], input[type="radio"] { line-height: normal; padding: 0px; }
+*, ::after, ::before { box-sizing: border-box; }
+#write h1, #write h2, #write h3, #write h4, #write h5, #write h6, #write p, #write pre { width: inherit; }
+#write h1, #write h2, #write h3, #write h4, #write h5, #write h6, #write p { position: relative; }
+p { line-height: inherit; }
+h1, h2, h3, h4, h5, h6 { break-after: avoid-page; break-inside: avoid; orphans: 2; }
+p { orphans: 4; }
+h1 { font-size: 2rem; }
+h2 { font-size: 1.8rem; }
+h3 { font-size: 1.6rem; }
+h4 { font-size: 1.4rem; }
+h5 { font-size: 1.2rem; }
+h6 { font-size: 1rem; }
+.md-math-block, .md-rawblock, h1, h2, h3, h4, h5, h6, p { margin-top: 1rem; margin-bottom: 1rem; }
+.hidden { display: none; }
+.md-blockmeta { color: rgb(204, 204, 204); font-weight: 700; font-style: italic; }
+a { cursor: pointer; }
+sup.md-footnote { padding: 2px 4px; background-color: rgba(238, 238, 238, 0.701961); color: rgb(85, 85, 85); border-top-left-radius: 4px; border-top-right-radius: 4px; border-bottom-right-radius: 4px; border-bottom-left-radius: 4px; cursor: pointer; }
+sup.md-footnote a, sup.md-footnote a:hover { color: inherit; text-transform: inherit; text-decoration: inherit; }
+#write input[type="checkbox"] { cursor: pointer; width: inherit; height: inherit; }
+figure { overflow-x: auto; margin: 1.2em 0px; max-width: calc(100% + 16px); padding: 0px; }
+figure > table { margin: 0px !important; }
+tr { break-inside: avoid; break-after: auto; }
+thead { display: table-header-group; }
+table { border-collapse: collapse; border-spacing: 0px; width: 100%; overflow: auto; break-inside: auto; text-align: left; }
+table.md-table td { min-width: 32px; }
+.CodeMirror-gutters { border-right-width: 0px; background-color: inherit; }
+.CodeMirror-linenumber { }
+.CodeMirror { text-align: left; }
+.CodeMirror-placeholder { opacity: 0.3; }
+.CodeMirror pre { padding: 0px 4px; }
+.CodeMirror-lines { padding: 0px; }
+div.hr:focus { cursor: none; }
+#write pre { white-space: pre-wrap; }
+#write.fences-no-line-wrapping pre { white-space: pre; }
+#write pre.ty-contain-cm { white-space: normal; }
+.CodeMirror-gutters { margin-right: 4px; }
+.md-fences { font-size: 0.9rem; display: block; break-inside: avoid; text-align: left; overflow: visible; white-space: pre; background-image: inherit; background-size: inherit; background-attachment: inherit; background-origin: inherit; background-clip: inherit; background-color: inherit; position: relative !important; background-position: inherit inherit; background-repeat: inherit inherit; }
+.md-diagram-panel { width: 100%; margin-top: 10px; text-align: center; padding-top: 0px; padding-bottom: 8px; overflow-x: auto; }
+#write .md-fences.mock-cm { white-space: pre-wrap; }
+.md-fences.md-fences-with-lineno { padding-left: 0px; }
+#write.fences-no-line-wrapping .md-fences.mock-cm { white-space: pre; overflow-x: auto; }
+.md-fences.mock-cm.md-fences-with-lineno { padding-left: 8px; }
+.CodeMirror-line, twitterwidget { break-inside: avoid; }
+.footnotes { opacity: 0.8; font-size: 0.9rem; margin-top: 1em; margin-bottom: 1em; }
+.footnotes + .footnotes { margin-top: 0px; }
+.md-reset { margin: 0px; padding: 0px; border: 0px; outline: 0px; vertical-align: top; text-decoration: none; text-shadow: none; float: none; position: static; width: auto; height: auto; white-space: nowrap; cursor: inherit; line-height: normal; font-weight: 400; text-align: left; box-sizing: content-box; direction: ltr; background-position: 0px 0px; background-repeat: initial initial; }
+li div { padding-top: 0px; }
+blockquote { margin: 1rem 0px; }
+li .mathjax-block, li p { margin: 0.5rem 0px; }
+li { margin: 0px; position: relative; }
+blockquote > :last-child { margin-bottom: 0px; }
+blockquote > :first-child, li > :first-child { margin-top: 0px; }
+.footnotes-area { color: rgb(136, 136, 136); margin-top: 0.714rem; padding-bottom: 0.143rem; white-space: normal; }
+#write .footnote-line { white-space: pre-wrap; }
+@media print { 
+  body, html { border: 1px solid transparent; height: 99%; break-after: avoid-page; break-before: avoid-page; }
+  #write { margin-top: 0px; padding-top: 0px; border-color: transparent !important; }
+  .typora-export * { -webkit-print-color-adjust: exact; }
+  html.blink-to-pdf { font-size: 13px; }
+  .typora-export #write { padding-left: 32px; padding-right: 32px; padding-bottom: 0px; break-after: avoid-page; }
+  .typora-export #write::after { height: 0px; }
+}
+.footnote-line { margin-top: 0.714em; font-size: 0.7em; }
+a img, img a { cursor: pointer; }
+pre.md-meta-block { font-size: 0.8rem; min-height: 0.8rem; white-space: pre-wrap; background-color: rgb(204, 204, 204); display: block; overflow-x: hidden; background-position: initial initial; background-repeat: initial initial; }
+p > .md-image:only-child:not(.md-img-error) img, p > img:only-child { display: block; margin: auto; }
+p > .md-image:only-child { display: inline-block; width: 100%; }
+#write .MathJax_Display { margin: 0.8em 0px 0px; }
+.md-math-block { width: 100%; }
+.md-math-block:not(:empty)::after { display: none; }
+[contenteditable="true"]:active, [contenteditable="true"]:focus { outline: 0px; box-shadow: none; }
+.md-task-list-item { position: relative; list-style-type: none; }
+.task-list-item.md-task-list-item { padding-left: 0px; }
+.md-task-list-item > input { position: absolute; top: 0px; left: 0px; margin-left: -1.2em; margin-top: calc(1em - 10px); border: none; }
+.math { font-size: 1rem; }
+.md-toc { min-height: 3.58rem; position: relative; font-size: 0.9rem; border-top-left-radius: 10px; border-top-right-radius: 10px; border-bottom-right-radius: 10px; border-bottom-left-radius: 10px; }
+.md-toc-content { position: relative; margin-left: 0px; }
+.md-toc-content::after, .md-toc::after { display: none; }
+.md-toc-item { display: block; color: rgb(65, 131, 196); }
+.md-toc-item a { text-decoration: none; }
+.md-toc-inner:hover { text-decoration: underline; }
+.md-toc-inner { display: inline-block; cursor: pointer; }
+.md-toc-h1 .md-toc-inner { margin-left: 0px; font-weight: 700; }
+.md-toc-h2 .md-toc-inner { margin-left: 2em; }
+.md-toc-h3 .md-toc-inner { margin-left: 4em; }
+.md-toc-h4 .md-toc-inner { margin-left: 6em; }
+.md-toc-h5 .md-toc-inner { margin-left: 8em; }
+.md-toc-h6 .md-toc-inner { margin-left: 10em; }
+@media screen and (max-width: 48em) { 
+  .md-toc-h3 .md-toc-inner { margin-left: 3.5em; }
+  .md-toc-h4 .md-toc-inner { margin-left: 5em; }
+  .md-toc-h5 .md-toc-inner { margin-left: 6.5em; }
+  .md-toc-h6 .md-toc-inner { margin-left: 8em; }
+}
+a.md-toc-inner { font-size: inherit; font-style: inherit; font-weight: inherit; line-height: inherit; }
+.footnote-line a:not(.reversefootnote) { color: inherit; }
+.md-attr { display: none; }
+.md-fn-count::after { content: "."; }
+code, pre, samp, tt { font-family: var(--monospace); }
+kbd { margin: 0px 0.1em; padding: 0.1em 0.6em; font-size: 0.8em; color: rgb(36, 39, 41); background-color: rgb(255, 255, 255); border: 1px solid rgb(173, 179, 185); border-top-left-radius: 3px; border-top-right-radius: 3px; border-bottom-right-radius: 3px; border-bottom-left-radius: 3px; box-shadow: rgba(12, 13, 14, 0.2) 0px 1px 0px, rgb(255, 255, 255) 0px 0px 0px 2px inset; white-space: nowrap; vertical-align: middle; background-position: initial initial; background-repeat: initial initial; }
+.md-comment { color: rgb(162, 127, 3); opacity: 0.8; font-family: var(--monospace); }
+code { text-align: left; }
+a.md-print-anchor { white-space: pre !important; border: none !important; display: inline-block !important; position: absolute !important; width: 1px !important; right: 0px !important; outline: 0px !important; text-shadow: initial !important; background-position: 0px 0px !important; background-repeat: initial initial !important; }
+.md-inline-math .MathJax_SVG .noError { display: none !important; }
+.html-for-mac .inline-math-svg .MathJax_SVG { vertical-align: 0.2px; }
+.md-math-block .MathJax_SVG_Display { text-align: center; margin: 0px; position: relative; text-indent: 0px; max-width: none; max-height: none; min-height: 0px; min-width: 100%; width: auto; overflow-y: hidden; display: block !important; }
+.MathJax_SVG_Display, .md-inline-math .MathJax_SVG_Display { width: auto; margin: inherit; display: inline-block !important; }
+.MathJax_SVG .MJX-monospace { font-family: var(--monospace); }
+.MathJax_SVG .MJX-sans-serif { font-family: sans-serif; }
+.MathJax_SVG { display: inline; font-style: normal; font-weight: 400; line-height: normal; zoom: 90%; text-indent: 0px; text-align: left; text-transform: none; letter-spacing: normal; word-spacing: normal; word-wrap: normal; white-space: nowrap; float: none; direction: ltr; max-width: none; max-height: none; min-width: 0px; min-height: 0px; border: 0px; padding: 0px; margin: 0px; }
+.MathJax_SVG * { transition: none; }
+.MathJax_SVG_Display svg { vertical-align: middle !important; margin-bottom: 0px !important; margin-top: 0px !important; }
+.os-windows.monocolor-emoji .md-emoji { font-family: "Segoe UI Symbol", sans-serif; }
+.md-diagram-panel > svg { max-width: 100%; }
+[lang="mermaid"] svg, [lang="flow"] svg { max-width: 100%; height: auto; }
+[lang="mermaid"] .node text { font-size: 1rem; }
+table tr th { border-bottom-width: 0px; }
+video { max-width: 100%; display: block; margin: 0px auto; }
+iframe { max-width: 100%; width: 100%; border: none; }
+.highlight td, .highlight tr { border: 0px; }
+svg[id^="mermaidChart"] { line-height: 1em; }
+mark { background-color: rgb(255, 255, 0); color: rgb(0, 0, 0); background-position: initial initial; background-repeat: initial initial; }
+.md-html-inline .md-plain, .md-html-inline strong, mark .md-inline-math, mark strong { color: inherit; }
+mark .md-meta { color: rgb(0, 0, 0); opacity: 0.3 !important; }
+
+
+.CodeMirror { height: auto; }
+.CodeMirror.cm-s-inner { background-image: inherit; background-size: inherit; background-attachment: inherit; background-origin: inherit; background-clip: inherit; background-color: inherit; background-position: inherit inherit; background-repeat: inherit inherit; }
+.CodeMirror-scroll { overflow-y: hidden; overflow-x: auto; z-index: 3; }
+.CodeMirror-gutter-filler, .CodeMirror-scrollbar-filler { background-color: rgb(255, 255, 255); }
+.CodeMirror-gutters { border-right-width: 1px; border-right-style: solid; border-right-color: rgb(221, 221, 221); background-image: inherit; background-size: inherit; background-attachment: inherit; background-origin: inherit; background-clip: inherit; background-color: inherit; white-space: nowrap; background-position: inherit inherit; background-repeat: inherit inherit; }
+.CodeMirror-linenumber { padding: 0px 3px 0px 5px; text-align: right; color: rgb(153, 153, 153); }
+.cm-s-inner .cm-keyword { color: rgb(119, 0, 136); }
+.cm-s-inner .cm-atom, .cm-s-inner.cm-atom { color: rgb(34, 17, 153); }
+.cm-s-inner .cm-number { color: rgb(17, 102, 68); }
+.cm-s-inner .cm-def { color: rgb(0, 0, 255); }
+.cm-s-inner .cm-variable { color: rgb(0, 0, 0); }
+.cm-s-inner .cm-variable-2 { color: rgb(0, 85, 170); }
+.cm-s-inner .cm-variable-3 { color: rgb(0, 136, 85); }
+.cm-s-inner .cm-string { color: rgb(170, 17, 17); }
+.cm-s-inner .cm-property { color: rgb(0, 0, 0); }
+.cm-s-inner .cm-operator { color: rgb(152, 26, 26); }
+.cm-s-inner .cm-comment, .cm-s-inner.cm-comment { color: rgb(170, 85, 0); }
+.cm-s-inner .cm-string-2 { color: rgb(255, 85, 0); }
+.cm-s-inner .cm-meta { color: rgb(85, 85, 85); }
+.cm-s-inner .cm-qualifier { color: rgb(85, 85, 85); }
+.cm-s-inner .cm-builtin { color: rgb(51, 0, 170); }
+.cm-s-inner .cm-bracket { color: rgb(153, 153, 119); }
+.cm-s-inner .cm-tag { color: rgb(17, 119, 0); }
+.cm-s-inner .cm-attribute { color: rgb(0, 0, 204); }
+.cm-s-inner .cm-header, .cm-s-inner.cm-header { color: rgb(0, 0, 255); }
+.cm-s-inner .cm-quote, .cm-s-inner.cm-quote { color: rgb(0, 153, 0); }
+.cm-s-inner .cm-hr, .cm-s-inner.cm-hr { color: rgb(153, 153, 153); }
+.cm-s-inner .cm-link, .cm-s-inner.cm-link { color: rgb(0, 0, 204); }
+.cm-negative { color: rgb(221, 68, 68); }
+.cm-positive { color: rgb(34, 153, 34); }
+.cm-header, .cm-strong { font-weight: 700; }
+.cm-del { text-decoration: line-through; }
+.cm-em { font-style: italic; }
+.cm-link { text-decoration: underline; }
+.cm-error { color: red; }
+.cm-invalidchar { color: red; }
+.cm-constant { color: rgb(38, 139, 210); }
+.cm-defined { color: rgb(181, 137, 0); }
+div.CodeMirror span.CodeMirror-matchingbracket { color: rgb(0, 255, 0); }
+div.CodeMirror span.CodeMirror-nonmatchingbracket { color: rgb(255, 34, 34); }
+.cm-s-inner .CodeMirror-activeline-background { background-image: inherit; background-size: inherit; background-attachment: inherit; background-origin: inherit; background-clip: inherit; background-color: inherit; background-position: inherit inherit; background-repeat: inherit inherit; }
+.CodeMirror { position: relative; overflow: hidden; }
+.CodeMirror-scroll { height: 100%; outline: 0px; position: relative; box-sizing: content-box; background-image: inherit; background-size: inherit; background-attachment: inherit; background-origin: inherit; background-clip: inherit; background-color: inherit; background-position: inherit inherit; background-repeat: inherit inherit; }
+.CodeMirror-sizer { position: relative; }
+.CodeMirror-gutter-filler, .CodeMirror-hscrollbar, .CodeMirror-scrollbar-filler, .CodeMirror-vscrollbar { position: absolute; z-index: 6; display: none; }
+.CodeMirror-vscrollbar { right: 0px; top: 0px; overflow: hidden; }
+.CodeMirror-hscrollbar { bottom: 0px; left: 0px; overflow: hidden; }
+.CodeMirror-scrollbar-filler { right: 0px; bottom: 0px; }
+.CodeMirror-gutter-filler { left: 0px; bottom: 0px; }
+.CodeMirror-gutters { position: absolute; left: 0px; top: 0px; padding-bottom: 30px; z-index: 3; }
+.CodeMirror-gutter { white-space: normal; height: 100%; box-sizing: content-box; padding-bottom: 30px; margin-bottom: -32px; display: inline-block; }
+.CodeMirror-gutter-wrapper { position: absolute; z-index: 4; border: none !important; background-position: 0px 0px !important; background-repeat: initial initial !important; }
+.CodeMirror-gutter-background { position: absolute; top: 0px; bottom: 0px; z-index: 4; }
+.CodeMirror-gutter-elt { position: absolute; cursor: default; z-index: 4; }
+.CodeMirror-lines { cursor: text; }
+.CodeMirror pre { border-top-left-radius: 0px; border-top-right-radius: 0px; border-bottom-right-radius: 0px; border-bottom-left-radius: 0px; border-width: 0px; font-family: inherit; font-size: inherit; margin: 0px; white-space: pre; word-wrap: normal; color: inherit; z-index: 2; position: relative; overflow: visible; background-position: 0px 0px; background-repeat: initial initial; }
+.CodeMirror-wrap pre { word-wrap: break-word; white-space: pre-wrap; word-break: normal; }
+.CodeMirror-code pre { border-right-width: 30px; border-right-style: solid; border-right-color: transparent; width: fit-content; }
+.CodeMirror-wrap .CodeMirror-code pre { border-right-style: none; width: auto; }
+.CodeMirror-linebackground { position: absolute; left: 0px; right: 0px; top: 0px; bottom: 0px; z-index: 0; }
+.CodeMirror-linewidget { position: relative; z-index: 2; overflow: auto; }
+.CodeMirror-wrap .CodeMirror-scroll { overflow-x: hidden; }
+.CodeMirror-measure { position: absolute; width: 100%; height: 0px; overflow: hidden; visibility: hidden; }
+.CodeMirror-measure pre { position: static; }
+.CodeMirror div.CodeMirror-cursor { position: absolute; visibility: hidden; border-right-style: none; width: 0px; }
+.CodeMirror div.CodeMirror-cursor { visibility: hidden; }
+.CodeMirror-focused div.CodeMirror-cursor { visibility: inherit; }
+.cm-searching { background-color: rgba(255, 255, 0, 0.4); background-position: initial initial; background-repeat: initial initial; }
+@media print { 
+  .CodeMirror div.CodeMirror-cursor { visibility: hidden; }
+}
+
+
+:root {
+    --side-bar-bg-color: #fafafa;
+    --control-text-color: #777;
+}
+
+@include-when-export url(https://fonts.loli.net/css?family=Open+Sans:400italic,700italic,700,400&subset=latin,latin-ext);
+
+html {
+    font-size: 16px;
+}
+
+body {
+    font-family: "Open Sans","Clear Sans","Helvetica Neue",Helvetica,Arial,sans-serif;
+    color: rgb(51, 51, 51);
+    line-height: 1.6;
+}
+
+#write {
+    max-width: 860px;
+  	margin: 0 auto;
+  	padding: 30px;
+    padding-bottom: 100px;
+}
+#write > ul:first-child,
+#write > ol:first-child{
+    margin-top: 30px;
+}
+
+a {
+    color: #4183C4;
+}
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    position: relative;
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+    font-weight: bold;
+    line-height: 1.4;
+    cursor: text;
+}
+h1:hover a.anchor,
+h2:hover a.anchor,
+h3:hover a.anchor,
+h4:hover a.anchor,
+h5:hover a.anchor,
+h6:hover a.anchor {
+    text-decoration: none;
+}
+h1 tt,
+h1 code {
+    font-size: inherit;
+}
+h2 tt,
+h2 code {
+    font-size: inherit;
+}
+h3 tt,
+h3 code {
+    font-size: inherit;
+}
+h4 tt,
+h4 code {
+    font-size: inherit;
+}
+h5 tt,
+h5 code {
+    font-size: inherit;
+}
+h6 tt,
+h6 code {
+    font-size: inherit;
+}
+h1 {
+    padding-bottom: .3em;
+    font-size: 2.25em;
+    line-height: 1.2;
+    border-bottom: 1px solid #eee;
+}
+h2 {
+   padding-bottom: .3em;
+    font-size: 1.75em;
+    line-height: 1.225;
+    border-bottom: 1px solid #eee;
+}
+h3 {
+    font-size: 1.5em;
+    line-height: 1.43;
+}
+h4 {
+    font-size: 1.25em;
+}
+h5 {
+    font-size: 1em;
+}
+h6 {
+   font-size: 1em;
+    color: #777;
+}
+p,
+blockquote,
+ul,
+ol,
+dl,
+table{
+    margin: 0.8em 0;
+}
+li>ol,
+li>ul {
+    margin: 0 0;
+}
+hr {
+    height: 2px;
+    padding: 0;
+    margin: 16px 0;
+    background-color: #e7e7e7;
+    border: 0 none;
+    overflow: hidden;
+    box-sizing: content-box;
+}
+
+li p.first {
+    display: inline-block;
+}
+ul,
+ol {
+    padding-left: 30px;
+}
+ul:first-child,
+ol:first-child {
+    margin-top: 0;
+}
+ul:last-child,
+ol:last-child {
+    margin-bottom: 0;
+}
+blockquote {
+    border-left: 4px solid #dfe2e5;
+    padding: 0 15px;
+    color: #777777;
+}
+blockquote blockquote {
+    padding-right: 0;
+}
+table {
+    padding: 0;
+    word-break: initial;
+}
+table tr {
+    border-top: 1px solid #dfe2e5;
+    margin: 0;
+    padding: 0;
+}
+table tr:nth-child(2n),
+thead {
+    background-color: #f8f8f8;
+}
+table tr th {
+    font-weight: bold;
+    border: 1px solid #dfe2e5;
+    border-bottom: 0;
+    margin: 0;
+    padding: 6px 13px;
+}
+table tr td {
+    border: 1px solid #dfe2e5;
+    margin: 0;
+    padding: 6px 13px;
+}
+table tr th:first-child,
+table tr td:first-child {
+    margin-top: 0;
+}
+table tr th:last-child,
+table tr td:last-child {
+    margin-bottom: 0;
+}
+
+.CodeMirror-lines {
+    padding-left: 4px;
+}
+
+.code-tooltip {
+    box-shadow: 0 1px 1px 0 rgba(0,28,36,.3);
+    border-top: 1px solid #eef2f2;
+}
+
+.md-fences,
+code,
+tt {
+    border: 1px solid #e7eaed;
+    background-color: #f8f8f8;
+    border-radius: 3px;
+    padding: 0;
+    padding: 2px 4px 0px 4px;
+    font-size: 0.9em;
+}
+
+code {
+    background-color: #f3f4f4;
+    padding: 0 2px 0 2px;
+}
+
+.md-fences {
+    margin-bottom: 15px;
+    margin-top: 15px;
+    padding-top: 8px;
+    padding-bottom: 6px;
+}
+
+
+.md-task-list-item > input {
+  margin-left: -1.3em;
+}
+
+@media print {
+    html {
+        font-size: 13px;
+    }
+    table,
+    pre {
+        page-break-inside: avoid;
+    }
+    pre {
+        word-wrap: break-word;
+    }
+}
+
+.md-fences {
+	background-color: #f8f8f8;
+}
+#write pre.md-meta-block {
+	padding: 1rem;
+    font-size: 85%;
+    line-height: 1.45;
+    background-color: #f7f7f7;
+    border: 0;
+    border-radius: 3px;
+    color: #777777;
+    margin-top: 0 !important;
+}
+
+.mathjax-block>.code-tooltip {
+	bottom: .375rem;
+}
+
+.md-mathjax-midline {
+    background: #fafafa;
+}
+
+#write>h3.md-focus:before{
+	left: -1.5625rem;
+	top: .375rem;
+}
+#write>h4.md-focus:before{
+	left: -1.5625rem;
+	top: .285714286rem;
+}
+#write>h5.md-focus:before{
+	left: -1.5625rem;
+	top: .285714286rem;
+}
+#write>h6.md-focus:before{
+	left: -1.5625rem;
+	top: .285714286rem;
+}
+.md-image>.md-meta {
+    /*border: 1px solid #ddd;*/
+    border-radius: 3px;
+    padding: 2px 0px 0px 4px;
+    font-size: 0.9em;
+    color: inherit;
+}
+
+.md-tag {
+    color: #a7a7a7;
+    opacity: 1;
+}
+
+.md-toc { 
+    margin-top:20px;
+    padding-bottom:20px;
+}
+
+.sidebar-tabs {
+    border-bottom: none;
+}
+
+#typora-quick-open {
+    border: 1px solid #ddd;
+    background-color: #f8f8f8;
+}
+
+#typora-quick-open-item {
+    background-color: #FAFAFA;
+    border-color: #FEFEFE #e5e5e5 #e5e5e5 #eee;
+    border-style: solid;
+    border-width: 1px;
+}
+
+/** focus mode */
+.on-focus-mode blockquote {
+    border-left-color: rgba(85, 85, 85, 0.12);
+}
+
+header, .context-menu, .megamenu-content, footer{
+    font-family: "Segoe UI", "Arial", sans-serif;
+}
+
+.file-node-content:hover .file-node-icon,
+.file-node-content:hover .file-node-open-state{
+    visibility: visible;
+}
+
+.mac-seamless-mode #typora-sidebar {
+    background-color: #fafafa;
+    background-color: var(--side-bar-bg-color);
+}
+
+.md-lang {
+    color: #b4654d;
+}
+
+.html-for-mac .context-menu {
+    --item-hover-bg-color: #E6F0FE;
+}
+
+#md-notification .btn {
+    border: 0;
+}
+
+.dropdown-menu .divider {
+    border-color: #e5e5e5;
+}
+
+.ty-preferences .window-content {
+    background-color: #fafafa;
+}
+
+.ty-preferences .nav-group-item.active {
+    color: white;
+    background: #999;
+}
+
+ .typora-export li, .typora-export p, .typora-export,  .footnote-line {white-space: normal;} 
+</style>
+</head>
+<body class='typora-export' >
+<div  id='write'  class = 'is-mac'><h2><a name="如何做一个搜索引擎" class="md-header-anchor"></a><span>如何做一个搜索引擎</span></h2><p><span>2020-01-30 22:39:47</span></p><p><img src="https://i.loli.net/2020/01/30/2S8Z6yTkHMp13tA.jpg" referrerpolicy="no-referrer" alt="2S8Z6yTkHMp13tA"></p><p><span>最近我对</span><a href='https://www.cupfox.com'><span>茶杯狐</span></a><span>进行了一些改造，使其成为了一个真正的搜索引擎。下面就简单分享一下我是怎么做的吧。</span></p><p><span>一个简单的搜索引擎应该由这些模块组成（括号里是茶杯狐选择使用的技术栈，由于各模块完全独立可以替换成任意具有相同功能的工具）。</span></p><p><img src="https://i.loli.net/2020/01/30/TOC52cJDGoVnEAB.png" referrerpolicy="no-referrer" alt="TOC52cJDGoVnEAB"></p><p><span>其中搜索引擎里最复杂的部分已经被搜索引擎数据库解决了，我们要写的其实主要是爬虫的部分。但是爬虫也没什么好说的，我主要还是想分享一下搜索引擎数据库相关的内容。</span></p><h4><a name="搜索引擎数据库简介" class="md-header-anchor"></a><span>搜索引擎数据库简介</span></h4><p><span>我们为什么需要搜索引擎数据库？它都做了哪些事情？用普通的关系型数据库或者 key-value 数据库可以做吗？</span></p><p><span>其实搜索引擎数据库主要做了一件事件，那就是</span><a href='https://www.wikiwand.com/zh-hans/倒排索引'><span>倒排索引</span></a><span>。所谓倒排索引就是将查询关键字作为索引的 key，将其出现的文档的 id 及出现的位置和次数等作为 value 来建立索引。</span></p><p><span>普通关系型数据库的索引是直接对字段建立索引，不会提取字段中的关键词，因此使用模糊查询的时候只有</span><code>LIKE &#39;X%&#39;</code><span>是会走索引的，</span><code>LIKE &#39;%X%&#39;</code><span>和</span><code>LIKE &#39;%X&#39;</code><span>都找不到索引。</span></p><p><span>Redis 倒是有一个扩展模块可以支持倒排索引：</span><a href='https://github.com/RediSearch/RediSearch'><span>RediSearch</span></a><span>，其原理是在 redis 的 hashmap 基础上就可以很容易实现倒排索引的结构。redisearch 倒排索引除了实现了基础功能外，还引入了内存管理等优化功能。在数据量和机器配置有限的情况下 RedisSearch 也是一个非常不错的选择，详见 </span><a href='https://redislabs.com/blog/search-benchmarking-redisearch-vs-elasticsearch/'><span>RediSearch 与 Elasticsearch 的 Benchmark 对比</span></a><span>。</span></p><h4><a name="搜索引擎数据库横向对比" class="md-header-anchor"></a><span>搜索引擎数据库横向对比</span></h4><p><span>前面已经提到了一些搜索引擎数据库，比如 RediSearch 和 Elasticsearch，那为什么我最终选择了 Solr 呢？很简单，请看下表（这是我通过查阅资料文档和自己的一系列尝试总结出的结果）：</span></p><figure><table><thead><tr><th><span>搜索引擎数据库</span></th><th><span>社区活跃度</span></th><th><span>文档丰富度</span></th><th><span>机器配置要求</span></th><th><span>中文分词支持</span></th></tr></thead><tbody><tr><td><span>Solr</span></td><td><span>高</span></td><td><span>高</span></td><td><span>实测 512M 内存即可流畅运行</span></td><td><span>ik、jieba 等</span></td></tr><tr><td><span>Elasticsearch</span></td><td><span>高</span></td><td><span>高</span></td><td><span>推荐 2G 以上内存</span></td><td><span>ik、jieba 等</span></td></tr><tr><td><span>RediSearch</span></td><td><span>一般</span></td><td><span>高</span></td><td><span>极低</span></td><td><a href='https://github.com/lionsoul2014/friso'><span>Friso</span></a></td></tr><tr><td><span>Sphinx</span></td><td><span>已经一年多没有版本更新了</span></td><td><span>一般</span></td><td><span>极低</span></td><td><span>mmseg 等</span></td></tr></tbody></table></figure><p><span>最初我选择的是 Elasticsearch，可后来我发现我的服务器配置太低了，根本无法正常使用。而 Sphinx 因为更新不活跃，文档不够完善等原因也被我 pass 掉了。最终，我没有去尝试 RediSearch 而是直接选择了 Solr 是因为 RediSearch 的中文分词支持比较基础，搜索功能也不如 Solr 强大。虽然 Solr 在</span><a href='https://db-engines.com/en/ranking/search+engine'><span>搜索引擎数据库排行榜</span></a><span>上的分数在不断下降，但仍然稳居前三名。</span></p><h4><a name="分词器与词库" class="md-header-anchor"></a><span>分词器与词库</span></h4><p><span>分词器和词库的选择会直接影响到搜索的效果。</span></p><p><span>这里我推荐一个 Solr 中比较好的解决方案：</span><a href='https://github.com/magese/ik-analyzer-solr' target='_blank' class='url'>https://github.com/magese/ik-analyzer-solr</a></p><p><span>它对 ik 原有的词库进行了扩充:</span></p><figure><table><thead><tr><th><span>分词工具</span></th><th><span>词库中词的数量</span></th><th><span>最后更新时间</span></th></tr></thead><tbody><tr><td><span>ik</span></td><td><span>27.5万</span></td><td><span>2012年</span></td></tr><tr><td><span>mmseg</span></td><td><span>15.7万</span></td><td><span>2017年</span></td></tr><tr><td><span>word</span></td><td><span>64.2万</span></td><td><span>2014年</span></td></tr><tr><td><span>jieba</span></td><td><span>58.4万</span></td><td><span>2012年</span></td></tr><tr><td><span>jcesg</span></td><td><span>16.6万</span></td><td><span>2018年</span></td></tr><tr><td><span>sougou词库</span></td><td><span>115.2万</span></td><td><span>2019年</span></td></tr></tbody></table></figure><p><span>将以上词库进行整理后约187.1万条词汇。</span></p><h4><a name="solr" class="md-header-anchor"></a><span>Solr</span></h4><p><span>关于 Solr 本身的使用建议以官方文档为准，因为它的配置比较繁杂，不同版本的配置有可能是不一样的，况且它的文档已经可以说是相当完善了。但我还是要介绍几个关键点，方便新手快速入门，具体操作的时候再参考一下官方文档就行了（我使用的版本是 8.4，文档版本可以直接通过修改 URL 中的版本号来切换）。</span></p><h5><a name="安装与启动" class="md-header-anchor"></a><span>安装与启动</span></h5><p><span>如果为了在本地尝试或学习，可以按照 Solr 的</span><a href='https://lucene.apache.org/solr/guide/8_4/solr-tutorial.html#solr-tutorial'><span>入门指南</span></a><span>来安装，安装包中已经自带了入门指南中用到的示例数据和配置。</span></p><p><span>而如果你要在生产环境部署，则需参考</span><a href='http://lucene.apache.org/solr/guide/8_4/taking-solr-to-production.html'><span>生产环境部署文档</span></a><span>，Solr 提供了一个部署脚本，十分方便。</span></p><p><span>值得注意的是，Solr 提供了两种模式：一种是使用 ZooKeeper 管理的集群模式 </span><a href='http://lucene.apache.org/solr/guide/8_4/solrcloud.html'><span>SolrCloud</span></a><span>，另一种则是单机模式。如果仅使用一台服务器来运行 Solr 选择单机模式即可。</span></p><p><span>另外，Solr 默认的 JVM 堆内存大小是 512M，生产环境可以根据服务器的配置和需要进行调整：</span><a href='http://lucene.apache.org/solr/guide/8_4/taking-solr-to-production.html#memory-and-gc-settings'><span>http://lucene.apache.org/solr/guide/8_4/taking-solr-to-production.html#memory-and-gc-settings</span></a><span>。</span></p><h5><a name="设置-schema" class="md-header-anchor"></a><span>设置 Schema</span></h5><p><span>启动成功后，我们就可以访问 Solr 的后台管理界面了。首先我们需要新建一个 Core，Core 在 Solr 中类似数据库表的概念，每个 Core 都通过一个 XML 文件来定义其中数据的 Schema。下面就是茶杯狐的 Schema 定义（在 Core 创建完成之后会在当前 Core 路径下的 config 文件夹中生成一个文件，名叫 managed-schema，虽然它提示不要直接编辑这个文件，但是增加 fieldType 等操作在管理后台中无法完成，这种情况其实直接编辑这个文件就可以了）：</span></p><pre spellcheck="false" class="md-fences md-end-block ty-contain-cm modeLoaded" lang="xml" style="page-break-inside: unset;"><div class="CodeMirror cm-s-inner CodeMirror-wrap" lang="xml"><div style="overflow: hidden; position: relative; width: 3px; height: 0px; top: 0px; left: 8px;"><textarea autocorrect="off" autocapitalize="off" spellcheck="false" tabindex="0" style="position: absolute; bottom: -1em; padding: 0px; width: 1000px; height: 1em; outline: none;"></textarea></div><div class="CodeMirror-scrollbar-filler" cm-not-content="true"></div><div class="CodeMirror-gutter-filler" cm-not-content="true"></div><div class="CodeMirror-scroll" tabindex="-1"><div class="CodeMirror-sizer" style="margin-left: 0px; margin-bottom: 0px; border-right-width: 0px; padding-right: 0px; padding-bottom: 0px;"><div style="position: relative; top: 0px;"><div class="CodeMirror-lines" role="presentation"><div role="presentation" style="position: relative; outline: none;"><div class="CodeMirror-measure"><pre><span>xxxxxxxxxx</span></pre></div><div class="CodeMirror-measure"></div><div style="position: relative; z-index: 1;"></div><div class="CodeMirror-code" role="presentation" style=""><div class="CodeMirror-activeline" style="position: relative;"><div class="CodeMirror-activeline-background CodeMirror-linebackground"></div><div class="CodeMirror-gutter-background CodeMirror-activeline-gutter" style="left: 0px; width: 0px;"></div><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"><span class="cm-meta">&lt;?xml</span> <span class="cm-meta">version="1.0" encoding="UTF-8"?&gt;</span></span></pre></div><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"><span class="cm-comment">&lt;!-- Solr managed schema - automatically generated - DO NOT EDIT --&gt;</span></span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">schema</span> <span class="cm-attribute">name</span>=<span class="cm-string">"cupfox"</span> <span class="cm-attribute">version</span>=<span class="cm-string">"1.6"</span><span class="cm-tag cm-bracket">&gt;</span></span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"> &nbsp;<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">uniqueKey</span><span class="cm-tag cm-bracket">&gt;</span>id<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">uniqueKey</span><span class="cm-tag cm-bracket">&gt;</span></span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"> &nbsp;<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">fieldType</span> <span class="cm-attribute">name</span>=<span class="cm-string">"plong"</span> <span class="cm-attribute">class</span>=<span class="cm-string">"solr.LongPointField"</span> <span class="cm-attribute">docValues</span>=<span class="cm-string">"true"</span><span class="cm-tag cm-bracket">/&gt;</span></span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"> &nbsp;<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">fieldType</span> <span class="cm-attribute">name</span>=<span class="cm-string">"string"</span> <span class="cm-attribute">class</span>=<span class="cm-string">"solr.StrField"</span> <span class="cm-attribute">sortMissingLast</span>=<span class="cm-string">"true"</span><span class="cm-tag cm-bracket">/&gt;</span></span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"> &nbsp;<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">fieldType</span> <span class="cm-attribute">name</span>=<span class="cm-string">"text_ik"</span> <span class="cm-attribute">class</span>=<span class="cm-string">"solr.TextField"</span><span class="cm-tag cm-bracket">&gt;</span></span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"> &nbsp; &nbsp;<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">analyzer</span> <span class="cm-attribute">type</span>=<span class="cm-string">"index"</span><span class="cm-tag cm-bracket">&gt;</span></span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"> &nbsp; &nbsp; &nbsp;<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">tokenizer</span> <span class="cm-attribute">class</span>=<span class="cm-string">"org.wltea.analyzer.lucene.IKTokenizerFactory"</span> <span class="cm-attribute">conf</span>=<span class="cm-string">"ik.conf"</span> <span class="cm-attribute">useSmart</span>=<span class="cm-string">"false"</span><span class="cm-tag cm-bracket">/&gt;</span></span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"> &nbsp; &nbsp; &nbsp;<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">filter</span> <span class="cm-attribute">class</span>=<span class="cm-string">"solr.LowerCaseFilterFactory"</span><span class="cm-tag cm-bracket">/&gt;</span></span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"> &nbsp; &nbsp;<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">analyzer</span><span class="cm-tag cm-bracket">&gt;</span></span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"> &nbsp; &nbsp;<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">analyzer</span> <span class="cm-attribute">type</span>=<span class="cm-string">"query"</span><span class="cm-tag cm-bracket">&gt;</span></span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"> &nbsp; &nbsp; &nbsp;<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">tokenizer</span> <span class="cm-attribute">class</span>=<span class="cm-string">"org.wltea.analyzer.lucene.IKTokenizerFactory"</span> <span class="cm-attribute">conf</span>=<span class="cm-string">"ik.conf"</span> <span class="cm-attribute">useSmart</span>=<span class="cm-string">"false"</span><span class="cm-tag cm-bracket">/&gt;</span></span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"> &nbsp; &nbsp; &nbsp;<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">filter</span> <span class="cm-attribute">class</span>=<span class="cm-string">"solr.LowerCaseFilterFactory"</span><span class="cm-tag cm-bracket">/&gt;</span></span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"> &nbsp; &nbsp;<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">analyzer</span><span class="cm-tag cm-bracket">&gt;</span></span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"> &nbsp;<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">fieldType</span><span class="cm-tag cm-bracket">&gt;</span></span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"> &nbsp;<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">field</span> <span class="cm-attribute">name</span>=<span class="cm-string">"_root_"</span> <span class="cm-attribute">type</span>=<span class="cm-string">"string"</span> <span class="cm-attribute">indexed</span>=<span class="cm-string">"true"</span> <span class="cm-attribute">stored</span>=<span class="cm-string">"false"</span><span class="cm-tag cm-bracket">/&gt;</span></span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"> &nbsp;<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">field</span> <span class="cm-attribute">name</span>=<span class="cm-string">"_version_"</span> <span class="cm-attribute">type</span>=<span class="cm-string">"plong"</span> <span class="cm-attribute">indexed</span>=<span class="cm-string">"true"</span> <span class="cm-attribute">stored</span>=<span class="cm-string">"true"</span><span class="cm-tag cm-bracket">/&gt;</span></span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"> &nbsp;<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">field</span> <span class="cm-attribute">name</span>=<span class="cm-string">"id"</span> <span class="cm-attribute">type</span>=<span class="cm-string">"string"</span> <span class="cm-attribute">multiValued</span>=<span class="cm-string">"false"</span> <span class="cm-attribute">indexed</span>=<span class="cm-string">"true"</span> <span class="cm-attribute">required</span>=<span class="cm-string">"true"</span> <span class="cm-attribute">stored</span>=<span class="cm-string">"true"</span><span class="cm-tag cm-bracket">/&gt;</span></span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"> &nbsp;<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">field</span> <span class="cm-attribute">name</span>=<span class="cm-string">"tags"</span> <span class="cm-attribute">type</span>=<span class="cm-string">"string"</span> <span class="cm-attribute">omitNorms</span>=<span class="cm-string">"true"</span> <span class="cm-attribute">omitTermFreqAndPositions</span>=<span class="cm-string">"true"</span> <span class="cm-attribute">indexed</span>=<span class="cm-string">"true"</span> <span class="cm-attribute">stored</span>=<span class="cm-string">"true"</span> <span class="cm-attribute">uninvertible</span>=<span class="cm-string">"true"</span> <span class="cm-attribute">required</span>=<span class="cm-string">"true"</span><span class="cm-tag cm-bracket">/&gt;</span></span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"> &nbsp;<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">field</span> <span class="cm-attribute">name</span>=<span class="cm-string">"text"</span> <span class="cm-attribute">type</span>=<span class="cm-string">"text_ik"</span> <span class="cm-attribute">omitNorms</span>=<span class="cm-string">"true"</span> <span class="cm-attribute">omitTermFreqAndPositions</span>=<span class="cm-string">"true"</span> <span class="cm-attribute">indexed</span>=<span class="cm-string">"true"</span> <span class="cm-attribute">stored</span>=<span class="cm-string">"true"</span> <span class="cm-attribute">uninvertible</span>=<span class="cm-string">"false"</span> <span class="cm-attribute">required</span>=<span class="cm-string">"true"</span><span class="cm-tag cm-bracket">/&gt;</span></span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"> &nbsp;<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">field</span> <span class="cm-attribute">name</span>=<span class="cm-string">"type"</span> <span class="cm-attribute">type</span>=<span class="cm-string">"string"</span> <span class="cm-attribute">omitNorms</span>=<span class="cm-string">"true"</span> <span class="cm-attribute">omitTermFreqAndPositions</span>=<span class="cm-string">"true"</span> <span class="cm-attribute">indexed</span>=<span class="cm-string">"true"</span> <span class="cm-attribute">stored</span>=<span class="cm-string">"true"</span> <span class="cm-attribute">uninvertible</span>=<span class="cm-string">"false"</span> <span class="cm-attribute">omitPositions</span>=<span class="cm-string">"true"</span> <span class="cm-attribute">required</span>=<span class="cm-string">"true"</span><span class="cm-tag cm-bracket">/&gt;</span></span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"> &nbsp;<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">field</span> <span class="cm-attribute">name</span>=<span class="cm-string">"url"</span> <span class="cm-attribute">type</span>=<span class="cm-string">"string"</span> <span class="cm-attribute">omitNorms</span>=<span class="cm-string">"true"</span> <span class="cm-attribute">omitTermFreqAndPositions</span>=<span class="cm-string">"true"</span> <span class="cm-attribute">indexed</span>=<span class="cm-string">"false"</span> <span class="cm-attribute">stored</span>=<span class="cm-string">"true"</span> <span class="cm-attribute">uninvertible</span>=<span class="cm-string">"false"</span> <span class="cm-attribute">omitPositions</span>=<span class="cm-string">"true"</span> <span class="cm-attribute">required</span>=<span class="cm-string">"true"</span><span class="cm-tag cm-bracket">/&gt;</span></span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"> &nbsp;<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">field</span> <span class="cm-attribute">name</span>=<span class="cm-string">"website"</span> <span class="cm-attribute">type</span>=<span class="cm-string">"string"</span> <span class="cm-attribute">omitTermFreqAndPositions</span>=<span class="cm-string">"true"</span> <span class="cm-attribute">omitNorms</span>=<span class="cm-string">"true"</span> <span class="cm-attribute">indexed</span>=<span class="cm-string">"true"</span> <span class="cm-attribute">stored</span>=<span class="cm-string">"true"</span> <span class="cm-attribute">uninvertible</span>=<span class="cm-string">"true"</span> <span class="cm-attribute">required</span>=<span class="cm-string">"true"</span><span class="cm-tag cm-bracket">/&gt;</span></span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">schema</span><span class="cm-tag cm-bracket">&gt;</span></span></pre></div></div></div></div></div><div style="position: absolute; height: 0px; width: 1px; border-bottom-width: 0px; border-bottom-style: solid; border-bottom-color: transparent; top: 726px;"></div><div class="CodeMirror-gutters" style="display: none; height: 726px;"></div></div></div></pre><p><span>可以看到，我只是简单的定义了一些 field 和它们所用到的 fieldType，其中需要中文分词的 field 使用了 text_ik 这个类型，在这个类型中我分别指定了索引和查询时所用的分词器为 IKTokenizerFactory，注意：useSmart = &quot;false&quot; 的意思是使用细颗粒度进行分词，而 LowerCaseFilterFactory 是把大写字母统一转成小写。分词效果可以在 Solr 后台的 Analysis 页面进行测试：</span></p><p><img src="https://i.loli.net/2020/01/29/HEc5kCgGQeOqWu9.jpg" referrerpolicy="no-referrer" alt="HEc5kCgGQeOqWu9"></p><h5><a name="从数据库导入数据" class="md-header-anchor"></a><span>从数据库导入数据</span></h5><p><span>从数据库导入需要配置两个 XML，首先是数据源的定义：</span></p><pre spellcheck="false" class="md-fences md-end-block ty-contain-cm modeLoaded" lang="xml"><div class="CodeMirror cm-s-inner CodeMirror-wrap" lang="xml"><div style="overflow: hidden; position: relative; width: 3px; height: 0px; top: 0px; left: 8px;"><textarea autocorrect="off" autocapitalize="off" spellcheck="false" tabindex="0" style="position: absolute; bottom: -1em; padding: 0px; width: 1000px; height: 1em; outline: none;"></textarea></div><div class="CodeMirror-scrollbar-filler" cm-not-content="true"></div><div class="CodeMirror-gutter-filler" cm-not-content="true"></div><div class="CodeMirror-scroll" tabindex="-1"><div class="CodeMirror-sizer" style="margin-left: 0px; margin-bottom: 0px; border-right-width: 0px; padding-right: 0px; padding-bottom: 0px;"><div style="position: relative; top: 0px;"><div class="CodeMirror-lines" role="presentation"><div role="presentation" style="position: relative; outline: none;"><div class="CodeMirror-measure"><pre><span>xxxxxxxxxx</span></pre></div><div class="CodeMirror-measure"></div><div style="position: relative; z-index: 1;"></div><div class="CodeMirror-code" role="presentation" style=""><div class="CodeMirror-activeline" style="position: relative;"><div class="CodeMirror-activeline-background CodeMirror-linebackground"></div><div class="CodeMirror-gutter-background CodeMirror-activeline-gutter" style="left: 0px; width: 0px;"></div><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"><span class="cm-meta">&lt;?xml</span> <span class="cm-meta">version="1.0" encoding="UTF-8" ?&gt;</span></span></pre></div><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">dataConfig</span><span class="cm-tag cm-bracket">&gt;</span></span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"> &nbsp; &nbsp;<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">dataSource</span> <span class="cm-attribute">driver</span>=<span class="cm-string">"org.mariadb.jdbc.Driver"</span> <span class="cm-attribute">url</span>=<span class="cm-string">"jdbc:mariadb://0.0.0.0:3306/cupfox"</span> <span class="cm-attribute">user</span>=<span class="cm-string">"write"</span> <span class="cm-attribute">password</span>=<span class="cm-string">"123456"</span><span class="cm-tag cm-bracket">/&gt;</span></span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"> &nbsp; &nbsp;<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">document</span><span class="cm-tag cm-bracket">&gt;</span></span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"> &nbsp; &nbsp; &nbsp; &nbsp;<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">entity</span> <span class="cm-attribute">name</span>=<span class="cm-string">"resource"</span> <span class="cm-attribute">query</span>=<span class="cm-string">"select * from resource"</span> <span class="cm-attribute">deltaImportQuery</span>=<span class="cm-string">"select * from resource where id=${dataimporter.delta.id}"</span> <span class="cm-attribute">deltaQuery</span>=<span class="cm-string">"select id from resource where is_deleted = 0 and update_time &gt; '${dataimporter.last_index_time}'"</span> <span class="cm-attribute">deletedPkQuery</span>=<span class="cm-string">"select id from resource where is_deleted = 1"</span><span class="cm-tag cm-bracket">&gt;</span></span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"> &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">field</span> <span class="cm-attribute">column</span>=<span class="cm-string">"text"</span> <span class="cm-attribute">name</span>=<span class="cm-string">"text"</span> <span class="cm-tag cm-bracket">/&gt;</span></span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"> &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">field</span> <span class="cm-attribute">column</span>=<span class="cm-string">"url"</span> <span class="cm-attribute">name</span>=<span class="cm-string">"url"</span> <span class="cm-tag cm-bracket">/&gt;</span></span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"> &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">field</span> <span class="cm-attribute">column</span>=<span class="cm-string">"website"</span> <span class="cm-attribute">name</span>=<span class="cm-string">"website"</span> <span class="cm-tag cm-bracket">/&gt;</span></span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"> &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">field</span> <span class="cm-attribute">column</span>=<span class="cm-string">"type"</span> <span class="cm-attribute">name</span>=<span class="cm-string">"type"</span> <span class="cm-tag cm-bracket">/&gt;</span></span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"> &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">field</span> <span class="cm-attribute">column</span>=<span class="cm-string">"tags"</span> <span class="cm-attribute">name</span>=<span class="cm-string">"tags"</span> <span class="cm-tag cm-bracket">/&gt;</span></span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"> &nbsp; &nbsp; &nbsp; &nbsp;<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">entity</span><span class="cm-tag cm-bracket">&gt;</span></span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"> &nbsp; &nbsp;<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">document</span><span class="cm-tag cm-bracket">&gt;</span></span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">dataConfig</span><span class="cm-tag cm-bracket">&gt;</span></span></pre></div></div></div></div></div><div style="position: absolute; height: 0px; width: 1px; border-bottom-width: 0px; border-bottom-style: solid; border-bottom-color: transparent; top: 374px;"></div><div class="CodeMirror-gutters" style="display: none; height: 374px;"></div></div></div></pre><p><span>我使用了 mariadb，因此需要在 solrconfig.xml 里引入 mariadb 的 jar 包（这个在 mariadb 官网就可以下载）：</span></p><pre spellcheck="false" class="md-fences md-end-block ty-contain-cm modeLoaded" lang="xml"><div class="CodeMirror cm-s-inner CodeMirror-wrap" lang="xml"><div style="overflow: hidden; position: relative; width: 3px; height: 0px; top: 0px; left: 8px;"><textarea autocorrect="off" autocapitalize="off" spellcheck="false" tabindex="0" style="position: absolute; bottom: -1em; padding: 0px; width: 1000px; height: 1em; outline: none;"></textarea></div><div class="CodeMirror-scrollbar-filler" cm-not-content="true"></div><div class="CodeMirror-gutter-filler" cm-not-content="true"></div><div class="CodeMirror-scroll" tabindex="-1"><div class="CodeMirror-sizer" style="margin-left: 0px; margin-bottom: 0px; border-right-width: 0px; padding-right: 0px; padding-bottom: 0px;"><div style="position: relative; top: 0px;"><div class="CodeMirror-lines" role="presentation"><div role="presentation" style="position: relative; outline: none;"><div class="CodeMirror-measure"><pre><span>xxxxxxxxxx</span></pre></div><div class="CodeMirror-measure"></div><div style="position: relative; z-index: 1;"></div><div class="CodeMirror-code" role="presentation"><div class="CodeMirror-activeline" style="position: relative;"><div class="CodeMirror-activeline-background CodeMirror-linebackground"></div><div class="CodeMirror-gutter-background CodeMirror-activeline-gutter" style="left: 0px; width: 0px;"></div><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">lib</span> <span class="cm-attribute">dir</span>=<span class="cm-string">"${solr.install.dir:../../../..}/lib/"</span> <span class="cm-attribute">regex</span>=<span class="cm-string">"mariadb-java-client-\d.*\.jar"</span> <span class="cm-tag cm-bracket">/&gt;</span></span></pre></div></div></div></div></div></div><div style="position: absolute; height: 0px; width: 1px; border-bottom-width: 0px; border-bottom-style: solid; border-bottom-color: transparent; top: 22px;"></div><div class="CodeMirror-gutters" style="display: none; height: 22px;"></div></div></div></pre><p><span>除此之外，solrconfig.xml 里还要加上：</span></p><pre spellcheck="false" class="md-fences md-end-block ty-contain-cm modeLoaded" lang="xml"><div class="CodeMirror cm-s-inner CodeMirror-wrap" lang="xml"><div style="overflow: hidden; position: relative; width: 3px; height: 0px; top: 0px; left: 8px;"><textarea autocorrect="off" autocapitalize="off" spellcheck="false" tabindex="0" style="position: absolute; bottom: -1em; padding: 0px; width: 1000px; height: 1em; outline: none;"></textarea></div><div class="CodeMirror-scrollbar-filler" cm-not-content="true"></div><div class="CodeMirror-gutter-filler" cm-not-content="true"></div><div class="CodeMirror-scroll" tabindex="-1"><div class="CodeMirror-sizer" style="margin-left: 0px; margin-bottom: 0px; border-right-width: 0px; padding-right: 0px; padding-bottom: 0px;"><div style="position: relative; top: 0px;"><div class="CodeMirror-lines" role="presentation"><div role="presentation" style="position: relative; outline: none;"><div class="CodeMirror-measure"><pre><span>xxxxxxxxxx</span></pre></div><div class="CodeMirror-measure"></div><div style="position: relative; z-index: 1;"></div><div class="CodeMirror-code" role="presentation" style=""><div class="CodeMirror-activeline" style="position: relative;"><div class="CodeMirror-activeline-background CodeMirror-linebackground"></div><div class="CodeMirror-gutter-background CodeMirror-activeline-gutter" style="left: 0px; width: 0px;"></div><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">lib</span> <span class="cm-attribute">dir</span>=<span class="cm-string">"${solr.install.dir:../../../..}/dist/"</span> <span class="cm-attribute">regex</span>=<span class="cm-string">"solr-dataimporthandler-.*\.jar"</span> <span class="cm-tag cm-bracket">/&gt;</span></span></pre></div><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"><span cm-text="">​</span></span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"><span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">requestHandler</span> <span class="cm-attribute">name</span>=<span class="cm-string">"/dataimport"</span> <span class="cm-attribute">class</span>=<span class="cm-string">"solr.DataImportHandler"</span><span class="cm-tag cm-bracket">&gt;</span></span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"> &nbsp; &nbsp;<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">lst</span> <span class="cm-attribute">name</span>=<span class="cm-string">"defaults"</span><span class="cm-tag cm-bracket">&gt;</span></span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"> &nbsp; &nbsp; &nbsp; &nbsp;<span class="cm-tag cm-bracket">&lt;</span><span class="cm-tag">str</span> <span class="cm-attribute">name</span>=<span class="cm-string">"config"</span><span class="cm-tag cm-bracket">&gt;</span>solr-data-config.xml<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">str</span><span class="cm-tag cm-bracket">&gt;</span></span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"> &nbsp; &nbsp;<span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">lst</span><span class="cm-tag cm-bracket">&gt;</span></span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"><span class="cm-tag cm-bracket">&lt;/</span><span class="cm-tag">requestHandler</span><span class="cm-tag cm-bracket">&gt;</span></span></pre></div></div></div></div></div><div style="position: absolute; height: 0px; width: 1px; border-bottom-width: 0px; border-bottom-style: solid; border-bottom-color: transparent; top: 154px;"></div><div class="CodeMirror-gutters" style="display: none; height: 154px;"></div></div></div></pre><p><span>因为 /dataimport 接口默认是关闭的，数据源配置文件需要我们自己指定。</span></p><p><span>当这些都配置好之后，就可以通过 /dataimport API 导入数据库了，当然，也可以在管理后台手动导入数据：</span></p><p><img src="https://i.loli.net/2020/01/30/Ch6nAMDks35WYmi.jpg" referrerpolicy="no-referrer" alt="Ch6nAMDks35WYmi"></p><p><span>有两种数据导入方式，分别是全量导入和增量导入，这两种导入方式对应的数据的 SQL 需要在 XML 中指明。</span></p><h5><a name="查询" class="md-header-anchor"></a><span>查询</span></h5><p><span>相比于其繁杂的配置，Solr 的查询方法可以说是相当简单了，基本上就是一个接口加上若干参数，参数取值与含义示例：</span></p><figure><table><thead><tr><th><span>参数</span></th><th><span>取值示例</span></th><th><span>取值含义</span></th></tr></thead><tbody><tr><td><span>q</span></td><td><span>阿甘正传 AND type:0</span></td><td><span>查询匹配关键词为“阿甘正传”且 type 字段值是 0 的记录</span></td></tr><tr><td><span>start</span></td><td><span>0</span></td><td><span>偏移量为 0</span></td></tr><tr><td><span>rows</span></td><td><span>10</span></td><td><span>从偏移量开始向后取 10 条记录</span></td></tr><tr><td><span>sort</span></td><td><span>score desc, website asc</span></td><td><span>先按 score 倒序，再按 website 字段正序排列（Solr 中的记录都有一个隐藏的字段 score，即匹配度的评分）</span></td></tr><tr><td><span>hl</span></td><td><span>on</span></td><td><span>开启匹配关键词高亮，会多返回一项 highlighting 字段</span></td></tr></tbody></table></figure><p><span>其他可用参数我就不列了，请参阅官方文档。</span></p><h4><a name="总结" class="md-header-anchor"></a><span>总结</span></h4><p><span>搜索其实是一个非常普遍的场景，并不仅仅是搜索引擎才会遇到搜索场景，有时候它可能看起来并不像是个搜索场景。就比如数据的可视化展示，你需要通过多种条件筛选出你需要展示的数据，有时候还需要根据多种条件进行排序，对于传统数据库来说这些场景不方便建立索引。因此，在数据量较大的情况下，凡是需要进行筛选、排序或匹配查询的场景都可以考虑使用搜索引擎数据库建立索引来进行优化。</span></p></div>
+</body>
+</html>
