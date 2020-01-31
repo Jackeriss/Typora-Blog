@@ -9,11 +9,11 @@ const qcloud = require('./qcloud.json')
 const cp = require("child_process")
 
 
-gulp.task('clean', function (cb) {
+function clean(cb) {
   return del(['./dist'], cb)
-})
+}
 
-gulp.task('build_js', function () {
+function build_js() {
   return gulp.src('app/static/js/*.js')
     .pipe(terser())
     .pipe(rev())
@@ -24,9 +24,9 @@ gulp.task('build_js', function () {
       merge: true
     }))
     .pipe(gulp.dest('dist'))
-})
+}
 
-gulp.task('build_css', function () {
+function build_css() {
   return gulp.src('app/static/css/*.css')
     .pipe(clean_css())
     .pipe(rev())
@@ -37,9 +37,9 @@ gulp.task('build_css', function () {
       merge: true
     }))
     .pipe(gulp.dest('dist'))
-})
+}
 
-gulp.task('upload', function () {
+function upload() {
   return gulp.src('*.*', { cwd: 'dist' })
     .pipe(uploadQcloud({
       AppId: qcloud.AppId,
@@ -49,9 +49,9 @@ gulp.task('upload', function () {
       Region: qcloud.Region,
       prefix: qcloud.prefix
     }))
-})
+}
 
-gulp.task('rev_collect', function () {
+function rev_collect() {
   return gulp.src(['dist/rev-manifest.json', 'app/template/*.html'])
     .pipe(revCollector({
       'replaceReved': true,
@@ -62,14 +62,21 @@ gulp.task('rev_collect', function () {
       }
     }))
     .pipe(gulp.dest('app/template/dist'))
-})
+}
 
-gulp.task('install', function () {
+function install() {
   return cp.exec('pipenv install --deploy')
-})
+}
 
-gulp.task('start', function () {
+function start() {
   return cp.exec('/usr/local/bin/pm2 startOrReload pm2.json')
-})
+}
 
-exports.default = gulp.series('clean', gulp.parallel('build_js', 'build_css'), 'upload', 'rev_collect', 'install', 'start')
+exports.default = gulp.series(
+  clean,
+  gulp.parallel(build_js, build_css),
+  upload,
+  rev_collect,
+  install,
+  start
+)
