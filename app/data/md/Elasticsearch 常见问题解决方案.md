@@ -69,8 +69,8 @@ A：修改还是不要想了，问就是重建。ES 中的字段类型在索引�
    ```json
    {
        "actions": [
-           {"remove": {"index": "order_comment", "alias": "comment"}},
-           {"add": {"index": "order_comment2",  "alias": "comment"}}
+           {"remove": {"index": "order_comment_1", "alias": "comment"}},
+           {"add": {"index": "order_comment_2",  "alias": "comment"}}
        ]
    }
    ```
