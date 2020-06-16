@@ -4,7 +4,7 @@
 
 #### Elasticsearch 真的有他们说的那么好吗？
 
-![img](https://img.2333gif.com/2333GIF2CA8.png)
+![image.png](https://i.loli.net/2020/06/16/7D6ELQWuxspHelJ.png)
 
 这件事我和鲁迅的看法一样。Elasticsearch 可以说是有口皆碑，尤其是近几年，几乎成为了搜索引擎数据库的代名词。作为新一代实时搜索分析引擎，它补足了许多传统搜索引擎和分析引擎的短板。这大大的拓宽了它的应用场景，在日志监控分析等新兴场景十分流行。
 
@@ -31,7 +31,7 @@
 
 既然 ES 这么耗资源，除了 ES 还有哪些数据库可以帮我们处理复杂查询?
 
-![image-20200609173624942](/Users/Jackeriss/Library/Application Support/typora-user-images/image-20200609173624942.png)
+![image.png](https://i.loli.net/2020/06/16/zAQYOEXDmJs5lK3.png)
 
 |          | MongoDB                                          | RediSearch | Solr                       | Elasticsearch                   |
 | -------- | ------------------------------------------------ | ---------- | -------------------------- | ------------------------------- |
@@ -53,17 +53,17 @@
 
 在索引建立的时候就已经确定了主分片数，但是副本分片数可以随时修改。
 
-![拥有两个节点的集群](https://www.elastic.co/guide/cn/elasticsearch/guide/current/images/elas_0203.png)
+![拥有两个节点的集群](https://i.loli.net/2020/06/16/jhdTg4QqWYaVSNn.png)
 
 图中我们的集群有两个节点，只有一个索引，这个索引有三个主分片和三个副本分片。
 
-![拥有三个节点的集群](https://www.elastic.co/guide/cn/elasticsearch/guide/current/images/elas_0204.png)
+![拥有三个节点的集群](https://i.loli.net/2020/06/16/sVYTGWZxu3Kop2F.png)
 
 这时候如果我们新增一个节点，Elasticsearch 集群会为了分散负载而对分片进行重新分配。
 
 因为我们的索引总共只有 6 个分片，所以最大只能有效扩容到 6 个节点，让每个分片独享一个节点的资源。如果想要扩容到 6 个以上的节点就需要增加副本数了。
 
-![拥有2份副本分片3个节点的集群](https://www.elastic.co/guide/cn/elasticsearch/guide/current/images/elas_0205.png)
+![拥有2份副本分片3个节点的集群](https://i.loli.net/2020/06/16/7ZrWsIYVFfcqXtQ.png)
 
 先将每个主分片的副本数改为两个，接下来就可以将节点扩容到 9 个了。
 
