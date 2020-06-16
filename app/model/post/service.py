@@ -37,13 +37,16 @@ class PostService(object):
                 abstract = str(soup.find("div", attrs={"class": "a"}))
                 if "</p></div>" in abstract:
                     post["abstract"] = abstract.replace(
-                        "</p></div>", post_link + "</p></div>"
+                        "</p></div>", f"{post_link}</p></div>"
                     )
                 else:
                     post["abstract"] = abstract.replace("</div>", post_link + "</div>")
                 if post["abstract"] == str(None):
-                    post["abstract"] = str(soup.find("p")).replace(
-                        "</p>", post_link + "</p>"
+                    abstract = str(soup.find("p"))
+                    post["abstract"] = (
+                        abstract.replace("</p>", f"<p>{post_link}</p></p>")
+                        if "<img" in abstract
+                        else abstract.replace("</p>", f"{post_link}</p>")
                     )
                 template = f"""
                     {{% extends "..{"/dist" if config.env != "dev" else ""}/base.html" %}}
@@ -73,8 +76,7 @@ class PostService(object):
     @classmethod
     def get_total_page(cls):
         total_page = int(
-            (len(cls.gen_posts()) + constant.PAGE_LIMIT - 1)
-            / constant.PAGE_LIMIT
+            (len(cls.gen_posts()) + constant.PAGE_LIMIT - 1) / constant.PAGE_LIMIT
         )
         return total_page
 
@@ -85,9 +87,7 @@ class PostService(object):
             total_page = cls.get_total_page()
             if page < total_page:
                 posts = posts[
-                    (page - 1)
-                    * constant.PAGE_LIMIT : page
-                    * constant.PAGE_LIMIT
+                    (page - 1) * constant.PAGE_LIMIT : page * constant.PAGE_LIMIT
                 ]
             elif page == total_page:
                 posts = posts[(page - 1) * constant.PAGE_LIMIT : len(posts)]
