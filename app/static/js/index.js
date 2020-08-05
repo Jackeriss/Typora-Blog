@@ -106,8 +106,8 @@ $(function () {
     }, 500)
   })
   const gitalk = new Gitalk({
-    clientID: '748b4dac7ace16b6d7cb',
-    clientSecret: 'c5db352dad6f88b898840d628e44cfb5b4eaf4c0',
+    clientID: 'f97829d37a8d54c05536',
+    clientSecret: '89896e7c2dc8eaf50f8b86baabc50005833a3062',
     repo: 'comments_of_www.jackeriss.com',
     owner: 'Jackeriss',
     admin: ['Jackeriss'],
