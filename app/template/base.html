@@ -6,10 +6,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="{% block description %}Elegance begets simplicity{% end %}">
   <meta name="keywords" content="Jackeriss">
-  <meta name="referrer" content="never">
+  <meta name="referrer" content="same-origin">
   <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
   <title>{% block title %}Jackeriss{% end %}</title>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+  <link href="https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css" rel="stylesheet">
   <link href="/css/style.css" rel="stylesheet">
   <link href="/image/logo.png" rel="apple-touch-icon-precomposed" sizes="144x144">
   <link href="/image/logo.png" rel="shortcut icon">
@@ -30,7 +30,7 @@
         <ul>
           <li><a href="/achive" id="achive">归档</a></li>
           <li><a href="/project" id="project">项目</a></li>
-          <li><a href="/i/movie?BMDB_MOVIES_CATEGORIES=starred" id="movie">电影</a></li>
+          <li><a href="/movie#starred" id="movie">电影</a></li>
           <li><a href="/about" id="about">关于</a></li>
         </ul>
       </div>

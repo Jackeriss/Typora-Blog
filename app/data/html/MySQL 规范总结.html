@@ -1,0 +1,1926 @@
+<!doctype html>
+<html>
+<head>
+<meta charset='UTF-8'><meta name='viewport' content='width=device-width initial-scale=1'>
+<title>MySQL 规范总结</title><style type='text/css'>html {overflow-x: initial !important;}:root { --bg-color: #ffffff; --text-color: #333333; --select-text-bg-color: #B5D6FC; --select-text-font-color: auto; --monospace: "Lucida Console",Consolas,"Courier",monospace; }
+html { font-size: 14px; background-color: var(--bg-color); color: var(--text-color); font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; -webkit-font-smoothing: antialiased; }
+body { margin: 0px; padding: 0px; height: auto; bottom: 0px; top: 0px; left: 0px; right: 0px; font-size: 1rem; line-height: 1.42857143; overflow-x: hidden; background-image: inherit; background-size: inherit; background-attachment: inherit; background-origin: inherit; background-clip: inherit; background-color: inherit; tab-size: 4; background-position: inherit inherit; background-repeat: inherit inherit; }
+iframe { margin: auto; }
+a.url { word-break: break-all; }
+a:active, a:hover { outline: 0px; }
+.in-text-selection, ::selection { text-shadow: none; background: var(--select-text-bg-color); color: var(--select-text-font-color); }
+#write { margin: 0px auto; height: auto; width: inherit; word-break: normal; word-wrap: break-word; position: relative; white-space: normal; overflow-x: visible; padding-top: 40px; }
+#write.first-line-indent p { text-indent: 2em; }
+#write.first-line-indent li p, #write.first-line-indent p * { text-indent: 0px; }
+#write.first-line-indent li { margin-left: 2em; }
+.for-image #write { padding-left: 8px; padding-right: 8px; }
+body.typora-export { padding-left: 30px; padding-right: 30px; }
+.typora-export .footnote-line, .typora-export li, .typora-export p { white-space: pre-wrap; }
+.typora-export .task-list-item input { pointer-events: none; }
+@media screen and (max-width: 500px) { 
+  body.typora-export { padding-left: 0px; padding-right: 0px; }
+  #write { padding-left: 20px; padding-right: 20px; }
+  .CodeMirror-sizer { margin-left: 0px !important; }
+  .CodeMirror-gutters { display: none !important; }
+}
+#write li > figure:last-child { margin-bottom: 0.5rem; }
+#write ol, #write ul { position: relative; }
+img { max-width: 100%; vertical-align: middle; }
+button, input, select, textarea { color: inherit; font-family: inherit; font-size: inherit; font-style: inherit; font-variant-caps: inherit; font-weight: inherit; font-stretch: inherit; line-height: inherit; }
+input[type="checkbox"], input[type="radio"] { line-height: normal; padding: 0px; }
+*, ::after, ::before { box-sizing: border-box; }
+#write h1, #write h2, #write h3, #write h4, #write h5, #write h6, #write p, #write pre { width: inherit; }
+#write h1, #write h2, #write h3, #write h4, #write h5, #write h6, #write p { position: relative; }
+p { line-height: inherit; }
+h1, h2, h3, h4, h5, h6 { break-after: avoid-page; break-inside: avoid; orphans: 4; }
+p { orphans: 4; }
+h1 { font-size: 2rem; }
+h2 { font-size: 1.8rem; }
+h3 { font-size: 1.6rem; }
+h4 { font-size: 1.4rem; }
+h5 { font-size: 1.2rem; }
+h6 { font-size: 1rem; }
+.md-math-block, .md-rawblock, h1, h2, h3, h4, h5, h6, p { margin-top: 1rem; margin-bottom: 1rem; }
+.hidden { display: none; }
+.md-blockmeta { color: rgb(204, 204, 204); font-weight: 700; font-style: italic; }
+a { cursor: pointer; }
+sup.md-footnote { padding: 2px 4px; background-color: rgba(238, 238, 238, 0.701961); color: rgb(85, 85, 85); border-top-left-radius: 4px; border-top-right-radius: 4px; border-bottom-right-radius: 4px; border-bottom-left-radius: 4px; cursor: pointer; }
+sup.md-footnote a, sup.md-footnote a:hover { color: inherit; text-transform: inherit; text-decoration: inherit; }
+#write input[type="checkbox"] { cursor: pointer; width: inherit; height: inherit; }
+figure { overflow-x: auto; margin: 1.2em 0px; max-width: calc(100% + 16px); padding: 0px; }
+figure > table { margin: 0px; }
+tr { break-inside: avoid; break-after: auto; }
+thead { display: table-header-group; }
+table { border-collapse: collapse; border-spacing: 0px; width: 100%; overflow: auto; break-inside: auto; text-align: left; }
+table.md-table td { min-width: 32px; }
+.CodeMirror-gutters { border-right-width: 0px; background-color: inherit; }
+.CodeMirror-linenumber { }
+.CodeMirror { text-align: left; }
+.CodeMirror-placeholder { opacity: 0.3; }
+.CodeMirror pre { padding: 0px 4px; }
+.CodeMirror-lines { padding: 0px; }
+div.hr:focus { cursor: none; }
+#write pre { white-space: pre-wrap; }
+#write.fences-no-line-wrapping pre { white-space: pre; }
+#write pre.ty-contain-cm { white-space: normal; }
+.CodeMirror-gutters { margin-right: 4px; }
+.md-fences { font-size: 0.9rem; display: block; break-inside: avoid; text-align: left; overflow: visible; white-space: pre; background-image: inherit; background-size: inherit; background-attachment: inherit; background-origin: inherit; background-clip: inherit; background-color: inherit; position: relative !important; background-position: inherit inherit; background-repeat: inherit inherit; }
+.md-diagram-panel { width: 100%; margin-top: 10px; text-align: center; padding-top: 0px; padding-bottom: 8px; overflow-x: auto; }
+#write .md-fences.mock-cm { white-space: pre-wrap; }
+.md-fences.md-fences-with-lineno { padding-left: 0px; }
+#write.fences-no-line-wrapping .md-fences.mock-cm { white-space: pre; overflow-x: auto; }
+.md-fences.mock-cm.md-fences-with-lineno { padding-left: 8px; }
+.CodeMirror-line, twitterwidget { break-inside: avoid; }
+.footnotes { opacity: 0.8; font-size: 0.9rem; margin-top: 1em; margin-bottom: 1em; }
+.footnotes + .footnotes { margin-top: 0px; }
+.md-reset { margin: 0px; padding: 0px; border: 0px; outline: 0px; vertical-align: top; text-decoration: none; text-shadow: none; float: none; position: static; width: auto; height: auto; white-space: nowrap; cursor: inherit; line-height: normal; font-weight: 400; text-align: left; box-sizing: content-box; direction: ltr; background-position: 0px 0px; background-repeat: initial initial; }
+li div { padding-top: 0px; }
+blockquote { margin: 1rem 0px; }
+li .mathjax-block, li p { margin: 0.5rem 0px; }
+li { margin: 0px; position: relative; }
+blockquote > :last-child { margin-bottom: 0px; }
+blockquote > :first-child, li > :first-child { margin-top: 0px; }
+.footnotes-area { color: rgb(136, 136, 136); margin-top: 0.714rem; padding-bottom: 0.143rem; white-space: normal; }
+#write .footnote-line { white-space: pre-wrap; }
+@media print { 
+  body, html { border: 1px solid transparent; height: 99%; break-after: avoid-page; break-before: avoid-page; font-variant-ligatures: no-common-ligatures; }
+  #write { margin-top: 0px; padding-top: 0px; border-color: transparent !important; }
+  .typora-export * { -webkit-print-color-adjust: exact; }
+  html.blink-to-pdf { font-size: 13px; }
+  .typora-export #write { break-after: avoid-page; }
+  .typora-export #write::after { height: 0px; }
+  .is-mac table { break-inside: avoid; }
+}
+.footnote-line { margin-top: 0.714em; font-size: 0.7em; }
+a img, img a { cursor: pointer; }
+pre.md-meta-block { font-size: 0.8rem; min-height: 0.8rem; white-space: pre-wrap; background-color: rgb(204, 204, 204); display: block; overflow-x: hidden; background-position: initial initial; background-repeat: initial initial; }
+p > .md-image:only-child:not(.md-img-error) img, p > img:only-child { display: block; margin: auto; }
+#write.first-line-indent p > .md-image:only-child:not(.md-img-error) img { left: -2em; position: relative; }
+p > .md-image:only-child { display: inline-block; width: 100%; }
+#write .MathJax_Display { margin: 0.8em 0px 0px; }
+.md-math-block { width: 100%; }
+.md-math-block:not(:empty)::after { display: none; }
+[contenteditable="true"]:active, [contenteditable="true"]:focus, [contenteditable="false"]:active, [contenteditable="false"]:focus { outline: 0px; box-shadow: none; }
+.md-task-list-item { position: relative; list-style-type: none; }
+.task-list-item.md-task-list-item { padding-left: 0px; }
+.md-task-list-item > input { position: absolute; top: 0px; left: 0px; margin-left: -1.2em; margin-top: calc(1em - 10px); border: none; }
+.math { font-size: 1rem; }
+.md-toc { min-height: 3.58rem; position: relative; font-size: 0.9rem; border-top-left-radius: 10px; border-top-right-radius: 10px; border-bottom-right-radius: 10px; border-bottom-left-radius: 10px; }
+.md-toc-content { position: relative; margin-left: 0px; }
+.md-toc-content::after, .md-toc::after { display: none; }
+.md-toc-item { display: block; color: rgb(65, 131, 196); }
+.md-toc-item a { text-decoration: none; }
+.md-toc-inner:hover { text-decoration: underline; }
+.md-toc-inner { display: inline-block; cursor: pointer; }
+.md-toc-h1 .md-toc-inner { margin-left: 0px; font-weight: 700; }
+.md-toc-h2 .md-toc-inner { margin-left: 2em; }
+.md-toc-h3 .md-toc-inner { margin-left: 4em; }
+.md-toc-h4 .md-toc-inner { margin-left: 6em; }
+.md-toc-h5 .md-toc-inner { margin-left: 8em; }
+.md-toc-h6 .md-toc-inner { margin-left: 10em; }
+@media screen and (max-width: 48em) { 
+  .md-toc-h3 .md-toc-inner { margin-left: 3.5em; }
+  .md-toc-h4 .md-toc-inner { margin-left: 5em; }
+  .md-toc-h5 .md-toc-inner { margin-left: 6.5em; }
+  .md-toc-h6 .md-toc-inner { margin-left: 8em; }
+}
+a.md-toc-inner { font-size: inherit; font-style: inherit; font-weight: inherit; line-height: inherit; }
+.footnote-line a:not(.reversefootnote) { color: inherit; }
+.md-attr { display: none; }
+.md-fn-count::after { content: "."; }
+code, pre, samp, tt { font-family: var(--monospace); }
+kbd { margin: 0px 0.1em; padding: 0.1em 0.6em; font-size: 0.8em; color: rgb(36, 39, 41); background-color: rgb(255, 255, 255); border: 1px solid rgb(173, 179, 185); border-top-left-radius: 3px; border-top-right-radius: 3px; border-bottom-right-radius: 3px; border-bottom-left-radius: 3px; box-shadow: rgba(12, 13, 14, 0.2) 0px 1px 0px, rgb(255, 255, 255) 0px 0px 0px 2px inset; white-space: nowrap; vertical-align: middle; background-position: initial initial; background-repeat: initial initial; }
+.md-comment { color: rgb(162, 127, 3); opacity: 0.8; font-family: var(--monospace); }
+code { text-align: left; }
+a.md-print-anchor { white-space: pre !important; border: none !important; display: inline-block !important; position: absolute !important; width: 1px !important; right: 0px !important; outline: 0px !important; text-shadow: initial !important; background-position: 0px 0px !important; background-repeat: initial initial !important; }
+.md-inline-math .MathJax_SVG .noError { display: none !important; }
+.html-for-mac .inline-math-svg .MathJax_SVG { vertical-align: 0.2px; }
+.md-math-block .MathJax_SVG_Display { text-align: center; margin: 0px; position: relative; text-indent: 0px; max-width: none; max-height: none; min-height: 0px; min-width: 100%; width: auto; overflow-y: hidden; display: block !important; }
+.MathJax_SVG_Display, .md-inline-math .MathJax_SVG_Display { width: auto; margin: inherit; display: inline-block !important; }
+.MathJax_SVG .MJX-monospace { font-family: var(--monospace); }
+.MathJax_SVG .MJX-sans-serif { font-family: sans-serif; }
+.MathJax_SVG { display: inline; font-style: normal; font-weight: 400; line-height: normal; zoom: 90%; text-indent: 0px; text-align: left; text-transform: none; letter-spacing: normal; word-spacing: normal; word-wrap: normal; white-space: nowrap; float: none; direction: ltr; max-width: none; max-height: none; min-width: 0px; min-height: 0px; border: 0px; padding: 0px; margin: 0px; }
+.MathJax_SVG * { transition: none; }
+.MathJax_SVG_Display svg { vertical-align: middle !important; margin-bottom: 0px !important; margin-top: 0px !important; }
+.os-windows.monocolor-emoji .md-emoji { font-family: "Segoe UI Symbol", sans-serif; }
+.md-diagram-panel > svg { max-width: 100%; }
+[lang="flow"] svg, [lang="mermaid"] svg { max-width: 100%; height: auto; }
+[lang="mermaid"] .node text { font-size: 1rem; }
+table tr th { border-bottom-width: 0px; }
+video { max-width: 100%; display: block; margin: 0px auto; }
+iframe { max-width: 100%; width: 100%; border: none; }
+.highlight td, .highlight tr { border: 0px; }
+svg[id^="mermaidChart"] { line-height: 1em; }
+mark { background-color: rgb(255, 255, 0); color: rgb(0, 0, 0); background-position: initial initial; background-repeat: initial initial; }
+.md-html-inline .md-plain, .md-html-inline strong, mark .md-inline-math, mark strong { color: inherit; }
+mark .md-meta { color: rgb(0, 0, 0); opacity: 0.3 !important; }
+@media print { 
+  .typora-export h1, .typora-export h2, .typora-export h3, .typora-export h4, .typora-export h5, .typora-export h6 { break-inside: avoid; }
+}
+
+
+.CodeMirror { height: auto; }
+.CodeMirror.cm-s-inner { background-image: inherit; background-size: inherit; background-attachment: inherit; background-origin: inherit; background-clip: inherit; background-color: inherit; background-position: inherit inherit; background-repeat: inherit inherit; }
+.CodeMirror-scroll { overflow-y: hidden; overflow-x: auto; z-index: 3; }
+.CodeMirror-gutter-filler, .CodeMirror-scrollbar-filler { background-color: rgb(255, 255, 255); }
+.CodeMirror-gutters { border-right-width: 1px; border-right-style: solid; border-right-color: rgb(221, 221, 221); background-image: inherit; background-size: inherit; background-attachment: inherit; background-origin: inherit; background-clip: inherit; background-color: inherit; white-space: nowrap; background-position: inherit inherit; background-repeat: inherit inherit; }
+.CodeMirror-linenumber { padding: 0px 3px 0px 5px; text-align: right; color: rgb(153, 153, 153); }
+.cm-s-inner .cm-keyword { color: rgb(119, 0, 136); }
+.cm-s-inner .cm-atom, .cm-s-inner.cm-atom { color: rgb(34, 17, 153); }
+.cm-s-inner .cm-number { color: rgb(17, 102, 68); }
+.cm-s-inner .cm-def { color: rgb(0, 0, 255); }
+.cm-s-inner .cm-variable { color: rgb(0, 0, 0); }
+.cm-s-inner .cm-variable-2 { color: rgb(0, 85, 170); }
+.cm-s-inner .cm-variable-3 { color: rgb(0, 136, 85); }
+.cm-s-inner .cm-string { color: rgb(170, 17, 17); }
+.cm-s-inner .cm-property { color: rgb(0, 0, 0); }
+.cm-s-inner .cm-operator { color: rgb(152, 26, 26); }
+.cm-s-inner .cm-comment, .cm-s-inner.cm-comment { color: rgb(170, 85, 0); }
+.cm-s-inner .cm-string-2 { color: rgb(255, 85, 0); }
+.cm-s-inner .cm-meta { color: rgb(85, 85, 85); }
+.cm-s-inner .cm-qualifier { color: rgb(85, 85, 85); }
+.cm-s-inner .cm-builtin { color: rgb(51, 0, 170); }
+.cm-s-inner .cm-bracket { color: rgb(153, 153, 119); }
+.cm-s-inner .cm-tag { color: rgb(17, 119, 0); }
+.cm-s-inner .cm-attribute { color: rgb(0, 0, 204); }
+.cm-s-inner .cm-header, .cm-s-inner.cm-header { color: rgb(0, 0, 255); }
+.cm-s-inner .cm-quote, .cm-s-inner.cm-quote { color: rgb(0, 153, 0); }
+.cm-s-inner .cm-hr, .cm-s-inner.cm-hr { color: rgb(153, 153, 153); }
+.cm-s-inner .cm-link, .cm-s-inner.cm-link { color: rgb(0, 0, 204); }
+.cm-negative { color: rgb(221, 68, 68); }
+.cm-positive { color: rgb(34, 153, 34); }
+.cm-header, .cm-strong { font-weight: 700; }
+.cm-del { text-decoration: line-through; }
+.cm-em { font-style: italic; }
+.cm-link { text-decoration: underline; }
+.cm-error { color: red; }
+.cm-invalidchar { color: red; }
+.cm-constant { color: rgb(38, 139, 210); }
+.cm-defined { color: rgb(181, 137, 0); }
+div.CodeMirror span.CodeMirror-matchingbracket { color: rgb(0, 255, 0); }
+div.CodeMirror span.CodeMirror-nonmatchingbracket { color: rgb(255, 34, 34); }
+.cm-s-inner .CodeMirror-activeline-background { background-image: inherit; background-size: inherit; background-attachment: inherit; background-origin: inherit; background-clip: inherit; background-color: inherit; background-position: inherit inherit; background-repeat: inherit inherit; }
+.CodeMirror { position: relative; overflow: hidden; }
+.CodeMirror-scroll { height: 100%; outline: 0px; position: relative; box-sizing: content-box; background-image: inherit; background-size: inherit; background-attachment: inherit; background-origin: inherit; background-clip: inherit; background-color: inherit; background-position: inherit inherit; background-repeat: inherit inherit; }
+.CodeMirror-sizer { position: relative; }
+.CodeMirror-gutter-filler, .CodeMirror-hscrollbar, .CodeMirror-scrollbar-filler, .CodeMirror-vscrollbar { position: absolute; z-index: 6; display: none; }
+.CodeMirror-vscrollbar { right: 0px; top: 0px; overflow: hidden; }
+.CodeMirror-hscrollbar { bottom: 0px; left: 0px; overflow: hidden; }
+.CodeMirror-scrollbar-filler { right: 0px; bottom: 0px; }
+.CodeMirror-gutter-filler { left: 0px; bottom: 0px; }
+.CodeMirror-gutters { position: absolute; left: 0px; top: 0px; padding-bottom: 30px; z-index: 3; }
+.CodeMirror-gutter { white-space: normal; height: 100%; box-sizing: content-box; padding-bottom: 30px; margin-bottom: -32px; display: inline-block; }
+.CodeMirror-gutter-wrapper { position: absolute; z-index: 4; border: none !important; background-position: 0px 0px !important; background-repeat: initial initial !important; }
+.CodeMirror-gutter-background { position: absolute; top: 0px; bottom: 0px; z-index: 4; }
+.CodeMirror-gutter-elt { position: absolute; cursor: default; z-index: 4; }
+.CodeMirror-lines { cursor: text; }
+.CodeMirror pre { border-top-left-radius: 0px; border-top-right-radius: 0px; border-bottom-right-radius: 0px; border-bottom-left-radius: 0px; border-width: 0px; font-family: inherit; font-size: inherit; margin: 0px; white-space: pre; word-wrap: normal; color: inherit; z-index: 2; position: relative; overflow: visible; background-position: 0px 0px; background-repeat: initial initial; }
+.CodeMirror-wrap pre { word-wrap: break-word; white-space: pre-wrap; word-break: normal; }
+.CodeMirror-code pre { border-right-width: 30px; border-right-style: solid; border-right-color: transparent; width: fit-content; }
+.CodeMirror-wrap .CodeMirror-code pre { border-right-style: none; width: auto; }
+.CodeMirror-linebackground { position: absolute; left: 0px; right: 0px; top: 0px; bottom: 0px; z-index: 0; }
+.CodeMirror-linewidget { position: relative; z-index: 2; overflow: auto; }
+.CodeMirror-wrap .CodeMirror-scroll { overflow-x: hidden; }
+.CodeMirror-measure { position: absolute; width: 100%; height: 0px; overflow: hidden; visibility: hidden; }
+.CodeMirror-measure pre { position: static; }
+.CodeMirror div.CodeMirror-cursor { position: absolute; visibility: hidden; border-right-style: none; width: 0px; }
+.CodeMirror div.CodeMirror-cursor { visibility: hidden; }
+.CodeMirror-focused div.CodeMirror-cursor { visibility: inherit; }
+.cm-searching { background-color: rgba(255, 255, 0, 0.4); background-position: initial initial; background-repeat: initial initial; }
+@media print { 
+  .CodeMirror div.CodeMirror-cursor { visibility: hidden; }
+}
+
+
+/* Flowchart variables */
+/* Sequence Diagram variables */
+/* Gantt chart variables */
+/* state colors */
+.label {
+  
+  color: #333; }
+
+.label text {
+  fill: #333; }
+
+.node rect,
+.node circle,
+.node ellipse,
+.node polygon {
+  fill: #BDD5EA;
+  stroke: #9370DB;
+  stroke-width: 1px; }
+
+.node .label {
+  text-align: center; }
+
+.node.clickable {
+  cursor: pointer; }
+
+.arrowheadPath {
+  fill: lightgrey; }
+
+.edgePath .path {
+  stroke: lightgrey;
+  stroke-width: 1.5px; }
+
+.edgeLabel {
+  background-color: #e8e8e8;
+  text-align: center; }
+
+.cluster rect {
+  fill: #6D6D65;
+  stroke: rgba(255, 255, 255, 0.25);
+  stroke-width: 1px; }
+
+.cluster text {
+  fill: #F9FFFE; }
+
+div.mermaidTooltip {
+  position: absolute;
+  text-align: center;
+  max-width: 200px;
+  padding: 2px;
+  
+  font-size: 12px;
+  background: #6D6D65;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 2px;
+  pointer-events: none;
+  z-index: 100; }
+
+.actor {
+  stroke: #81B1DB;
+  fill: #BDD5EA; }
+
+text.actor {
+  fill: black;
+  stroke: none; }
+
+.actor-line {
+  stroke: lightgrey; }
+
+.messageLine0 {
+  stroke-width: 1.5;
+  stroke-dasharray: '2 2';
+  stroke: lightgrey; }
+
+.messageLine1 {
+  stroke-width: 1.5;
+  stroke-dasharray: '2 2';
+  stroke: lightgrey; }
+
+#arrowhead {
+  fill: lightgrey; }
+
+.sequenceNumber {
+  fill: white; }
+
+#sequencenumber {
+  fill: lightgrey; }
+
+#crosshead path {
+  fill: lightgrey !important;
+  stroke: lightgrey !important; }
+
+.messageText {
+  fill: lightgrey;
+  stroke: none; }
+
+.labelBox {
+  stroke: #81B1DB;
+  fill: #BDD5EA; }
+
+.labelText {
+  fill: #323D47;
+  stroke: none; }
+
+.loopText {
+  fill: lightgrey;
+  stroke: none; }
+
+.loopLine {
+  stroke-width: 2;
+  stroke-dasharray: '2 2';
+  stroke: #81B1DB; }
+
+.note {
+  stroke: rgba(255, 255, 255, 0.25);
+  fill: #fff5ad; }
+
+.noteText {
+  fill: black;
+  stroke: none;
+  
+  font-size: 14px; }
+
+.activation0 {
+  fill: #f4f4f4;
+  stroke: #666; }
+
+.activation1 {
+  fill: #f4f4f4;
+  stroke: #666; }
+
+.activation2 {
+  fill: #f4f4f4;
+  stroke: #666; }
+
+/** Section styling */
+.section {
+  stroke: none;
+  opacity: 0.2; }
+
+.section0 {
+  fill: rgba(255, 255, 255, 0.3); }
+
+.section2 {
+  fill: #EAE8B9; }
+
+.section1,
+.section3 {
+  fill: white;
+  opacity: 0.2; }
+
+.sectionTitle0 {
+  fill: #F9FFFE; }
+
+.sectionTitle1 {
+  fill: #F9FFFE; }
+
+.sectionTitle2 {
+  fill: #F9FFFE; }
+
+.sectionTitle3 {
+  fill: #F9FFFE; }
+
+.sectionTitle {
+  text-anchor: start;
+  font-size: 11px;
+  text-height: 14px;
+   }
+
+/* Grid and axis */
+.grid .tick {
+  stroke: lightgrey;
+  opacity: 0.3;
+  shape-rendering: crispEdges; }
+
+.grid path {
+  stroke-width: 0; }
+
+/* Today line */
+.today {
+  fill: none;
+  stroke: #DB5757;
+  stroke-width: 2px; }
+
+/* Task styling */
+/* Default task */
+.task {
+  stroke-width: 2; }
+
+.taskText {
+  text-anchor: middle;
+   }
+
+.taskText:not([font-size]) {
+  font-size: 11px; }
+
+.taskTextOutsideRight {
+  fill: #323D47;
+  text-anchor: start;
+  font-size: 11px;
+   }
+
+.taskTextOutsideLeft {
+  fill: #323D47;
+  text-anchor: end;
+  font-size: 11px; }
+
+/* Special case clickable */
+.task.clickable {
+  cursor: pointer; }
+
+.taskText.clickable {
+  cursor: pointer;
+  fill: #003163 !important;
+  font-weight: bold; }
+
+.taskTextOutsideLeft.clickable {
+  cursor: pointer;
+  fill: #003163 !important;
+  font-weight: bold; }
+
+.taskTextOutsideRight.clickable {
+  cursor: pointer;
+  fill: #003163 !important;
+  font-weight: bold; }
+
+/* Specific task settings for the sections*/
+.taskText0,
+.taskText1,
+.taskText2,
+.taskText3 {
+  fill: #323D47; }
+
+.task0,
+.task1,
+.task2,
+.task3 {
+  fill: #BDD5EA;
+  stroke: rgba(255, 255, 255, 0.5); }
+
+.taskTextOutside0,
+.taskTextOutside2 {
+  fill: lightgrey; }
+
+.taskTextOutside1,
+.taskTextOutside3 {
+  fill: lightgrey; }
+
+/* Active task */
+.active0,
+.active1,
+.active2,
+.active3 {
+  fill: #81B1DB;
+  stroke: rgba(255, 255, 255, 0.5); }
+
+.activeText0,
+.activeText1,
+.activeText2,
+.activeText3 {
+  fill: #323D47 !important; }
+
+/* Completed task */
+.done0,
+.done1,
+.done2,
+.done3 {
+  stroke: grey;
+  fill: lightgrey;
+  stroke-width: 2; }
+
+.doneText0,
+.doneText1,
+.doneText2,
+.doneText3 {
+  fill: #323D47 !important; }
+
+/* Tasks on the critical line */
+.crit0,
+.crit1,
+.crit2,
+.crit3 {
+  stroke: #E83737;
+  fill: #E83737;
+  stroke-width: 2; }
+
+.activeCrit0,
+.activeCrit1,
+.activeCrit2,
+.activeCrit3 {
+  stroke: #E83737;
+  fill: #81B1DB;
+  stroke-width: 2; }
+
+.doneCrit0,
+.doneCrit1,
+.doneCrit2,
+.doneCrit3 {
+  stroke: #E83737;
+  fill: lightgrey;
+  stroke-width: 2;
+  cursor: pointer;
+  shape-rendering: crispEdges; }
+
+.milestone {
+  transform: rotate(45deg) scale(0.8, 0.8); }
+
+.milestoneText {
+  font-style: italic; }
+
+.doneCritText0,
+.doneCritText1,
+.doneCritText2,
+.doneCritText3 {
+  fill: #323D47 !important; }
+
+.activeCritText0,
+.activeCritText1,
+.activeCritText2,
+.activeCritText3 {
+  fill: #323D47 !important; }
+
+.titleText {
+  text-anchor: middle;
+  font-size: 18px;
+  fill: #323D47;
+   }
+
+g.classGroup text {
+  fill: #9370DB;
+  stroke: none;
+  
+  font-size: 10px; }
+  g.classGroup text .title {
+    font-weight: bolder; }
+
+g.classGroup rect {
+  fill: #BDD5EA;
+  stroke: #9370DB; }
+
+g.classGroup line {
+  stroke: #9370DB;
+  stroke-width: 1; }
+
+.classLabel .box {
+  stroke: none;
+  stroke-width: 0;
+  fill: #BDD5EA;
+  opacity: 0.5; }
+
+.classLabel .label {
+  fill: #9370DB;
+  font-size: 10px; }
+
+.relation {
+  stroke: #9370DB;
+  stroke-width: 1;
+  fill: none; }
+
+#compositionStart {
+  fill: #9370DB;
+  stroke: #9370DB;
+  stroke-width: 1; }
+
+#compositionEnd {
+  fill: #9370DB;
+  stroke: #9370DB;
+  stroke-width: 1; }
+
+#aggregationStart {
+  fill: #BDD5EA;
+  stroke: #9370DB;
+  stroke-width: 1; }
+
+#aggregationEnd {
+  fill: #BDD5EA;
+  stroke: #9370DB;
+  stroke-width: 1; }
+
+#dependencyStart {
+  fill: #9370DB;
+  stroke: #9370DB;
+  stroke-width: 1; }
+
+#dependencyEnd {
+  fill: #9370DB;
+  stroke: #9370DB;
+  stroke-width: 1; }
+
+#extensionStart {
+  fill: #9370DB;
+  stroke: #9370DB;
+  stroke-width: 1; }
+
+#extensionEnd {
+  fill: #9370DB;
+  stroke: #9370DB;
+  stroke-width: 1; }
+
+.commit-id,
+.commit-msg,
+.branch-label {
+  fill: lightgrey;
+  color: lightgrey;
+   }
+
+.pieTitleText {
+  text-anchor: middle;
+  font-size: 25px;
+  fill: #eee;
+}
+
+g.stateGroup text {
+  stroke: none;
+  font-size: 10px;
+}
+
+g.stateGroup circle {
+  fill: white !important;
+  stroke: white !important;
+}
+
+g.stateGroup .state-title {
+  font-weight: bolder;
+  fill: black; }
+
+g.stateGroup rect {
+  fill: #ececff;
+  stroke: #9370DB; }
+
+g.stateGroup line {
+  stroke: #9370DB;
+  stroke-width: 1; }
+
+.transition {
+  stroke: #9370DB;
+  stroke-width: 1;
+  fill: none; }
+
+.stateGroup .composit {
+  fill: #555;
+  border-bottom: 1px; }
+
+.state-note {
+  stroke: rgba(255, 255, 255, 0.25);
+  fill: #fff5ad; }
+  .state-note text {
+    fill: black;
+    stroke: none;
+    font-size: 10px; }
+
+.stateLabel .box {
+  stroke: none;
+  stroke-width: 0;
+  fill: #BDD5EA;
+  opacity: 0.5; }
+
+.stateLabel text {
+  fill: black;
+  font-size: 10px;
+  font-weight: bold;
+}
+
+.cluster-label {
+  color:black;
+}
+
+.statediagram-cluster rect {
+  fill: #BDD5EA;
+  stroke: #9370DB; 
+  stroke-width: 1px;
+}
+.statediagram-cluster rect.outer {
+  rx: 5px;
+  ry: 5px;
+}
+.statediagram-state .divider {
+  stroke: #9370DB; 
+}
+
+.statediagram-state .title-state {
+  rx: 5px;
+  ry: 5px;
+}
+.statediagram-cluster.statediagram-cluster .inner {
+  fill: white;
+}
+.statediagram-cluster.statediagram-cluster-alt .inner {
+  fill: #e0e0e0;
+}
+
+.statediagram-cluster .inner {
+  rx:0;
+  ry:0;
+}
+
+.statediagram-state rect.basic {
+  rx: 5px;
+  ry: 5px;
+}
+.statediagram-state rect.divider {
+  stroke-dasharray: 10,10;
+  fill: #efefef;
+}
+
+.note-edge {
+  stroke-dasharray: 5;
+}
+
+.statediagram-note rect {
+  stroke: var(--cluster-border);
+  fill: #fff5ad;
+  stroke-width: 1px;
+  rx: 0;
+  ry: 0;
+}
+
+.node circle.state-start {
+  fill: black;
+  stroke: black;
+}
+.node circle.state-end {
+  fill: black;
+  stroke: white;
+  stroke-width: 1.5
+}
+#statediagram-barbEnd {
+  fill: #9370DB; 
+}
+
+/* CSS Document */
+
+/** code highlight */
+
+.cm-s-inner .cm-variable,
+.cm-s-inner .cm-operator,
+.cm-s-inner .cm-property {
+    color: #b8bfc6;
+}
+
+.cm-s-inner .cm-keyword {
+    color: #C88FD0;
+}
+
+.cm-s-inner .cm-tag {
+    color: #7DF46A;
+}
+
+.cm-s-inner .cm-attribute {
+    color: #7575E4;
+}
+
+.CodeMirror div.CodeMirror-cursor {
+    border-left: 1px solid #b8bfc6;
+    z-index: 3;
+}
+
+.cm-s-inner .cm-string {
+    color: #D26B6B;
+}
+
+.cm-s-inner .cm-comment,
+.cm-s-inner.cm-comment {
+    color: #DA924A;
+}
+
+.cm-s-inner .cm-header,
+.cm-s-inner .cm-def,
+.cm-s-inner.cm-header,
+.cm-s-inner.cm-def {
+    color: #8d8df0;
+}
+
+.cm-s-inner .cm-quote,
+.cm-s-inner.cm-quote {
+    color: #57ac57;
+}
+
+.cm-s-inner .cm-hr {
+    color: #d8d5d5;
+}
+
+.cm-s-inner .cm-link {
+    color: #d3d3ef;
+}
+
+.cm-s-inner .cm-negative {
+    color: #d95050;
+}
+
+.cm-s-inner .cm-positive {
+    color: #50e650;
+}
+
+.cm-s-inner .cm-string-2 {
+    color: #f50;
+}
+
+.cm-s-inner .cm-meta,
+.cm-s-inner .cm-qualifier {
+    color: #b7b3b3;
+}
+
+.cm-s-inner .cm-builtin {
+    color: #f3b3f8;
+}
+
+.cm-s-inner .cm-bracket {
+    color: #997;
+}
+
+.cm-s-inner .cm-atom,
+.cm-s-inner.cm-atom {
+    color: #84B6CB;
+}
+
+.cm-s-inner .cm-number {
+    color: #64AB8F;
+}
+
+.cm-s-inner .cm-variable {
+    color: #b8bfc6;
+}
+
+.cm-s-inner .cm-variable-2 {
+    color: #9FBAD5;
+}
+
+.cm-s-inner .cm-variable-3 {
+    color: #1cc685;
+}
+
+.CodeMirror-selectedtext,
+.CodeMirror-selected {
+    background: #4a89dc;
+    color: #fff !important;
+    text-shadow: none;
+}
+
+.CodeMirror-gutters {
+    border-right: none;
+}
+
+/* CSS Document */
+
+/** markdown source **/
+.cm-s-typora-default .cm-header, 
+.cm-s-typora-default .cm-property
+{
+    color: #cebcca;
+}
+
+.CodeMirror.cm-s-typora-default div.CodeMirror-cursor{
+    border-left: 3px solid #b8bfc6;
+}
+
+.cm-s-typora-default .cm-comment {
+    color: #9FB1FF;
+}
+
+.cm-s-typora-default .cm-string {
+    color: #A7A7D9
+}
+
+.cm-s-typora-default .cm-atom, .cm-s-typora-default .cm-number {
+    color: #848695;
+    font-style: italic;
+}
+
+.cm-s-typora-default .cm-link {
+    color: #95B94B;
+}
+
+.cm-s-typora-default .CodeMirror-activeline-background {
+    background: rgba(51, 51, 51, 0.72);
+}
+
+.cm-s-typora-default .cm-comment, .cm-s-typora-default .cm-code {
+	color: #8aa1e1;
+}@import "";
+@import "";
+@import "";
+
+:root {
+    --bg-color:  #363B40;
+    --side-bar-bg-color: #2E3033;
+    --text-color: #b8bfc6;
+
+    --select-text-bg-color:#4a89dc;
+
+    --item-hover-bg-color: #0a0d16;
+    --control-text-color: #b7b7b7;
+    --control-text-hover-color: #eee;
+    --window-border: 1px solid #555;
+
+    --active-file-bg-color: rgb(34, 34, 34);
+    --active-file-border-color: #8d8df0;
+
+    --primary-color: #a3d5fe;
+
+    --active-file-text-color: white;
+    --item-hover-bg-color: #70717d;
+    --item-hover-text-color: white;
+    --primary-color: #6dc1e7;
+
+    --rawblock-edit-panel-bd: #333;
+
+    --search-select-bg-color: #428bca;
+}
+
+html {
+    font-size: 16px;
+}
+
+html,
+body {
+    -webkit-text-size-adjust: 100%;
+    -ms-text-size-adjust: 100%;
+    background: #363B40;
+    background: var(--bg-color);
+    fill: currentColor;
+    line-height: 1.625rem;
+}
+
+#write {
+    max-width: 914px;
+}
+
+
+@media only screen and (min-width: 1400px) {
+	#write {
+		max-width: 1024px;
+	}
+}
+
+@media only screen and (min-width: 1800px) {
+	#write {
+		max-width: 1200px;
+	}
+}
+
+html,
+body,
+button,
+input,
+select,
+textarea,
+div.code-tooltip-content {
+    color: #b8bfc6;
+    border-color: transparent;
+}
+
+div.code-tooltip,
+.md-hover-tip .md-arrow:after {
+    background: #333;
+}
+
+.popover.bottom > .arrow:after {
+    border-bottom-color: #333;
+}
+
+html,
+body,
+button,
+input,
+select,
+textarea {
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+
+hr {
+    height: 2px;
+    border: 0;
+    margin: 24px 0 !important;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    font-family: "Lucida Grande", "Corbel", sans-serif;
+    font-weight: normal;
+    clear: both;
+    -ms-word-wrap: break-word;
+    word-wrap: break-word;
+    margin: 0;
+    padding: 0;
+    color: #DEDEDE
+}
+
+h1 {
+    font-size: 2.5rem;
+    /* 36px */
+    line-height: 2.75rem;
+    /* 40px */
+    margin-bottom: 1.5rem;
+    /* 24px */
+    letter-spacing: -1.5px;
+}
+
+h2 {
+    font-size: 1.63rem;
+    /* 24px */
+    line-height: 1.875rem;
+    /* 30px */
+    margin-bottom: 1.5rem;
+    /* 24px */
+    letter-spacing: -1px;
+    font-weight: bold;
+}
+
+h3 {
+    font-size: 1.17rem;
+    /* 18px */
+    line-height: 1.5rem;
+    /* 24px */
+    margin-bottom: 1.5rem;
+    /* 24px */
+    letter-spacing: -1px;
+    font-weight: bold;
+}
+
+h4 {
+    font-size: 1.12rem;
+    /* 16px */
+    line-height: 1.375rem;
+    /* 22px */
+    margin-bottom: 1.5rem;
+    /* 24px */
+    color: white;
+}
+
+h5 {
+    font-size: 0.97rem;
+    /* 16px */
+    line-height: 1.25rem;
+    /* 22px */
+    margin-bottom: 1.5rem;
+    /* 24px */
+    font-weight: bold;
+}
+
+h6 {
+    font-size: 0.93rem;
+    /* 16px */
+    line-height: 1rem;
+    /* 16px */
+    margin-bottom: 0.75rem;
+    color: white;
+}
+
+@media (min-width: 980px) {
+    h3.md-focus:before,
+    h4.md-focus:before,
+    h5.md-focus:before,
+    h6.md-focus:before {
+        color: #ddd;
+        border: 1px solid #ddd;
+        border-radius: 3px;
+        position: absolute;
+        left: -1.642857143rem;
+        top: .357142857rem;
+        float: left;
+        font-size: 9px;
+        padding-left: 2px;
+        padding-right: 2px;
+        vertical-align: bottom;
+        font-weight: normal;
+        line-height: normal;
+    }
+
+    h3.md-focus:before {
+        content: 'h3';
+    }
+
+    h4.md-focus:before {
+        content: 'h4';
+    }
+
+    h5.md-focus:before {
+        content: 'h5';
+        top: 0px;
+    }
+
+    h6.md-focus:before {
+        content: 'h6';
+        top: 0px;
+    }
+}
+
+a {
+    text-decoration: none;
+    outline: 0;
+}
+
+a:hover {
+    outline: 0;
+}
+
+a:focus {
+    outline: thin dotted;
+}
+
+sup.md-footnote {
+    background-color: #555;
+    color: #ddd;
+}
+
+p {
+    -ms-word-wrap: break-word;
+    word-wrap: break-word;
+}
+
+p,
+ul,
+dd,
+ol,
+hr,
+address,
+pre,
+table,
+iframe,
+.wp-caption,
+.wp-audio-shortcode,
+.wp-video-shortcode {
+    margin-top: 0;
+    margin-bottom: 1.5rem;
+    /* 24px */
+}
+
+li > blockquote {
+	margin-bottom: 0;
+}
+
+audio:not([controls]) {
+    display: none;
+}
+
+[hidden] {
+    display: none;
+}
+
+::-moz-selection {
+    background: #4a89dc;
+    color: #fff;
+    text-shadow: none;
+}
+
+*.in-text-selection,
+::selection {
+    background: #4a89dc;
+    color: #fff;
+    text-shadow: none;
+}
+
+ul,
+ol {
+    padding: 0 0 0 1.875rem;
+    /* 30px */
+}
+
+ul {
+    list-style: square;
+}
+
+ol {
+    list-style: decimal;
+}
+
+ul ul,
+ol ol,
+ul ol,
+ol ul {
+    margin: 0;
+}
+
+b,
+th,
+dt,
+strong {
+    font-weight: bold;
+}
+
+i,
+em,
+dfn,
+cite {
+    font-style: italic;
+}
+
+blockquote {
+    padding-left: 1.875rem;
+    margin: 0 0 1.875rem 1.875rem;
+    border-left: solid 2px #474d54;
+    padding-left: 30px;
+    margin-top: 35px;
+}
+
+pre,
+code,
+kbd,
+tt,
+var {
+    font-size: 0.875rem;
+    font-family: Monaco, Consolas, "Andale Mono", "DejaVu Sans Mono", monospace;
+}
+
+code,
+tt,
+var {
+    background: rgba(0, 0, 0, 0.05);
+}
+
+kbd {
+    padding: 2px 4px;
+    font-size: 90%;
+    color: #fff;
+    background-color: #333;
+    border-radius: 3px;
+    box-shadow: inset 0 -1px 0 rgba(0,0,0,.25);
+}
+
+pre.md-fences {
+    padding: 10px 10px 10px 30px;
+    margin-bottom: 20px;
+    background: #333;
+}
+
+.CodeMirror-gutters {
+    background: #333;
+    border-right: 1px solid transparent;
+}
+
+.enable-diagrams pre.md-fences[lang="sequence"] .code-tooltip,
+.enable-diagrams pre.md-fences[lang="flow"] .code-tooltip,
+.enable-diagrams pre.md-fences[lang="mermaid"] .code-tooltip {
+    bottom: -2.2em;
+    right: 4px;
+}
+
+code,
+kbd,
+tt,
+var {
+    padding: 2px 5px;
+}
+
+table {
+    max-width: 100%;
+    width: 100%;
+    border-collapse: collapse;
+    border-spacing: 0;
+}
+
+th,
+td {
+    padding: 5px 10px;
+    vertical-align: top;
+}
+
+a {
+    -webkit-transition: all .2s ease-in-out;
+    transition: all .2s ease-in-out;
+}
+
+hr {
+    background: #474d54;
+    /* variable */
+}
+
+h1 {
+    margin-top: 2em;
+}
+
+a {
+    color: #e0e0e0;
+    text-decoration: underline;
+}
+
+a:hover {
+    color: #fff;
+}
+
+.md-inline-math script {
+    color: #81b1db;
+}
+
+b,
+th,
+dt,
+strong {
+    color: #DEDEDE;
+    /* variable */
+}
+
+mark {
+    background: #D3D40E;
+}
+
+blockquote {
+    color: #9DA2A6;
+}
+
+table a {
+    color: #DEDEDE;
+    /* variable */
+}
+
+th,
+td {
+    border: solid 1px #474d54;
+    /* variable */
+}
+
+.task-list {
+    padding-left: 0;
+}
+
+.md-task-list-item {
+    padding-left: 1.25rem;
+}
+
+.md-task-list-item > input {
+    top: auto;
+}
+
+.md-task-list-item > input:before {
+    content: "";
+    display: inline-block;
+    width: 0.875rem;
+    height: 0.875rem;
+    vertical-align: middle;
+    text-align: center;
+    border: 1px solid #b8bfc6;
+    background-color: #363B40;
+    margin-top: -0.4rem;
+}
+
+.md-task-list-item > input:checked:before,
+.md-task-list-item > input[checked]:before {
+    content: '\221A';
+    /*◘*/
+    font-size: 0.625rem;
+    line-height: 0.625rem;
+    color: #DEDEDE;
+}
+
+/** quick open **/
+.auto-suggest-container {
+    border: 0px;
+    background-color: #525C65;
+}
+
+#typora-quick-open {
+    background-color: #525C65;
+}
+
+#typora-quick-open input{
+    background-color: #525C65;
+    border: 0;
+    border-bottom: 1px solid grey;
+}
+
+.typora-quick-open-item {
+    background-color: inherit;
+    color: inherit;
+}
+
+.typora-quick-open-item.active,
+.typora-quick-open-item:hover {
+    background-color: #4D8BDB;
+    color: white;
+}
+
+.typora-quick-open-item:hover {
+    background-color: rgba(77, 139, 219, 0.8);
+}
+
+.typora-search-spinner > div {
+  background-color: #fff;
+}
+
+#write pre.md-meta-block {
+    border-bottom: 1px dashed #ccc;
+    background: transparent;
+    padding-bottom: 0.6em;
+    line-height: 1.6em;
+}
+
+.btn,
+.btn .btn-default {
+    background: transparent;
+    color: #b8bfc6;
+}
+
+.ty-table-edit {
+    border-top: 1px solid gray;
+    background-color: #363B40;
+}
+
+.popover-title {
+    background: transparent;
+}
+
+.md-image>.md-meta {
+    color: #BBBBBB;
+    background: transparent;
+}
+
+.md-expand.md-image>.md-meta {
+    color: #DDD;
+}
+
+#write>h3:before,
+#write>h4:before,
+#write>h5:before,
+#write>h6:before {
+    border: none;
+    border-radius: 0px;
+    color: #888;
+    text-decoration: underline;
+    left: -1.4rem;
+    top: 0.2rem;
+}
+
+#write>h3.md-focus:before {
+    top: 2px;
+}
+
+#write>h4.md-focus:before {
+    top: 2px;
+}
+
+.md-toc-item {
+    color: #A8C2DC;
+}
+
+#write div.md-toc-tooltip {
+    background-color: #363B40;
+}
+
+.dropdown-menu .btn:hover,
+.dropdown-menu .btn:focus,
+.md-toc .btn:hover,
+.md-toc .btn:focus {
+    color: white;
+    background: black;
+}
+
+#toc-dropmenu {
+    background: rgba(50, 54, 59, 0.93);
+    border: 1px solid rgba(253, 253, 253, 0.15);
+}
+
+#toc-dropmenu .divider {
+    background-color: #9b9b9b;
+}
+
+.outline-expander:before {
+    top: 2px;
+}
+
+#typora-sidebar {
+    box-shadow: none;
+    border-right: 1px dashed;
+    border-right: none;
+}
+
+.sidebar-tabs {
+    border-bottom:0;
+}
+
+#typora-sidebar:hover .outline-title-wrapper {
+    border-left: 1px dashed;
+}
+
+.outline-title-wrapper .btn {
+    color: inherit;
+}
+
+.outline-item:hover {
+    border-color: #363B40;
+    background-color: #363B40;
+    color: white;
+}
+
+h1.md-focus .md-attr,
+h2.md-focus .md-attr,
+h3.md-focus .md-attr,
+h4.md-focus .md-attr,
+h5.md-focus .md-attr,
+h6.md-focus .md-attr,
+.md-header-span .md-attr {
+    color: #8C8E92;
+    display: inline;
+}
+
+.md-comment {
+    color: #5a95e3;
+    opacity: 1;
+}
+
+.md-inline-math svg {
+    color: #b8bfc6;
+}
+
+#math-inline-preview .md-arrow:after {
+    background: black;
+}
+
+.modal-content {
+    background: var(--bg-color);
+    border: 0;
+}
+
+.modal-title {
+    font-size: 1.5em;
+}
+
+.modal-content input {
+    background-color: rgba(26, 21, 21, 0.51);
+    color: white;
+}
+
+.modal-content .input-group-addon {
+    color: white;
+}
+
+.modal-backdrop {
+    background-color: rgba(174, 174, 174, 0.7);
+}
+
+.modal-content .btn-primary {
+    border-color: var(--primary-color);
+}
+
+.md-table-resize-popover {
+    background-color: #333;
+}
+
+.form-inline .input-group .input-group-addon {
+    color: white;
+}
+
+#md-searchpanel {
+    border-bottom: 1px dashed grey;
+}
+
+/** UI for electron */
+
+.context-menu,
+#spell-check-panel,
+#footer-word-count-info {
+    background-color: #42464A;
+}
+
+.context-menu.dropdown-menu .divider,
+.dropdown-menu .divider {
+    background-color: #777777;
+}
+
+footer {
+    color: inherit;
+}
+
+@media (max-width: 1000px) {
+    footer {
+        border-top: none;
+    }
+    footer:hover {
+        color: inherit;
+    }
+}
+
+#file-info-file-path .file-info-field-value:hover {
+    background-color: #555;
+    color: #dedede;
+}
+
+.megamenu-content,
+.megamenu-opened header {
+    background: var(--bg-color);
+}
+
+.megamenu-menu-panel h2,
+.megamenu-menu-panel h1,
+.long-btn {
+    color: inherit;
+}
+
+.megamenu-menu-panel input[type='text'] {
+    background: inherit;
+    border: 0;
+    border-bottom: 1px solid;
+}
+
+#recent-file-panel-action-btn {
+    background: inherit;
+    border: 1px grey solid;
+}
+
+.megamenu-menu-panel .dropdown-menu > li > a {
+    color: inherit;
+    background-color: #2F353A;
+    text-decoration: none;
+}
+
+.megamenu-menu-panel table td:nth-child(1) {
+    color: inherit;
+    font-weight: bold;
+}
+
+.megamenu-menu-panel tbody tr:hover td:nth-child(1) {
+    color: white;
+}
+
+.modal-footer .btn-default, 
+.modal-footer .btn-primary,
+.modal-footer .btn-default:not(:hover) {
+    border: 1px solid;
+    border-color: transparent;
+}
+
+.btn-default:hover, .btn-default:focus, .btn-default.focus, .btn-default:active, .btn-default.active, .open > .dropdown-toggle.btn-default {
+    color: white;
+    border: 1px solid #ddd;
+    background-color: inherit;
+}
+
+.modal-header {
+    border-bottom: 0;
+}
+
+.modal-footer {
+    border-top: 0;
+}
+
+#recent-file-panel tbody tr:nth-child(2n-1) {
+    background-color: transparent !important;
+}
+
+.megamenu-menu-panel tbody tr:hover td:nth-child(2) {
+    color: inherit;
+}
+
+.megamenu-menu-panel .btn {
+    border: 1px solid #eee;
+    background: transparent;
+}
+
+.mouse-hover .toolbar-icon.btn:hover,
+#w-full.mouse-hover,
+#w-pin.mouse-hover {
+    background-color: inherit;
+}
+
+.typora-node::-webkit-scrollbar {
+    width: 5px;
+}
+
+.typora-node::-webkit-scrollbar-thumb:vertical {
+    background: rgba(250, 250, 250, 0.3);
+}
+
+.typora-node::-webkit-scrollbar-thumb:vertical:active {
+    background: rgba(250, 250, 250, 0.5);
+}
+
+#w-unpin {
+    background-color: #4182c4;
+}
+
+#top-titlebar, #top-titlebar * {
+    color: var(--item-hover-text-color);
+}
+
+.typora-sourceview-on #toggle-sourceview-btn,
+#footer-word-count:hover,
+.ty-show-word-count #footer-word-count {
+    background: #333333;
+}
+
+#toggle-sourceview-btn:hover {
+    color: #eee;
+    background: #333333;
+}
+
+/** focus mode */
+.on-focus-mode .md-end-block:not(.md-focus):not(.md-focus-container) * {
+    color: #686868 !important;
+}
+
+.on-focus-mode .md-end-block:not(.md-focus) img,
+.on-focus-mode .md-task-list-item:not(.md-focus-container)>input {
+    opacity: #686868 !important;
+}
+
+.on-focus-mode li[cid]:not(.md-focus-container){
+    color: #686868;
+}
+
+.on-focus-mode .md-fences.md-focus .CodeMirror-code>*:not(.CodeMirror-activeline) *,
+.on-focus-mode .CodeMirror.cm-s-inner:not(.CodeMirror-focused) * {
+    color: #686868 !important;
+}
+
+.on-focus-mode .md-focus,
+.on-focus-mode .md-focus-container {
+    color: #fff;
+}
+
+.on-focus-mode #typora-source .CodeMirror-code>*:not(.CodeMirror-activeline) * {
+    color: #686868 !important;
+}
+
+
+/*diagrams*/
+#write .md-focus .md-diagram-panel {
+    border: 1px solid #ddd;
+    margin-left: -1px;
+    width: calc(100% + 2px);
+}
+
+/*diagrams*/
+#write .md-focus.md-fences-with-lineno .md-diagram-panel {
+    margin-left: auto;
+}
+
+.md-diagram-panel-error {
+    color: #f1908e;
+}
+
+.active-tab-files #info-panel-tab-file,
+.active-tab-files #info-panel-tab-file:hover,
+.active-tab-outline #info-panel-tab-outline,
+.active-tab-outline #info-panel-tab-outline:hover {
+    color: #eee;
+}
+
+.sidebar-footer-item:hover,
+.footer-item:hover {
+    background: inherit;
+    color: white;
+}
+
+.ty-side-sort-btn.active,
+.ty-side-sort-btn:hover,
+.selected-folder-menu-item a:after {
+    color: white;
+}
+
+#sidebar-files-menu {
+    border:solid 1px;
+    box-shadow: 4px 4px 20px rgba(0, 0, 0, 0.79);
+    background-color: var(--bg-color);
+}
+
+.file-list-item {
+    border-bottom:none;
+}
+
+.file-list-item-summary {
+    opacity: 1;
+}
+
+.file-list-item.active:first-child {
+    border-top: none;
+}
+
+.file-node-background {
+    height: 32px;
+}
+
+.file-library-node.active>.file-node-content,
+.file-list-item.active {
+    color: white;
+    color: var(--active-file-text-color);
+}
+
+.file-library-node.active>.file-node-background{
+    background-color: rgb(34, 34, 34);
+    background-color: var(--active-file-bg-color);
+}
+.file-list-item.active {
+    background-color: rgb(34, 34, 34);
+    background-color: var(--active-file-bg-color);
+}
+
+#ty-tooltip {
+    background-color: black;
+    color: #eee;
+}
+
+.md-task-list-item>input {
+    margin-left: -1.3em;
+    margin-top: 0.3rem;
+    -webkit-appearance: none;
+}
+
+.md-mathjax-midline {
+    background-color: #57616b;
+    border-bottom: none;
+}
+
+footer.ty-footer {
+    border-color: #656565;
+}
+
+.ty-preferences .btn-default {
+    background: transparent;
+}
+.ty-preferences .btn-default:hover {
+    background: #57616b;
+}
+
+.ty-preferences select {
+    border: 1px solid #989698;
+    height: 21px;
+}
+
+.ty-preferences .nav-group-item.active {
+    background: var(--item-hover-bg-color);
+}
+
+.ty-preferences input[type="search"] {
+    border-color: #333;
+    background: #333;
+    line-height: 22px;
+    border-radius: 6px;
+    color: white;
+}
+
+.ty-preferences input[type="search"]:focus {
+    box-shadow: none;
+}
+
+[data-is-directory="true"] .file-node-content {
+    margin-bottom: 0;
+}
+
+.file-node-title {
+    line-height: 22px;
+}
+
+.html-for-mac .file-node-open-state, .html-for-mac .file-node-icon {
+    line-height: 26px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: rgba(230, 230, 230, 0.30);
+}
+
+::-webkit-scrollbar-thumb:active {
+    background: rgba(230, 230, 230, 0.50);
+}
+
+#typora-sidebar:hover div.sidebar-content-content::-webkit-scrollbar-thumb:horizontal {
+    background: rgba(230, 230, 230, 0.30);
+}
+
+.nav-group-item:active {
+    background-color: #474d54;
+}
+
+.md-search-hit {
+    background: rgba(199, 140, 60, 0.81);
+    color: #eee;
+}
+
+.md-search-hit * {
+    color: #eee;
+}
+
+#md-searchpanel input {
+    color: white;
+}
+
+.export-detail,
+.export-item.active,
+.export-items-list-control {
+    background: #d6d6d4
+}
+
+ .typora-export li, .typora-export p, .typora-export,  .footnote-line {white-space: normal;} 
+</style>
+</head>
+<body class='typora-export'>
+<div id='write'  class=''><h2><a name="mysql-规范总结" class="md-header-anchor"></a><span>MySQL 规范总结</span></h2><p><span>2020-07-20 13:07:34</span></p><h3><a name="div-classa一建库规范" class="md-header-anchor"></a><div class="a"><span>一、建库规范</span></h3><ol start='' ><li><p><span>库命名规范：</span></p><ol start='' ><li><span>库名称必须控制在 25 个字符以内</span></li><li><span>库名与应用名称尽量一致，库的命名规则必须契合所属业务的特点</span></div></li><li><span>库名用小写（尽量不要使用除下划线、小写英文字母之外的其他字符，如果要用下划线，应该尽量保持一致的风格）</span></li></ol></li><li><p><span>字符集规范：创建数据库时必须显示指定字符集，建议使用 utf8mb4 字符集：CREATE DATABASE xxxxxx DEFAULT CHARACTER SET utf8mb4。 MySQL 5.5.3 之后增加 utf8mb4 编码，utf8mb4 是utf8 的一个扩展。许多新类型的字符，例如 emoji 这种类型的符号，utf8 不支持存储，但 utf8mb4 支持。所以，设计数据库时如果想要允许用户使用特殊符号，最好使用 utf8mb4 编码来存储，使得数据库有更好的兼容性。可参考官方说明：</span><a href='https://dev.mysql.com/doc/refman/5.5/en/charset-unicode-utf8mb4.html' target='_blank' class='url'>https://dev.mysql.com/doc/refman/5.5/en/charset-unicode-utf8mb4.html</a></p></li></ol><h3><a name="二建表规范" class="md-header-anchor"></a><span>二、建表规范</span></h3><ol start='' ><li><p><span>表命名规范：</span></p><ol start='' ><li><span>表命名做到专业、简洁、见名知意，多使用专业词汇命名，不使用拼音，以使用方便记忆、描述性强的可读性名称为第一准则，应尽量避免使用缩写或代码来命名</span></li><li><span>表命名必须使用小写字母或数字，禁止出现数字开头，禁止两个下划线中间只出现数字，应该尽量保持一致的风格。正例：aliyun_admin，rdc_config，level3_name ；反例：AliyunAdmin，rdcConfig，level_3_name</span></li><li><span>命名不要过长（应尽量少于25个字符）</span></li><li><span>禁止使用数字开头，禁止使用关键字或保留字，可参考官方说明：</span><a href='https://dev.mysql.com/doc/refman/5.7/en/keywords.html' target='_blank' class='url'>https://dev.mysql.com/doc/refman/5.7/en/keywords.html</a></li><li><span>同一个应用(或领域)下的表需要有相同的前缀名称，如：acticity_share、acticity_order、activity_item；同一个数据库下有不同的应用模块，则可以考虑对表名用不同的前缀标识</span></li><li><span>备份表命名时加上时间标识</span></li><li><span>相关模块的表名与表名之间尽量体现 JOIN 的关系，如 user 表和 user_login 表</span></li><li><span>表命名加上“业务名称_表的作用”，如：alipay_task / force_project / trade_config</span></li></ol></li><li><p><span>表注释规范：</span></p><ol start='' ><li><span>每个表建立时必须加上表描述，如：COMMENT=&#39;履约单商品表&#39;，方便参考理解、维护管理</span></li></ol></li><li><p><span>存储引擎规范：</span></p><ol start='' ><li><span>若没有特殊要求，存储引擎均采用默认的 InnoDB（ENGINE=InnoDB）</span></li></ol></li><li><p><span>数据表存储格式规范：</span></p><ol start='' ><li><span>ROW_FORMAT 没有特殊需求时默认即可，不需要指定。ROW_FORMAT=Dynamic/Compressed只有在innodb_file_format=barracuda的情况下才支持，如果强制设置了，后续再对表进行DDL操作时会产生警告：#1 Execute(Warning, Code 1478):InnoDB: ROW_FORMAT=DYNAMIC requires innodb_file_format &gt; Antelope. #2 Execute(Warning, Code 1478):InnoDB: assuming ROW_FORMAT=COMPACT</span></li></ol></li><li><p><span>表字符集规范：</span></p><ol start='' ><li><span>若没有特殊要求，统一设置为 utf8mb4，即 CHARSET=utf8mb4。关联查询时，若字符集不一致，可能会导致索引失效</span></li></ol></li><li><p><span>主键规范：</span></p><ol start='' ><li><span>每个表建立时必须设置主键 id（PRIMARY KEY (</span><span>`</span><span>id</span><span>`</span><span>)），自增长（AUTO_INCREMENT）、步长为1，类型为整型（根据需要选择 INT 或 BIGINT。一般情况下业务表使用 BIGINT 类型，防止数据量增长后自增主键值不够用；对于数据量不会增长很多的配置表，可使用 INT 类型）</span></li></ol></li></ol><h3><a name="三字段规范" class="md-header-anchor"></a><span>三、字段规范</span></h3><ol start='' ><li><p><span>字段命名规范：</span></p><ol start='' ><li><span>字段命名要做到专业、简洁，做到见名知意，多使用专业词汇命名，不使用拼音，以使用方便记忆、描述性强的可读性名称为第一准则，应尽量避免使用缩写或代码来命名</span></li><li><span>字段名必须使用小写字母或数字，禁止出现数字开头，禁止两个下划线中间只出现数字，应该尽量保持一致的风格。正例：aliyun_admin，rdc_config，level3_name ；反例：AliyunAdmin，rdcConfig，level_3_name</span></li><li><span>命名不要过长（应尽量少于25个字符）</span></li><li><span>禁止使用数字开头，禁止使用 MySQL 关键字，MySQL 官方保留字：</span><a href='https://dev.mysql.com/doc/refman/5.7/en/keywords.html' target='_blank' class='url'>https://dev.mysql.com/doc/refman/5.7/en/keywords.html</a></li><li><span>注意字段类型的一致性、命名的一致性，同一个字段在不同的表中也应是相同的类型或长度，方便大家理解（如用户 ID，都用user_id，就不需要再造一个 member_id；如创建时间统一命名为 create_time，更新时间统一命名为 update_time）</span></li><li><span>表达是与否概念的字段，必须使用 is_xxx 的方式命名，数据类型是 unsigned tinyint（1 表示是，0 表示否）。正例：表达逻辑删除的字段名 is_deleted，1 表示删除，0 表示未删除</span></li></ol></li><li><p><span>字段注释规范：</span></p><ol start='' ><li><span>字段注释必须加上（如 </span><code>product varchar(100) NOT NULL DEFAULT &#39;&#39; COMMENT &#39;商品名称&#39;</code><span>），字段取值范围含义、枚举常量等注释必须加上，方便参考理解、维护管理</span></li><li><span>字段注释规范：修改字段含义或对字段表示的状态追加时，需要及时更新字段注释</span></li></ol></li><li><p><span>字段默认值规范：</span></p><ol start='' ><li><p><span>尽量将字段设置成 NOT NULL DEFAULT xxx。可为 NULL 的列使得索引、索引统计和值都比较复杂，InnoDB 使用单独的位（bit）存储 NULL 值，当可为 NULL 的列被索引时，每个索引记录需要一个额外的字节，所以会占用更多的存储空间，在MyISAM 引擎中，NULL 值会使索引失效。另外，使用 NULL 值之后，SQL 的复杂度变大，会使优化器更难以优化 SQL，如下 SQL 所示，如果 box_type 有默认值，则 SQL 不需要用 OR 来关联：</span></p><pre spellcheck="false" class="md-fences md-end-block ty-contain-cm modeLoaded" lang="sql" style="page-break-inside: unset;"><div class="CodeMirror cm-s-inner CodeMirror-wrap" lang="sql"><div style="overflow: hidden; position: relative; width: 3px; height: 0px; top: 0px; left: 4px;"><textarea autocorrect="off" autocapitalize="off" spellcheck="false" tabindex="0" style="position: absolute; bottom: -1em; padding: 0px; width: 1000px; height: 1em; outline: none;"></textarea></div><div class="CodeMirror-scrollbar-filler" cm-not-content="true"></div><div class="CodeMirror-gutter-filler" cm-not-content="true"></div><div class="CodeMirror-scroll" tabindex="-1"><div class="CodeMirror-sizer" style="margin-left: 0px; margin-bottom: 0px; border-right-width: 0px; padding-right: 0px; padding-bottom: 0px;"><div style="position: relative; top: 0px;"><div class="CodeMirror-lines" role="presentation"><div role="presentation" style="position: relative; outline: none;"><div class="CodeMirror-measure"></div><div class="CodeMirror-measure"></div><div style="position: relative; z-index: 1;"></div><div class="CodeMirror-code" role="presentation" style=""><div class="CodeMirror-activeline" style="position: relative;"><div class="CodeMirror-activeline-background CodeMirror-linebackground"></div><div class="CodeMirror-gutter-background CodeMirror-activeline-gutter" style="left: 0px; width: 0px;"></div><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"><span class="cm-keyword">SELECT</span></span></pre></div><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"> &nbsp;  idle_sku<span class="cm-variable-2">.sku_id</span>,</span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"> &nbsp;  sum(<span class="cm-number">1</span>) <span class="cm-keyword">AS</span> stocked_sum</span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"><span class="cm-keyword">FROM</span></span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"> &nbsp;  idle_sku</span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"> &nbsp;  LEFT <span class="cm-keyword">JOIN</span> box_sku <span class="cm-keyword">ON</span> box_sku<span class="cm-variable-2">.id</span> = idle_sku<span class="cm-variable-2">.box_id</span></span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"><span class="cm-keyword">WHERE</span></span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"> &nbsp;  idle_sku<span class="cm-variable-2">.status</span> <span class="cm-keyword">NOT</span> <span class="cm-keyword">IN</span> (<span class="cm-string">'IDLE_TRASH'</span>)</span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"> &nbsp; &nbsp;<span class="cm-keyword">AND</span> (</span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"> &nbsp; &nbsp; &nbsp;  box_sku<span class="cm-variable-2">.box_type</span> = <span class="cm-number">1</span></span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"> &nbsp; &nbsp; &nbsp; &nbsp;<span class="cm-keyword">OR</span> box_sku<span class="cm-variable-2">.box_type</span> <span class="cm-keyword">IS</span> <span class="cm-atom">NULL</span></span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"> &nbsp;  )</span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"><span class="cm-keyword">GROUP</span> <span class="cm-keyword">BY</span></span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"> &nbsp;  idle_sku<span class="cm-variable-2">.sku_id</span>;</span></pre></div></div></div></div></div><div style="position: absolute; height: 0px; width: 1px; border-bottom-width: 0px; border-bottom-style: solid; border-bottom-color: transparent; top: 364px;"></div><div class="CodeMirror-gutters" style="display: none; height: 364px;"></div></div></div></pre></li><li><p><span>在对字段进行 count() 统计时，值为 NULL 的不会被 count 统计进去，即当字段值为 NULL 时，count(*) 和 count(字段) 值是不一样的</span></p></li><li><p><span>字段默认值规范：当前字段为 NULL 时，更改字段时不必要再 NOT NULL DEFAULT xxx，因为数据量过多，改动成本过大，可能会对磁盘 IO 造成过多压力，阻塞其他进程</span></p></li></ol></li><li><p><span>字段顺序规范：</span></p><ol start='' ><li><span>表的字段顺序很重要，从前到后，按照字段的重要性和使用频率排列，create_time、update_time、remark 等字段在最后。按字段的分类归集排列，如金额相关的字段在一块，时间相关的字段在一块等。以方便查看、排查问题（注：增加字段时不采用after 和 first 关键字，原因是数仓增量采集数据时无法感知 after 的位置，如果在表中间位置加字段，会使数仓同步数据失败）</span></li></ol></li><li><p><span>字段拆分规范：</span></p><ol start='' ><li><span>考虑使用垂直分区。比如，我们可以把大字段或使用不频繁的字段分离到另外的表中，这样做可以减少表的大小，让表执行得更快。我们还可以把一个频繁更新的字段放到另外的表中，因为频繁更新的字段会导致 MySQL Query Cache 里相关的结果集频繁失效，可能会影响性能。需要留意的一点是，垂直分区的目的是为了优化性能，但如果将字段分离了到分离表后，又经常需要建立连接，那可能就会得不偿失了，所以，我们要确保分离的表不会经常进行连接，这时，用程序进行连接是一个可以考虑的办法</span></li></ol></li></ol><h3><a name="四字段数据类型规范" class="md-header-anchor"></a><span>四、字段数据类型规范</span></h3><ol start='' ><li><p><span>设计字段有一个基本的原则，保小不保大，也就是一般情况应该尽量使用可以正确存储数据的最小数据类型，更小的数据类型执行速度通常更快，因为它们占用更小的磁盘、内存和 CPU 缓存，处理时需要的 CPU 周期也更小</span></p></li><li><p><span>整型：</span></p><ol start='' ><li><p><span>在 MySQL 中支持的 5 个主要整数类型是 tinyint、smallint、mediumint、int、bigint，下表列出了各种数值类型以及它们的允许范围和占用的内存空间：</span></p><figure><table><thead><tr><th style='text-align:left;' ><span>类型</span></th><th style='text-align:left;' ><span>字节</span></th><th style='text-align:left;' ><span>最小值~最大值（有符号）</span></th><th style='text-align:left;' ><span>最小值~最大值（无符号）</span></th></tr></thead><tbody><tr><td style='text-align:left;' ><span>tinyint</span></td><td style='text-align:left;' ><span>1</span></td><td style='text-align:left;' ><span>-128~127</span></td><td style='text-align:left;' ><span>0~255</span></td></tr><tr><td style='text-align:left;' ><span>smallint</span></td><td style='text-align:left;' ><span>2</span></td><td style='text-align:left;' ><span>-32 768~32 767</span></td><td style='text-align:left;' ><span>0~65 535</span></td></tr><tr><td style='text-align:left;' ><span>mediumint</span></td><td style='text-align:left;' ><span>3</span></td><td style='text-align:left;' ><span>-8 388 608~8 388 607</span></td><td style='text-align:left;' ><span>0~16 777 215</span></td></tr><tr><td style='text-align:left;' ><span>int</span></td><td style='text-align:left;' ><span>4</span></td><td style='text-align:left;' ><span>-2 147 483 648~2 147 483 647</span></td><td style='text-align:left;' ><span>0~4 294 967 295</span></td></tr><tr><td style='text-align:left;' ><span>bigint</span></td><td style='text-align:left;' ><span>8</span></td><td style='text-align:left;' ><span>-9 223 372 036 854 775 808~9 223 372 036 854 775 807</span></td><td style='text-align:left;' ><span>0~18 446 744 073 709 551 615</span></td></tr></tbody></table></figure></li><li><p><span>建议使用 unsigned（无符号类型）存储非负值，这样数值范围可以扩大一倍，例如 tinyint 的取值范围为-127~128，unsigned tinyint 的取值范围为0~255</span></p></li><li><p><span>建议使用无符号整型存储 IPV4（IP地址），可以使用 inet_aton()、inet_ntoa() 函数进行转换，基本上没必要使用 char 类型来存储。例如，使用 inet_aton(&#39;172.16.23.16&#39;) 将 IP 转化成整数值 2886735632，使用 inet_ntoa(2886735632) 可得到 IP 值172.16.23.16</span></p></li><li><p><span>整型定义中不添加显示长度的值，比如使用 INT，而不是 INT(4)</span></p></li><li><p><span>使用更短小的列，比如短整型，整型列的执行速度往往更快。年龄、性别、状态、删除标记等枚举类型：可以用 tinyint 来存放，它只占用 1 个字节，unsigned tinyint 可以表示 0~255 的范围，基本够用</span></p></li><li><p><span>手机号：通常我们在存储手机号时，喜欢用 varchar 类型。假设是 11 位的手机号，用 utf8 编码。如果使用字符串存储，每位需要 3 个字节，一共需要 11*3=33 个字节；如果使用 bigint，只需要 8 个字节</span></p></li><li><p><span>能用整型的就用整型而不用字符型，如下反面示例中状态值完全可以用整型替代，从数据库读取之后再做释义即可：</span></p><ol start='' ><li><code>\</code><span>status</span><span>`</span><span> varchar(32) NOT NULL DEFAULT &#39;IDLE_UNALLOCATED&#39; COMMENT &#39;状态: IDLE_UNALLOCATED,IDLE_TO_SHELVE, IDLE_SHELVED, IDLE_OCCUPIED, IDLE_TO_OFF_SHELF,IDLE_TRASH, IDLE_FIN&#39;`</span></li></ol></li></ol></li><li><p><span>浮点型：</span></p><ol start='' ><li><span>存储精确浮点数（如金额）时必须使用 decimal 替代 float 和 double，float 和 double 可能会存在精度损失的问题</span></li><li><span>decimal 存在额外的存储和计算开销，在数据量非常大时可以用 bigint 代替：将数据乘以 100 万存储使用时再除以 100 万</span></li></ol></li><li><p><span>字符类型：</span></p><ol start='' ><li><span>char 和 varchar 是我们常用的字符类型。char(n) 用来记录固定长度的字符，长度最大为 255，比指定长度大的值将被截短，而比指定长度小的值将会用空格进行填补。varchar(n) 用来保存可变长度的字符，只存储字符串实际需要的长度，varchar 使用额外的 1～2 字节来存储值的长度，如果列的最大长度小于或等于 255 则使用 1 字节，否则就是用2字节。char 和 varchar 占用的字节数，根据数据库的编码格式不同而不同。latin1 占用 1 个字节，gbk 占用 2 个字节，utf8 占用 3 个字节</span></li><li><span>用法方面，如果存储的内容是可变长度的，如家庭住址、用户描述等就可以用 varchar；如果内容是固定长度的，例如：uuid（36 位）、md5 加密串（32 位）等就可以使用 char 存放；如果存储的字符串长度几乎相等，使用 char ；如果存储的字符串长度差别大，使用 varchar</span></li><li><span>字符串存储能用 varchar 就不要用 text，varchar 长度不要超过 5000，存储搜索性能均高于 text，text 查询时会产生临时磁盘文件，性能差。如果字符串长度超过 5000 需要使用 text 类型存储，则建议独立出来一张表，用主键来对应，避免影响其它字段索引效率。MySQL 把 text 值当作一个独立的对象处理，存储引擎在存储时通常会做特殊处理，当 text 值过大时，InnoDB 会使用专门的外部存储区域来进行存储，此时每个值在行内需要 1-4 个字节存储一个指针，然后在外部存储区域存储实际的值</span></li><li><span>慷慨是不明智的，最好的策略是只分配真正需要的空间。如使用 varchar(5) 和 varchar(200) 存储 &#39;hello&#39; 的空间开销是一样的，但是 varchar(200) 会消耗更多的内存，因为 MySQL 通常会分配固定大小的内存块来保存内部值，尤其是使用内存临时表进行排序或操作时会特别糟糕，在利用磁盘临时表进行排序时也同样糟糕。</span></li><li><span>字段数据类型的选择要方便以后扩展。一般扩展性有限的常量类型，建议用整型，性能高、占空间少，比如状态字段；一般不确定扩展性的类型，建议用字符型，可以添加业务规则，一个字段可以同时表示多种含义</span></li><li><span>在 varchar(n) 中，N表示的是字符数而不是字节数，比如 varchar(255)，最大可存储 255 个汉字。需要根据实际的宽度来选择 n。此外，n 应尽可能地小，因为在 MySQL 的一个表中，所有的 varchar 字段的最大长度是 65535 个字节，进行排序和创建临时表一类的内存操作时，会使用 n 的长度申请内存（对于这一点，MySQL 5.7后有了改进）</span></li><li><span>字符型详解参考链接：</span><a href='http://wiki.yuceyi.com/pages/viewpage.action?pageId=43959039'><span>字符类型详解</span></a></li></ol></li><li><p><span>JSON 类型（MySQL 5.7.8 以后才支持）：</span></p><ol start='' ><li><p><span>存储 JSON 字符串时选用 JSON 类型，而不要选 varchar、text 类型存储</span></p></li><li><p><span>JSON 类型的意义：</span></p><ol start='' ><li><span>保证了 JSON 数据类型的强校验，JSON 数据列会自动校验存入此列的内容是否符合 JSON 格式，非正常格式则报错，而varchar 类型和 text 等类型不存在这种机制</span></li><li><span>更优化的存储格式，存储在 JSON 列中的 JSON 数据会被转成内部特定的存储格式，允许快速读取</span></li><li><span>MySQL 同时提供了一组操作 JSON 类型数据的内置函数</span></li><li><span>可以基于JSON格式的特征支持修改特定的键值（即不需要把整条内容拿出来放到程序中遍历然后寻找替换再塞回去，MySQL 内置的函数允许你通过一条 SQL 语句就能搞定）</span></li></ol></li></ol></li><li><p><span>时间类型：</span></p><ol start='' ><li><p><span>存储年时使用 year 类型，存储日期时使用 date 类型，存储时间时使用 time 类型，date 保存精度到天，格式为：YYYY-MM-DD，如2019-11-07</span></p></li><li><p><span>时间类型的精度统一到毫秒级别，毫秒的格式类似为：2019-11-07 10:58:27.257，定义方法：datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3)，datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3) ON UPDATE CURRENT_TIMESTAMP(3)</span></p></li><li><p><span>建议使用 datetime 类型存储日期时间，因为它的可用范围比 timestamp 更大，MySQL 5.6.4以后物理存储上仅比 timestamp 多 1 个字节，整体性能上的损失并不大</span></p></li><li><p><span>datetime 和 timestamp 有下面几个小区别，需要注意：</span></p><ol start='' ><li><p><span>区别一：存储数据方式不同</span></p><ul><li><span>timestamp 是转化成 UTC 时间进行存储，查询时转化为客户端时间返回</span></li></ul></li><li><p><span>区别二：可存储的时间范围不同</span></p><ul><li><span>timestamp 为&#39;1970-01-01 00:00:01.000000&#39; 到 &#39;2038-01-19 03:14:07.999999&#39;</span></li><li><span>datetime 为&#39;1000-01-01 00:00:00.000000&#39; 到 &#39;9999-12-31 23:59:59.999999&#39;</span></li></ul></li><li><p><span>区别三：占用存储空间不同</span></p><ul><li><span>MySQL 5.6.4之前：datetime 占用 8 个字节，timestamp 占用 4 个字节</span></li><li><span>MySQL 5.6.4开始：datetime 占用 5 个字节+小数秒存储，timestamp 占用 4 个字节+小数秒存储</span></li></ul></li><li><p><span>区别四：受时区影响不同</span></p><ul><li><span>当更改时区参数 time_zone 时，timestamp 会随时区改变而改变，datetime 不会改变</span></li></ul></li><li><p><span>区别五：索引效率不同</span></p><ul><li><span>timestamp 更轻量，索引相对更快</span></li></ul></li></ol></li></ol></li><li><p><span>text、blob 类型：</span></p><ol start='' ><li><span>尽可能不要使用 text、blob 类型</span></li><li><span>不要在数据库中使用 varbinary 或 blob 存储图片及文件等。MySQL 并不适合大量存储这种类型的文件</span></li></ol></li></ol><h3><a name="五索引规范" class="md-header-anchor"></a><span>五、索引规范</span></h3><ol start='' ><li><p><span>索引命名规范：</span></p><ol start='' ><li><span>主键索引名为 pk</span><span>_</span><span>字段名；唯一索引名为 uniq</span><span>_</span><span>字段名；普通索引名则为 idx</span><span>_</span><span>字段名（pk_ 即 PRIMARY KEY；uniq_ 即 UNIQUE KEY；idx_ 即 INDEX）</span></li><li><span>用小写，命名不要过长</span></li></ol></li><li><p><span>主键规范：每个表必须设置主键 id（PRIMARY KEY (</span><code>id</code><span>)），字段类型必须为整型、自增长（AUTO_INCREMENT）、步长为1（根据需要选择 int 或 bigint。一般情况下业务表使用 bigint 类型，防止数据量增长后自增主键值不够用。对于数据量不会增长过多的配置表，可使用 int 类型）</span></p></li><li><p><span>外键规范：禁止使用外键，约束逻辑在应用层面解决，外键影响性能，并且在并发操作时容易引起死锁</span></p></li><li><p><span>索引数量规范：单张表的索引数量建议控制在 5 个以内</span></p></li><li><p><span>普通索引规范：</span></p><ol start='' ><li><span>选择性低的字段不适合单独建立索引（如状态值、性别等），即使设计了索引也未必会生效，查询时 MySQL 优化器可能仍然选择全表扫描，这样的索引反而浪费存储空间，影响增删改的效率</span>
+<span>这里需要引入一个概念，索引的选择性。索引的选择性是指，不重复的索引值和数据表的记录总数的比值。索引的选择性越高则查询效率越高，因为选择性高的索引可以让 MySQL 在查找时过滤掉更多的行</span></li><li><span>UPDATE、DELETE 语句需要根据 WHERE 条件添加索引</span></li><li><span>使用 EXPLAIN 判断 SQL 语句是否合理使用了索引，尽量避免 Extra 列出现 Using FileSort，Using Temporary</span></li><li><span>合理地利用覆盖索引。由于覆盖索引一般常驻于内存中，因此可以大大提高查询速度</span></li><li><span>对长度过长的 varchar 字段（比如网页地址）建立索引时，需要增加散列字段，对 varchar 使用散列算法时，散列后的字段最好是整型，然后对该字段建立索引</span></li><li><span>存储域名地址时，可以考虑采用反向存储的方法，比如把 </span><a href='http://news.sohu.com/'><span>news.sohu.com</span></a><span> 存储为 com.sohu.news，方便在其上构建索引和进行统计</span></li></ol></li><li><p><span>联合索引规范：</span></p><ol start='' ><li><span>建议联合索引中的字段数量不超过5个</span></li><li><span>经常用的列优先（最左前缀原则）、离散度高的列优先（离散度高原则）、宽度小的列优先（最少空间原则），另外还是要结合索引的原理结构和具体使用的业务场景</span></li><li><span>索引字段的顺序需要考虑字段唯一值的个数，一般选择性高的字段放在前面</span></li><li><span>ORDER BY、GROUP BY、DISTINCT 的字段需要放在联合索引的后面，也就是说，联合索引的前面部分用于等值查询，后面的部分用于排序</span></li><li><span>合理创建联合索引，联合合索引 (a,b,c) 可以用于</span><code>WHERE a=?</code><span>、</span><code>WHERE a=? AND b=?</code><span>、</span><code>WHERE a=? AND b=? AND c=?</code><span>等形式，但对于</span><code>WHERE a=?</code><span>的查询，可能会比仅仅在 a 列上创建单列索引查询要慢，因此需要在空间和效率上达成平衡</span></li><li><span>把范围条件放到联合索引的最后，WHERE 条件中的范围条件（BETWEEN、&lt;、&lt;=、&gt;、&gt;=）会导致后面的条件使用不了索引</span></li></ol></li><li><p><span>前缀索引规范：</span></p><ol start='' ><li><span>对于超过 20 个长度的字符串列，可以考虑创建前缀索引</span></li><li><span>或者一个字段的前几个字符的选择性跟整个字段的选择性差不多，这时候考虑前缀索引，节省空间且提高效率，例如邮箱地址</span><a href='mailto:xxxx@clubfactory.com' target='_blank' class='url'>xxxx@clubfactory.com</a><span>，取前几位姓名做前缀索引即可</span></li><li><span>缺点是排序无法使用前缀索引</span></li></ol></li><li><p><span>时间索引规范：每个业务相关的表在建表时必须加上创建时间索引和更新时间索引，以方便数据清理转移、数仓同步数据</span></p><p><span>最后的最后，SQL 进行 EXPLAIN 后再提测是一种美德</span></p></li></ol><h3><a name="六分表规范" class="md-header-anchor"></a><span>六、分表规范</span></h3><ol start='' ><li><span>MySQL 单表数据量在 300 万 ~ 500 万 左右时性能最佳。每张表的数据量控制在 5000 万以下，数据量超过 5000 万考虑水平拆分，单表字段值过多考虑垂直拆分</span></li><li><span>对于可预见的短期内会形成大表的，在建表时即可考虑分表，以免后期被动</span></li><li><span>推荐使用 CRC32 求余（或者类似的算术算法）进行分表，表名后缀使用数字，数字必须从 0 开始并等宽，比如散 100 张表，后缀则是从 00-99</span></li><li><span>使用时间分表，表名后缀必须使用固定的格式，比如按日分表为 user_20110101</span></li><li><span>深入理解业务，根据业务特性、查询需求来分表，如按年、季度、月分，如按 user_id 取模、seller_id 末尾数字来分等</span></li></ol><h3><a name="七其他规范" class="md-header-anchor"></a><span>七、其他规范</span></h3><ol start='' ><li><p><span>禁止使用函数、触发器、存储过程、事件、外键等，这些会将业务逻辑和数据库耦合在一起，维护起来不方便、出现问题难以排查，</span></p><p><span>除此之外还会消耗数据库资源，降低数据库集群可扩展性，因此推荐在程序端实现</span></p></li><li><p><span>添加索引前第一步先确认需要加索引的字段是否已经存在索引，禁止添加重复的索引降低性能、浪费资源</span></p></li><li><p><span>清空表数据请使用 TRUNCATE，而不用 DELETE，DELETE 速度慢，会造成主从延迟，且产生大量 binlog</span></p></li></ol><h3><a name="八建表示例" class="md-header-anchor"></a><span>八、建表示例</span></h3><pre spellcheck="false" class="md-fences md-end-block ty-contain-cm modeLoaded" lang="sql" style="page-break-inside: unset;"><div class="CodeMirror cm-s-inner CodeMirror-wrap" lang="sql"><div style="overflow: hidden; position: relative; width: 3px; height: 0px; top: 0px; left: 4px;"><textarea autocorrect="off" autocapitalize="off" spellcheck="false" tabindex="0" style="position: absolute; bottom: -1em; padding: 0px; width: 1000px; height: 1em; outline: none;"></textarea></div><div class="CodeMirror-scrollbar-filler" cm-not-content="true"></div><div class="CodeMirror-gutter-filler" cm-not-content="true"></div><div class="CodeMirror-scroll" tabindex="-1"><div class="CodeMirror-sizer" style="margin-left: 0px; margin-bottom: 0px; border-right-width: 0px; padding-right: 0px; padding-bottom: 0px;"><div style="position: relative; top: 0px;"><div class="CodeMirror-lines" role="presentation"><div role="presentation" style="position: relative; outline: none;"><div class="CodeMirror-measure"><pre><span>xxxxxxxxxx</span></pre></div><div class="CodeMirror-measure"></div><div style="position: relative; z-index: 1;"></div><div class="CodeMirror-code" role="presentation" style=""><div class="CodeMirror-activeline" style="position: relative;"><div class="CodeMirror-activeline-background CodeMirror-linebackground"></div><div class="CodeMirror-gutter-background CodeMirror-activeline-gutter" style="left: 0px; width: 0px;"></div><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"><span class="cm-keyword">CREATE</span> <span class="cm-keyword">TABLE</span> `air_route` (</span></pre></div><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;">  `id` <span class="cm-builtin">bigint</span>(<span class="cm-number">20</span>) <span class="cm-builtin">unsigned</span> <span class="cm-keyword">NOT</span> <span class="cm-atom">NULL</span> AUTO_INCREMENT COMMENT <span class="cm-string">'主键'</span>,</span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;">  `air_route_code` <span class="cm-builtin">varchar</span>(<span class="cm-number">32</span>) <span class="cm-keyword">NOT</span> <span class="cm-atom">NULL</span> DEFAULT <span class="cm-string">''</span> COMMENT <span class="cm-string">'航线简码'</span>,</span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;">  `air_route_middle` <span class="cm-builtin">varchar</span>(<span class="cm-number">1024</span>) <span class="cm-keyword">NOT</span> <span class="cm-atom">NULL</span> DEFAULT <span class="cm-string">''</span> COMMENT <span class="cm-string">'经停信息'</span>,</span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;">  `origin_country_name` <span class="cm-builtin">varchar</span>(<span class="cm-number">128</span>) <span class="cm-keyword">NOT</span> <span class="cm-atom">NULL</span> DEFAULT <span class="cm-string">''</span> COMMENT <span class="cm-string">'出发国'</span>,</span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;">  `origin_country_code` <span class="cm-builtin">varchar</span>(<span class="cm-number">32</span>) <span class="cm-keyword">NOT</span> <span class="cm-atom">NULL</span> DEFAULT <span class="cm-string">''</span> COMMENT <span class="cm-string">'出发国简码'</span>,</span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;">  `origin_air_line_code` <span class="cm-builtin">varchar</span>(<span class="cm-number">64</span>) <span class="cm-keyword">NOT</span> <span class="cm-atom">NULL</span> DEFAULT <span class="cm-string">''</span> COMMENT <span class="cm-string">'出发港航司简码'</span>,</span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;">  `origin_port_code` <span class="cm-builtin">varchar</span>(<span class="cm-number">32</span>) <span class="cm-keyword">NOT</span> <span class="cm-atom">NULL</span> DEFAULT <span class="cm-string">''</span> COMMENT <span class="cm-string">'出发港简码'</span>,</span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;">  `dest_country_name` <span class="cm-builtin">varchar</span>(<span class="cm-number">128</span>) <span class="cm-keyword">NOT</span> <span class="cm-atom">NULL</span> DEFAULT <span class="cm-string">''</span> COMMENT <span class="cm-string">'目的国'</span>,</span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;">  `dest_country_code` <span class="cm-builtin">varchar</span>(<span class="cm-number">32</span>) <span class="cm-keyword">NOT</span> <span class="cm-atom">NULL</span> DEFAULT <span class="cm-string">''</span> COMMENT <span class="cm-string">'目的国简码'</span>,</span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;">  `dest_port_code` <span class="cm-builtin">varchar</span>(<span class="cm-number">32</span>) <span class="cm-keyword">NOT</span> <span class="cm-atom">NULL</span> DEFAULT <span class="cm-string">''</span> COMMENT <span class="cm-string">'目的港简码'</span>,</span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;">  `air_space_type` <span class="cm-builtin">tinyint</span>(<span class="cm-number">4</span>) <span class="cm-builtin">unsigned</span> DEFAULT <span class="cm-atom">NULL</span> COMMENT <span class="cm-string">'舱位类型'</span>,</span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;">  `air_route_status` <span class="cm-builtin">tinyint</span>(<span class="cm-number">4</span>) <span class="cm-keyword">NOT</span> <span class="cm-atom">NULL</span> DEFAULT <span class="cm-string">'2'</span> COMMENT <span class="cm-string">'状态，1. 使用中 2. 暂停使用'</span>,</span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;">  `create_time` <span class="cm-builtin">datetime</span>(<span class="cm-number">3</span>) <span class="cm-keyword">NOT</span> <span class="cm-atom">NULL</span> DEFAULT CURRENT_TIMESTAMP(<span class="cm-number">3</span>) COMMENT <span class="cm-string">'创建时间'</span>,</span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;">  `update_time` <span class="cm-builtin">datetime</span>(<span class="cm-number">3</span>) <span class="cm-keyword">NOT</span> <span class="cm-atom">NULL</span> DEFAULT CURRENT_TIMESTAMP(<span class="cm-number">3</span>) <span class="cm-keyword">ON</span> <span class="cm-keyword">UPDATE</span> CURRENT_TIMESTAMP(<span class="cm-number">3</span>) COMMENT <span class="cm-string">'更新时间'</span>,</span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;">  `is_deleted` <span class="cm-builtin">tinyint</span>(<span class="cm-number">4</span>) <span class="cm-keyword">NOT</span> <span class="cm-atom">NULL</span> DEFAULT <span class="cm-string">'0'</span> COMMENT <span class="cm-string">'逻辑删除'</span>,</span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;">  PRIMARY KEY (`id`),</span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;">  UNIQUE KEY `uniq_air_route_code` (`air_route_code`),</span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;">  KEY `idx_air_route_status` (`air_route_status`)</span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;">) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COMMENT = <span class="cm-string">'航线表'</span>;</span></pre></div></div></div></div></div><div style="position: absolute; height: 0px; width: 1px; border-bottom-width: 0px; border-bottom-style: solid; border-bottom-color: transparent; top: 546px;"></div><div class="CodeMirror-gutters" style="display: none; height: 546px;"></div></div></div></pre><h3><a name="九查询优化" class="md-header-anchor"></a><span>九、查询优化</span></h3><ol start='' ><li><p><span>SELECT 语句指定具体字段名称，杜绝使用 SELECT *  读取全部字段。尤其是当表中存在 text / blob 大列时就会是灾难，可能本来不需要读取这些列，但因为偷懒写成 SELECT * 导致内存 buffer pool 被这些“垃圾“数据把真正需要缓冲起来的热点数据给洗出去了</span></p></li><li><p><span>SELECT 语句避免使用 UNION，推荐使用 UNION ALL，并且子句个数限制在 5 个以内。因为 UNION ALL 不需要去重，节省数据库资源，提高性能</span></p></li><li><p><code>SELECT … WHERE … IN (…)</code><span>，IN 值不要过多，限制在 500 以内，会增加底层扫描，影响查询效率。因为哪怕是基于索引的条件过滤，如果优化器意识到总共需要扫描的数据量超过 30% 时，就会直接改表执行计划为全表扫描，不再使用索引</span></p></li><li><p><span>SELECT 查询时必须加上 limit 限制查询行数，避免慢查询</span></p></li><li><p><span>生产环境禁止使用 hint，hint 是用来强制改变 MySQL 执行计划，如 FORCE INDEX、IGNORE KEY、STARAIGHT JOIN 等，但随着数据量变化我们无法保证自己当初的预判是正确的，因此要充分相信 MySQL优化器 </span></p></li><li><p><span>WHERE 条件中等号左右两边的字段类型必须一致，否则无法利用索引</span></p></li><li><p><span>WHERE 子句中禁止只使用全模糊的 LIKE 条件进行查找，必须有其他等值或范围查询条件</span></p></li><li><p><span>索引列禁止使用函数或表达式，否则无法利用索引。如</span><code>WHERE length(name)=’Admin’</code><span>或</span><code>WHERE user_id+2=10023</code></p></li><li><p><span>OR 语句慎用</span></p></li><li><p><span>使用 EXPLAIN 判断 SQL 语句是否合理使用了索引，尽量避免 Extra 列出现 Using FileSort，Using Temporary</span></p></li><li><p><span>建议不要使用</span><code>LIKE &#39;%value&#39;</code><span>的形式，因为 MySQL 仅支持最左前缀索引，即</span><code>LIKE &#39;%value&#39;</code><span>不走索引而</span><code>LIKE &#39;value%&#39;</code><span>是可以走一部分索引的</span></p></li><li><p><span>关联优化</span></p><ol start='' ><li><span>不建议使用子查询，建议将子查询 SQL 拆开结合程序多次查询，或使用 JOIN 来代替子查询</span></li><li><span>多表 JOIN 不要超过3个表</span></li><li><span>多表 JOIN 时，要把过滤性最大（不一定是数据量最小，而是指加了 WHERE 条件后过滤性最大的那个）的表选为驱动表</span></li><li><span>如果 JOIN 之后有排序，排序字段只有在属于驱动表的情况下，才能利用驱动表的索引完成排序</span></li><li><span>JOIN 的关联字段在不同表中的类型和命名要一致</span></li></ol></li><li><p><span>ORDER BY、GROUP BY 优化</span></p><ol start='' ><li><p><span>减少使用 ORDER BY，和业务沟通能不排序就不排序或将排序放到程序端去做。ORDER BY、GROUP BY、DISTINCT 这些语句都比较耗费 CPU</span></p></li><li><p><span>ORDER BY、GROUP BY、DISTINCT 尽量利用索引直接检索出排序好的数据</span></p></li><li><p><span>包含了 ORDER BY、GROUP BY、DISTINCT 这些查询的语句，必须加 LIMIT，限制行数控制在 1000 以内</span></p></li><li><p><span>GROUP BY 时会按照一定规则进行排序，如果业务上对顺序没有要求，可以加 ORDER BY NULL 提高查询效率</span></p></li><li><p><span>多字段联合索引情况下，WHERE 中过滤条件的字段顺序无需和索引一致，但如果有排序、分组则必须一致，比如联合索引idx(a,b,c)</span></p><ol start='' ><li><p><span>下面的 SQL 都可以完整用到索引：</span></p><ul><li><code>SELECT … WHERE b = ? AND c = ? AND a = ?</code><span>——注意到，WHERE 中字段顺序并没有和索引字段顺序一致</span></li><li><code>SELECT … WHERE b = ? AND a = ? AND c = ?</code></li><li><code>SELECT … WHERE a = ? AND b IN (?, ?) AND c = ?</code></li><li><code>SELECT … WHERE a = ? AND b = ? ORDER BY c</code></li><li><code>SELECT … WHERE a = ? AND b IN (?, ?) ORDER BY c</code></li><li><code>SELECT … WHERE a = ? ORDER BY b, c</code></li><li><code>SELECT … ORDER BY a, b, c</code><span>——可利用联合索引完成排序</span></li></ul></li><li><p><span>下面的 SQL 只能用到部分索引，或者可利用 ICP 特性（ICP（Index Condition Pushdown）索引下推是 MySQL 5.6 的新特性，其机制会让索引的其他部分也参与过滤，减少引擎层和 server 层之间的数据传输和回表请求，通常情况下可大幅提升查询效率）：</span></p><ul><li><code>SELECT … WHERE b = ? AND a = ?</code><span>——只能用到 (a, b) 部分</span></li><li><code>SELECT … WHERE a IN (?, ?) AND b = ?</code><span>——EXPLAIN 显示只用到 (a, b) 部分索引，同时有 ICP</span></li><li><code>SELECT … WHERE (a BETWEEN ? AND ?) AND b = ?</code><span>——EXPLAIN 显示只用到 (a, b) 部分索引，同时有 ICP</span></li><li><code>SELECT … WHERE a = ? AND b IN (?, ?)</code><span>——EXPLAIN 显示只用到 (a, b) 部分索引，同时有 ICP</span></li><li><code>SELECT … WHERE a = ? AND (b BETWEEN ? AND ?) AND c = ?</code><span>——EXPLAIN 显示用到 (a, b, c) 整个索引，同时有 ICP</span></li><li><code>SELECT … WHERE a = ? AND c = ?</code><span>——EXPLAIN 显示只用到 (a) 部分索引，同时有 ICP</span></li><li><code>SELECT … WHERE a = ? AND c &gt;= ?</code><span>——EXPLAIN 显示只用到 (a) 部分索引，同时有 ICP</span></li></ul></li><li><p><span>下面的几个 SQL 完全用不到索引：</span></p><ul><li><code>SELECT … WHERE b = ?</code></li><li><code>SELECT … WHERE b = ? AND c = ?</code></li><li><code>SELECT … WHERE b = ? AND c = ?</code></li><li><code>SELECT … ORDER BY b</code></li><li><code>SELECT … ORDER BY b, a</code></li></ul></li></ol></li></ol></li><li><p><span>分页优化</span></p><ol start='' ><li><p><span>分页查询，当 LIMIT 起点较高时，可先用过滤条件进行过滤。如 </span><code>SELECT a,b,c FROM t1 LIMIT 1000,20</code><span>优化为: </span><code>SELECT a,b,c FROM t1 WHERE id&gt;1000 LIMIT 20</code></p></li><li><p><span>分页 LIMIT 优化，采用覆盖索引和延迟关联的思想进行优化，改写前后 SQL 查询时间从18秒缩短到1秒</span></p><p><span>原 SQL:</span></p><pre spellcheck="false" class="md-fences md-end-block ty-contain-cm modeLoaded" lang="sql"><div class="CodeMirror cm-s-inner CodeMirror-wrap" lang="sql"><div style="overflow: hidden; position: relative; width: 3px; height: 0px; top: 0px; left: 4px;"><textarea autocorrect="off" autocapitalize="off" spellcheck="false" tabindex="0" style="position: absolute; bottom: -1em; padding: 0px; width: 1000px; height: 1em; outline: none;"></textarea></div><div class="CodeMirror-scrollbar-filler" cm-not-content="true"></div><div class="CodeMirror-gutter-filler" cm-not-content="true"></div><div class="CodeMirror-scroll" tabindex="-1"><div class="CodeMirror-sizer" style="margin-left: 0px; margin-bottom: 0px; border-right-width: 0px; padding-right: 0px; padding-bottom: 0px;"><div style="position: relative; top: 0px;"><div class="CodeMirror-lines" role="presentation"><div role="presentation" style="position: relative; outline: none;"><div class="CodeMirror-measure"></div><div class="CodeMirror-measure"></div><div style="position: relative; z-index: 1;"></div><div class="CodeMirror-code" role="presentation" style=""><div class="CodeMirror-activeline" style="position: relative;"><div class="CodeMirror-activeline-background CodeMirror-linebackground"></div><div class="CodeMirror-gutter-background CodeMirror-activeline-gutter" style="left: 0px; width: 0px;"></div><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"><span class="cm-keyword">SElECT</span> id, awb_no, cf_info_pricing_id, lm_info_pricing_id, available_pricing_time,</span></pre></div><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;">main_contractor_id,logistics_business_id, lm_id, batch_adj_no, negotiation_time</span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"><span class="cm-keyword">FROM</span> reconcile_result</span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"><span class="cm-keyword">WHERE</span> <span class="cm-number">1</span> = <span class="cm-number">1</span> <span class="cm-keyword">AND</span> lm_id = <span class="cm-number">4</span></span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"><span class="cm-keyword">AND</span> main_contractor_id = <span class="cm-number">3</span></span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"><span class="cm-keyword">AND</span> recon_status = <span class="cm-number">80</span></span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"><span class="cm-keyword">AND</span> available_pricing_time &gt;= <span class="cm-string">'2019-10-01 00:00:00'</span></span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"><span class="cm-keyword">AND</span> available_pricing_time &lt;= <span class="cm-string">'2019-10-07 23:59:59'</span></span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"><span class="cm-keyword">AND</span> is_deleted = <span class="cm-number">0</span></span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"><span class="cm-keyword">LIMIT</span> <span class="cm-number">10000</span>, <span class="cm-number">10</span></span></pre></div></div></div></div></div><div style="position: absolute; height: 0px; width: 1px; border-bottom-width: 0px; border-bottom-style: solid; border-bottom-color: transparent; top: 260px;"></div><div class="CodeMirror-gutters" style="display: none; height: 260px;"></div></div></div></pre><p><span>改写 SQL：</span></p><pre spellcheck="false" class="md-fences md-end-block ty-contain-cm modeLoaded" lang="sql"><div class="CodeMirror cm-s-inner CodeMirror-wrap" lang="sql"><div style="overflow: hidden; position: relative; width: 3px; height: 0px; top: 0px; left: 4px;"><textarea autocorrect="off" autocapitalize="off" spellcheck="false" tabindex="0" style="position: absolute; bottom: -1em; padding: 0px; width: 1000px; height: 1em; outline: none;"></textarea></div><div class="CodeMirror-scrollbar-filler" cm-not-content="true"></div><div class="CodeMirror-gutter-filler" cm-not-content="true"></div><div class="CodeMirror-scroll" tabindex="-1"><div class="CodeMirror-sizer" style="margin-left: 0px; margin-bottom: 0px; border-right-width: 0px; padding-right: 0px; padding-bottom: 0px;"><div style="position: relative; top: 0px;"><div class="CodeMirror-lines" role="presentation"><div role="presentation" style="position: relative; outline: none;"><div class="CodeMirror-measure"></div><div class="CodeMirror-measure"></div><div style="position: relative; z-index: 1;"></div><div class="CodeMirror-code" role="presentation" style=""><div class="CodeMirror-activeline" style="position: relative;"><div class="CodeMirror-activeline-background CodeMirror-linebackground"></div><div class="CodeMirror-gutter-background CodeMirror-activeline-gutter" style="left: 0px; width: 0px;"></div><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"><span class="cm-keyword">SELECT</span> a<span class="cm-variable-2">.id</span>, a<span class="cm-variable-2">.awb_no</span>, a<span class="cm-variable-2">.cf_info_pricing_id</span>, a<span class="cm-variable-2">.lm_info_pricing_id</span>, a<span class="cm-variable-2">.available_pricing_time</span>,</span></pre></div><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;">a<span class="cm-variable-2">.main_contractor_id</span>,a<span class="cm-variable-2">.logistics_business_id</span>, a<span class="cm-variable-2">.lm_id</span>, a<span class="cm-variable-2">.batch_adj_no</span>, a<span class="cm-variable-2">.negotiation_time</span></span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"><span class="cm-keyword">FROM</span> reconcile_result a,</span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;">(<span class="cm-keyword">SELECT</span> id</span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"><span class="cm-keyword">FROM</span> reconcile_result</span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"><span class="cm-keyword">WHERE</span> <span class="cm-number">1</span> = <span class="cm-number">1</span> <span class="cm-keyword">AND</span> lm_id = <span class="cm-number">4</span></span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"><span class="cm-keyword">AND</span> main_contractor_id = <span class="cm-number">3</span></span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"><span class="cm-keyword">AND</span> recon_status = <span class="cm-number">80</span></span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"><span class="cm-keyword">AND</span> available_pricing_time &gt;= <span class="cm-string">'2019-10-01 00:00:00'</span></span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"><span class="cm-keyword">AND</span> available_pricing_time &lt;= <span class="cm-string">'2019-10-07 23:59:59'</span></span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"><span class="cm-keyword">AND</span> is_deleted = <span class="cm-number">0</span></span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"><span class="cm-keyword">LIMIT</span> <span class="cm-number">10000</span>, <span class="cm-number">10</span>) b</span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"><span class="cm-keyword">WHERE</span> a<span class="cm-variable-2">.id</span>=b<span class="cm-variable-2">.id</span></span></pre></div></div></div></div></div><div style="position: absolute; height: 0px; width: 1px; border-bottom-width: 0px; border-bottom-style: solid; border-bottom-color: transparent; top: 338px;"></div><div class="CodeMirror-gutters" style="display: none; height: 338px;"></div></div></div></pre></li></ol></li></ol><h3><a name="十dml-优化" class="md-header-anchor"></a><span>十、DML 优化</span></h3><ol start='' ><li><span>INSERT 语句需要指定具体字段名称，禁止写成</span><code>INSERT INTO table VALUES(…)</code></li><li><span>事务涉及的表必须全部是 InnoDB 表，否则一旦失败不会全部回滚</span></li><li><span>禁止在业务的更新类 SQL 语句中使用 JOIN，比如</span><code>UPDATE t1 JOIN t2 …</code></li><li><span>事务中 INSERT | UPDATE | DELETE | REPLACE 语句操作的行数控制在 2000 以内，一次性提交过多的记录会导致线上 I/O 紧张，出现慢查询，引起主从同步延迟</span></li><li><span>UPDATE、DELETE 语句需要根据 WHERE 条件添加索引</span></li><li><span>批量操作数据时，需要控制事务处理间隔时间，进行必要的 sleep，一般建议 5-10 秒</span></li><li><span>禁用 procedure、function、trigger、views、event、外键约束，因为它们会消耗数据库资源，降低数据库集群可扩展性。推荐都在程序端实现</span></li><li><span>禁止使用关联子查询，如</span><code>UPDATE t1 SET … WHERE name IN(SElECT name FROM user WHERE …)</code><span>效率极其低下</span></li><li><span>禁止联表更新语句，如</span><code>UPDATE t1,t2 WHERE t1.id=t2.id …</code></li><li><span>禁用 </span><code>INSET INTO … ON DUPLICATE KEY UPDATE …</code><span>原因如下：1. 在高并发环境下，容易发生死锁 2.会造成自增主键 id 不连续，假设原来有数据 300 条，用 DUPLICATE KEY 插入 100 条数据，其中前 99 条都是和原来有重叠的，只有最后一条是新增的，那么最后一条 id 会从 400 开始</span></li><li><span>禁用</span><code>INSERT IGNORE …</code><span>，在高并发环境下，容易发生交叉死锁</span></li><li><span>UPDATE / DELETE 禁止使用关联子查询，如 </span><code>UPDATE t1 SET … WHERE name IN(SELECT name FROM user WHERE …)</code></li><li><span>UPDATE / DELETE 禁止联表更新，如</span><code>UPDATE t1,t2 WHERE t1.id=t2.id …</code></li><li><span>UPDATE / DELETE 禁止使用 JOIN，比如</span><code>UPDATE t1 JOIN t2 …</code></li><li><span>UPDATE / DELETE 禁止使用模糊查询 LIKE</span></li></ol></div>
+</body>
+</html>

@@ -1,8 +1,43 @@
-{% extends navPageBase.html %}
+{% extends base.html %}
 {% block title %}关于{% end %}
+{% block head %}
+<link href="https://cdn.jsdelivr.net/npm/aplayer@1.10.1/dist/APlayer.min.css" rel="stylesheet" >
+{% end %}
 {% block section %}
 <div class="staticBlock">
-  <h4>联系</h4>
+  <h3>About</h3>
+  <div id="aplayer"></div>
+  <h3></h3>
+  <a href="https://github.com/Jackeriss/" target="_blank">
+    <img align="right" src="https://github-readme-stats.vercel.app/api?username=Jackeriss&show_icons=true&theme=radical">
+  </a>
+  <h3>Backend Stack</h3>
+  <img src="https://img.shields.io/badge/-Java-DE1F27?style=flat-square&logo=java&logoColor=white">
+  <img src="https://img.shields.io/badge/-Python-3A77A9?style=flat-square&logo=python&logoColor=white">
+  <img src="https://img.shields.io/badge/-Spring-6DB33F?style=flat-square&logo=spring&logoColor=white">
+  <img src="https://img.shields.io/badge/-MySQL-0F768E?style=flat-square&logo=mysql&logoColor=white">
+  <img src="https://img.shields.io/badge/-Redis-DC382D?style=flat-square&logo=redis&logoColor=white">
+  <img src="https://img.shields.io/badge/-Elasticsearch-1279C9?style=flat-square&logo=elasticsearch&logoColor=white">
+  <img src="https://img.shields.io/badge/-Kafka-000000?style=flat-square&logo=apache-kafka&logoColor=white">
+  <img src="https://img.shields.io/badge/-Solr-D9411E?style=flat-square&logo=apache-solr&logoColor=white">
+  <img src="https://img.shields.io/badge/-GraphQL-E10098?style=flat-square&logo=graphql&logoColor=white">
+  <h3>Frontend Stack</h3>
+  <img src="https://img.shields.io/badge/-HTML5-E34F26?style=flat-square&logo=html5&logoColor=white">
+  <img src="https://img.shields.io/badge/-CSS3-1572B6?style=flat-square&logo=css3&logoColor=white">
+  <img src="https://img.shields.io/badge/-TypeScript-007ACC?style=flat-square&logo=typescript&logoColor=white">
+  <img src="https://img.shields.io/badge/-React-61DAFB?style=flat-square&logo=react&logoColor=white">
+  <img src="https://img.shields.io/badge/-Vue.js-4FC08D?style=flat-square&logo=vue.js&logoColor=white">
+  <img src="https://img.shields.io/badge/-Next.js-000000?style=flat-square&logo=next.js&logoColor=white">
+  <img src="https://img.shields.io/badge/-Apollo%20GraphQL-311C87?style=flat-square&logo=apollo-graphql&logoColor=white">
+  <img src="https://img.shields.io/badge/-Gulp-CF4647?style=flat-square&logo=gulp&logoColor=white">
+  <h3>Tools</h3>
+  <img src="https://img.shields.io/badge/-IntelliJ%20IDEA-000000?style=flat-square&logo=intellij-idea&logoColor=white">
+  <img src="https://img.shields.io/badge/-Visual%20Studio%20Code-007ACC?style=flat-square&logo=visual-studio-code&logoColor=white">
+  <img src="https://img.shields.io/badge/-Google%20Chrome-4285F4?style=flat-square&logo=google-chrome&logoColor=white">
+  <img src="https://img.shields.io/badge/-Insomnia-5849BE?style=flat-square&logo=insomnia&logoColor=white">
+  <img src="https://img.shields.io/badge/-Sentry-362D59?style=flat-square&logo=sentry&logoColor=white">
+  <img src="https://img.shields.io/badge/-Figma-000000?style=flat-square&logo=figma&logoColor=white">
+  <h3>Contact</h3>
   <ul>
     <li>
       <a href="https://github.com/Jackeriss/" target="_blank">GitHub</a>
@@ -11,22 +46,24 @@
       <a href="mailto:i@jackeriss.com" target="_blank">i@jackeriss.com</a>
     </li>
   </ul>
-  <h4>友链</h4>
-  <table>
-    <tbody>
-      <tr>
-        <td style="text-align:center;">
-          <a href="https://blog.jackeriss.com/app/data/md" target="_blank">本博客的 gitbook 版</a>
-        </td>
-        <td style="text-align:center;">
-          <a href="https://www.0xaa55.com/" target="_blank">技术宅的结界</a>
-        </td>
-        <td style="text-align:center;">
-          <a href="https://hfo4.github.io/" target="_blank">Aaron's Blog</a>
-        </td>
-      </tr>
-    </tbody>
-  </table>
   <div id="gitalk-container"></div>
 </div>
+{% end %}
+{% block script %}
+<script src="https://cdn.jsdelivr.net/npm/aplayer@1/dist/APlayer.min.js"></script>
+<script>
+  $.ajax({
+    type: 'get',
+    url: 'https://api.i-meto.com/meting/api?server=netease&type=playlist&id=2839871887',
+    dataType: 'json',
+    success: function (data) {
+      const aplayer = new APlayer({
+        container: document.getElementById('aplayer'),
+        fixed: false,
+        order: 'random',
+        audio: data
+      })
+    }
+  })
+</script>
 {% end %}
