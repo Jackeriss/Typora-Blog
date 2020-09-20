@@ -1,7 +1,7 @@
 const gulp = require('gulp');
 const del = require('del')
 const rev = require('gulp-rev')
-const clean_css = require('gulp-clean-css')
+const cleanCss = require('gulp-clean-css')
 const terser = require('gulp-terser')
 const uploadQcloud = require('gulp-qcloud-cos-upload')
 const revCollector = require('gulp-rev-collector')
@@ -28,7 +28,7 @@ function build_js() {
 
 function build_css() {
   return gulp.src('app/static/css/*.css')
-    .pipe(clean_css())
+    .pipe(cleanCss({inline: ['none']}))
     .pipe(rev())
     .pipe(gulp.dest('dist'))
     .pipe(rev.manifest({
