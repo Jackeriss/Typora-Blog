@@ -28,7 +28,7 @@ function build_js() {
 
 function build_css() {
   return gulp.src('app/static/css/*.css')
-    .pipe(cleanCss({inline: ['none']}))
+    .pipe(cleanCss({ inline: ['none'] }))
     .pipe(rev())
     .pipe(gulp.dest('dist'))
     .pipe(rev.manifest({
