@@ -55,6 +55,15 @@
     src="https://cdn.jsdelivr.net/combine/npm/gitalk@1,npm/moment@2,npm/moment@2/locale/zh-cn.min.js,npm/jquery@3">
   </script>
   <script src="/js/index.js"></script>
+  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-120960494-3"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'UA-120960494-3');
+  </script>
+
   {% block script %}{% end %}
 </body>
 

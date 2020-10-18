@@ -1940,7 +1940,7 @@ header {
 }
 
 .site-name {
-  font-size: 40px;
+  font-size: 2.5em;
   font-weight: 700;
   line-height: 66px;
 }
@@ -2272,6 +2272,10 @@ img {
 }
 
 @media screen and (max-width: 768px) {
+  .site-name {
+    font-size: 2em;
+  }
+
   .nav {
     margin-right: 0;
   }
