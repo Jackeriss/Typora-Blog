@@ -342,8 +342,6 @@ table.md-table td {
   background-color: inherit;
 }
 
-.CodeMirror-linenumber {}
-
 .CodeMirror {
   text-align: left;
 }
@@ -1623,10 +1621,6 @@ code {
   pre {
     word-wrap: break-word;
   }
-}
-
-.md-fences {
-  /* background-color: #f8f8f8; */
 }
 
 pre.md-meta-block {
