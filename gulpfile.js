@@ -64,10 +64,6 @@ function rev_collect() {
     .pipe(gulp.dest('app/template/dist'))
 }
 
-function install() {
-  return cp.exec('pipenv install --deploy')
-}
-
 function start() {
   return cp.exec('/usr/local/bin/pm2 startOrReload pm2.json')
 }
@@ -77,6 +73,5 @@ exports.default = gulp.series(
   gulp.parallel(build_js, build_css),
   upload,
   rev_collect,
-  install,
   start
 )
