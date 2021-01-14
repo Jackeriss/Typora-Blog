@@ -6,7 +6,7 @@ const terser = require('gulp-terser')
 const uploadQcloud = require('gulp-qcloud-cos-upload')
 const revCollector = require('gulp-rev-collector')
 const qcloud = require('./qcloud.json')
-const cp = require("child_process")
+const run = require('gulp-run')
 
 
 function clean(cb) {
@@ -65,7 +65,7 @@ function rev_collect() {
 }
 
 function start() {
-  return cp.exec('/usr/local/bin/pm2 startOrReload pm2.json')
+  return run('/usr/local/bin/pm2 startOrRestart pm2.json').exec()
 }
 
 exports.default = gulp.series(
