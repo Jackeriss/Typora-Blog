@@ -113,5 +113,5 @@ $(function () {
     admin: ['Jackeriss'],
     id: document.title.split(' - ')[0],
   })
-  // gitalk.render('gitalk-container')
+  gitalk.render('gitalk-container')
 })
